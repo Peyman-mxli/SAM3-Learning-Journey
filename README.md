@@ -1,6 +1,6 @@
 # SAM3-Learning-Journey
 
-A complete step-by-step guide to setting up Google Colab, NVIDIA T4 GPU, Hugging Face, and the development environment for the SAM3 Computer Vision course by Meta.
+A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, and practical projects.
 # ✨ Overview
 
 This repository documents my learning journey through the **SAM3: Computer Vision with Segment Anything Model 3** course developed by **Meta**, **CENTRO**, and **INFOTEC**.
