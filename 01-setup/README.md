@@ -56,8 +56,12 @@ This folder contains the complete setup guides required before starting the **SA
 ├── 08-NVIDIA-T4
 │   └── README.md
 │
+├── 09-Install-Libraries
+│   └── README.md
+│
 └── README.md
 ```
+Each folder contains a dedicated guide for installing, configuring, and understanding the tools required throughout the SAM3 course.
 
 Each folder contains a complete beginner-to-professional guide for installing, configuring, and understanding the tools required throughout the SAM3 course.
 ---
