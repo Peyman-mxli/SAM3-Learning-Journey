@@ -868,7 +868,7 @@ without writing HTML.
 ---
 ## Example Markdown
 
-````text
+```text
 # Main Title
 
 ## Subtitle
@@ -883,11 +883,13 @@ without writing HTML.
 
 [Visit GitHub](https://github.com)
 
-```python
+Python example:
 print("Hello GitHub!")
-```GitHub!")
- ---
-Why Markdown Is Important
+```
+
+---
+
+## Why Markdown Is Important
 
 Professional documentation is just as important as writing good code.
 
