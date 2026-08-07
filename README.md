@@ -140,7 +140,20 @@ SAM3-Learning-Journey
 | **07-screenshots** | Visual documentation of the learning journey |
 | **08-course-notes** | Notes from every SAM3 session |
 | **09-assets** | Repository images, banners and icons |
+---
+# 🛠️ Technologies Used
 
+| Technology | Purpose |
+|------------|---------|
+| 🐍 Python | Main programming language used throughout the course. |
+| 📓 Google Colab | Cloud-based development environment with GPU acceleration. |
+| 📒 Jupyter Notebook | Interactive notebooks for experiments and documentation. |
+| 🖥️ NVIDIA T4 GPU | Hardware acceleration for AI model training and inference. |
+| 🤗 Hugging Face | Downloading and managing pretrained AI models. |
+| 🎯 Roboflow | Dataset management, annotation, and preprocessing. |
+| 🧠 Segment Anything Model 3 (SAM3) | Meta's foundation model for image and video segmentation. |
+| 🌐 GitHub | Version control and project documentation. |
+| 📝 Markdown | Documentation and repository organization. |
 # 🧠 What You Will Learn
 
 By following this repository, you will learn how to prepare a complete AI development environment, understand the workflow used during the SAM3 course, execute notebooks in Google Colab, configure GPU acceleration, and apply modern Computer Vision techniques using real-world examples.
