@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="09-assets/banner.png" alt="SAM3 Learning Journey Banner" width="100%">
+</p>
+
 # SAM3-Learning-Journey
 
 A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, practical projects, and resources.
