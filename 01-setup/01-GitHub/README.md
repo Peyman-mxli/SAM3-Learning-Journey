@@ -869,7 +869,7 @@ without writing HTML.
 
 ## Example Markdown
 
-```markdown
+````text
 # Main Title
 
 ## Subtitle
@@ -887,9 +887,6 @@ without writing HTML.
 ```python
 print("Hello GitHub!")
 ```
-```
-
----
 
 ## Why Markdown Is Important
 
