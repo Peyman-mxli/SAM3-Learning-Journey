@@ -28,7 +28,7 @@
 - [🍴 Forks](#-forks)
 - [🌐 GitHub Pages](#-github-pages)
 - [📝 Markdown](#-markdown)
-- [🎓 Why GitHub Matters for SAM3](#-why-github-matters-for-sam3)
+- [🎓 Why GitHub Matters for SAM3](#why-github-matters-for-sam3)
 - [📖 Summary](#-summary)
 
 ---
