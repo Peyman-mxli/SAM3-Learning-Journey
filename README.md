@@ -1,22 +1,21 @@
 <p align="center">
   <img src="09-assets/SAM3.png" alt="SAM3 Learning Journey Banner" width="100%">
 </p>
+
 <p align="center">
+  <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
 
-<img src="https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white" alt="Google Colab">
 
-<img src="https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Jupyter-Notebook-F37626?style=for-the-badge&logo=jupyter&logoColor=white" alt="Jupyter">
 
-<img src="https://img.shields.io/badge/Jupyter-Notebook-F37626?style=for-the-badge&logo=jupyter&logoColor=white"/>
+  <img src="https://img.shields.io/badge/SAM3-Computer_Vision-0052CC?style=for-the-badge" alt="SAM3">
 
-<img src="https://img.shields.io/badge/SAM3-Computer_Vision-0052CC?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Artificial_Intelligence-Deep_Learning-8A2BE2?style=for-the-badge" alt="Artificial Intelligence">
 
-<img src="https://img.shields.io/badge/Artificial_Intelligence-Deep_Learning-8A2BE2?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Meta-Course-0467DF?style=for-the-badge&logo=meta&logoColor=white" alt="Meta">
 
-<img src="https://img.shields.io/badge/Meta-Course-0467DF?style=for-the-badge&logo=meta&logoColor=white"/>
-
-<img src="https://img.shields.io/badge/CENTRO-INFOTEC-2026-00A86B?style=for-the-badge"/>
-
+  <img src="https://img.shields.io/badge/CENTRO-INFOTEC_2026-00A86B?style=for-the-badge" alt="CENTRO INFOTEC">
 </p>
 
 # SAM3-Learning-Journey
