@@ -25,8 +25,29 @@ SAM3-Learning-Journey
 </h1>
 
 <p align="center">
-<b>A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, practical projects, and resources.</b>
+<b>
+A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, practical projects, and resources.
+</b>
 </p>
+
+---
+
+# 📚 Table of Contents
+
+- [✨ Overview](#-overview)
+- [🎯 Objectives](#-objectives)
+- [💡 Why It Matters](#-why-it-matters)
+- [📦 Core Topics](#-core-topics)
+- [📂 Repository Structure](#-repository-structure)
+- [🛠️ Technologies Used](#️-technologies-used)
+- [🗺️ Learning Roadmap](#️-learning-roadmap)
+- [📅 Course Progress](#-course-progress)
+- [📚 Resources](#-resources)
+- [👤 Author](#-author)
+
+---
+
+# ✨ Overview
 
 # ✨ Overview
 
