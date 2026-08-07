@@ -866,7 +866,6 @@ Markdown allows developers to create:
 without writing HTML.
 
 ---
-
 ## Example Markdown
 
 ````text
@@ -884,138 +883,124 @@ without writing HTML.
 
 [Visit GitHub](https://github.com)
 
-         python
+```python
 print("Hello GitHub!")
+```GitHub!")
  ---
-
-## Why Markdown Is Important
+Why Markdown Is Important
 
 Professional documentation is just as important as writing good code.
 
 A well-written README helps users understand:
 
-- What the project does.
-- How to install it.
-- How to use it.
-- How to contribute.
-- Who created it.
+What the project does.
+How to install it.
+How to use it.
+How to contribute.
+Who created it.
 
 For this reason, Markdown has become the standard documentation language on GitHub.
 
----
-
-# 🌍 Open Source
+🌍 Open Source
 
 Open-source software is software whose source code is publicly available for anyone to view, study, modify, and improve.
 
 Instead of being developed by a single company behind closed doors, open-source projects are often maintained by communities of developers working together.
 
-GitHub has become the world's largest open-source collaboration platform.
+GitHub has become one of the most important platforms for open-source collaboration.
 
 Thousands of projects receive contributions every day from developers around the world.
 
----
-
-## Advantages of Open Source
+Advantages of Open Source
 
 Open-source software encourages:
 
-- Collaboration
-- Innovation
-- Transparency
-- Learning
-- Community support
-- Faster development
-- Higher software quality
+Collaboration
+Innovation
+Transparency
+Learning
+Community support
+Faster development
+Higher software quality
 
 Many technologies used every day are open source.
 
 Examples include:
 
-- Linux
-- Python
-- Git
-- VS Code
-- TensorFlow
-- PyTorch
-- Kubernetes
-
----
-
-## Why Developers Contribute
+Linux
+Python
+Git
+Visual Studio Code
+TensorFlow
+PyTorch
+Kubernetes
+Why Developers Contribute
 
 Developers contribute to open-source projects to:
 
-- Learn from experienced engineers.
-- Improve programming skills.
-- Gain real-world experience.
-- Build professional portfolios.
-- Help the community.
-- Fix bugs.
-- Add new features.
-- Network with other developers.
+Learn from experienced engineers.
+Improve programming skills.
+Gain real-world experience.
+Build professional portfolios.
+Help the community.
+Fix bugs.
+Add new features.
+Network with other developers.
 
-Open-source contributions are highly valued by employers because they demonstrate practical experience and collaboration skills.
+Open-source contributions are highly valued because they demonstrate practical experience, communication skills, and collaboration.
 
----
+🎓 Why GitHub Matters for SAM3
 
-
-# 🎓 Why GitHub Matters for SAM3
-
-Throughout the **SAM3 Learning Journey**, GitHub will serve as the foundation of the entire course.
+Throughout the SAM3 Learning Journey, GitHub will serve as the foundation for organizing and documenting the entire course.
 
 Every notebook, document, screenshot, dataset, and project created during this training will be organized inside this repository.
 
 GitHub will be used to:
 
-- Document installation procedures.
-- Organize learning materials.
-- Store Google Colab notebooks.
-- Publish Python code.
-- Track project progress.
-- Save Computer Vision experiments.
-- Build AI projects.
-- Maintain professional documentation.
-- Create a long-term technical portfolio.
+Document installation procedures.
+Organize learning materials.
+Store Google Colab notebooks.
+Publish Python code.
+Track project progress.
+Save Computer Vision experiments.
+Build AI projects.
+Maintain professional documentation.
+Create a long-term technical portfolio.
 
 By maintaining this repository throughout the course, you will not only learn how to use GitHub but also develop a portfolio that demonstrates your growth in Artificial Intelligence, Computer Vision, Python development, and software engineering.
 
-Rather than simply completing assignments, this repository will become a permanent record of your learning journey and a valuable resource you can continue expanding long after the course has ended.
+Rather than simply completing assignments, this repository will become a permanent record of your learning journey and a resource that can continue growing long after the course has ended.
 
----
-
-## 📌 Key Concepts Learned
+📌 Key Concepts Learned
 
 After completing this section, you should understand:
 
-- What GitHub Pages is.
-- How Markdown is used for technical documentation.
-- What open-source software is.
-- Why developers contribute to open-source projects.
-- Why GitHub is an essential tool throughout the SAM3 Learning Journey.
+What GitHub Pages is.
+How Markdown is used for technical documentation.
+What open-source software is.
+Why developers contribute to open-source projects.
+Why GitHub is an essential tool throughout the SAM3 Learning Journey.
+✅ Best Practices
 
----
----
+Following good GitHub practices helps you build repositories that are organized, professional, and easy for others to understand.
 
-# ✅ Best Practices
+Whether you are working alone or with a team, these habits will improve the quality of your projects.
 
-Following good GitHub practices helps you build repositories that are organized, professional, and easy for others to understand. Whether you are working alone or with a team, these habits will improve the quality of your projects.
-
-## 📌 Organize Your Repository
+📌 Organize Your Repository
 
 A well-structured repository is easier to navigate and maintain.
 
 Recommendations:
 
-- Use meaningful folder names.
-- Keep related files together.
-- Separate documentation from source code.
-- Store images and assets in dedicated folders.
-- Maintain a consistent folder structure.
+Use meaningful folder names.
+Keep related files together.
+Separate documentation from source code when appropriate.
+Store images and assets in dedicated folders.
+Maintain a consistent naming convention.
+Keep the project structure easy to understand.
 
 Example:
 
-```text
 Project
 │
 ├── README.md
@@ -1024,191 +1009,165 @@ Project
 ├── assets
 ├── notebooks
 └── examples
-```
+📝 Write Clear Documentation
 
----
-
-## 📝 Write Clear Documentation
-
-Every repository should include a professional **README.md**.
+Every repository should include a professional README.md.
 
 A good README explains:
 
-- What the project is.
-- Why it exists.
-- How to install it.
-- How to use it.
-- Technologies used.
-- Project structure.
-- Author information.
+What the project is.
+Why it exists.
+How to install it.
+How to use it.
+Technologies used.
+Project structure.
+Important requirements.
+Author information.
 
-Good documentation saves time and helps others understand your work quickly.
+Good documentation saves time and helps other developers understand your work quickly.
 
----
-
-## 💾 Write Meaningful Commit Messages
+💾 Write Meaningful Commit Messages
 
 Avoid vague commit messages such as:
 
-```
 update
-
 fix
-
 changes
-
 test
-```
 
-Instead, write descriptive messages.
+Instead, use descriptive messages.
 
 Good examples:
 
-```
 Create project structure
-
 Add GitHub documentation
-
 Fix README formatting
-
 Upload course banners
-
 Implement login interface
-
 Update installation guide
-```
 
-A clear commit history makes projects much easier to understand.
+A clear commit history makes a project easier to understand and maintain.
 
----
+🌿 Use Branches
 
-## 🌿 Use Branches
+For larger or collaborative projects, avoid making every change directly on the main branch.
 
-Avoid working directly on the **main** branch.
+A safer workflow is:
 
-Instead:
+Create a feature branch.
+Develop your changes.
+Test your work.
+Commit the changes.
+Open a Pull Request.
+Review the changes.
+Merge them into the main branch.
 
-- Create a feature branch.
-- Develop your changes.
-- Test your work.
-- Open a Pull Request.
-- Merge only after review.
+This workflow reduces mistakes and keeps the primary project stable.
 
-This workflow reduces mistakes and keeps projects stable.
-
----
-
-## 🤝 Collaborate Professionally
+🤝 Collaborate Professionally
 
 When contributing to projects:
 
-- Respect coding standards.
-- Review Pull Requests carefully.
-- Keep discussions constructive.
-- Document major changes.
-- Report bugs clearly.
-- Write useful Issue descriptions.
+Respect coding standards.
+Review Pull Requests carefully.
+Keep discussions constructive.
+Document important changes.
+Report bugs clearly.
+Write useful Issue descriptions.
+Avoid unnecessary or unclear commits.
+Communicate respectfully with contributors.
 
-Professional collaboration is one of the most valuable software engineering skills.
+Professional collaboration is one of the most important skills in software engineering.
 
----
+🚀 Keep Learning
 
-## 🚀 Keep Learning
+GitHub continues to evolve with new tools and capabilities.
 
-GitHub is continuously evolving.
+Useful features to explore include:
 
-Explore features such as:
+GitHub Actions
+GitHub Pages
+GitHub Projects
+GitHub Discussions
+Codespaces
+GitHub Copilot
+Dependabot
+Security scanning
+Releases
+Tags
 
-- GitHub Actions
-- GitHub Pages
-- GitHub Projects
-- Discussions
-- Codespaces
-- Copilot
-- Security Scanning
+Learning these tools can significantly improve your development workflow.
 
-Learning these tools will significantly improve your development workflow.
+📖 Summary
 
----
-
-# 📖 Summary
-
-GitHub has transformed the way software is developed around the world.
+GitHub has transformed the way software is developed and shared around the world.
 
 Throughout this chapter, you learned:
 
-- What GitHub is.
-- The history of GitHub.
-- Why GitHub was created.
-- How GitHub works.
-- The difference between Git and GitHub.
-- What repositories are.
-- How branches improve collaboration.
-- Why commits are important.
-- How Pull Requests work.
-- How Issues organize development.
-- What GitHub Actions automate.
-- Why Forks are essential for open-source collaboration.
-- How GitHub Pages hosts websites.
-- Why Markdown is the standard documentation language.
-- The importance of open-source software.
-- How GitHub supports the SAM3 Learning Journey.
-- Professional GitHub best practices.
+What GitHub is.
+The history of GitHub.
+Why GitHub was created.
+How GitHub works.
+The difference between Git and GitHub.
+What repositories are.
+How branches improve collaboration.
+Why commits are important.
+How Pull Requests work.
+How Issues organize development.
+What GitHub Actions automate.
+Why Forks are essential for open-source collaboration.
+How GitHub Pages can host websites.
+Why Markdown is widely used for documentation.
+The importance of open-source software.
+How GitHub supports the SAM3 Learning Journey.
+Professional GitHub best practices.
 
-By mastering these concepts, you have built a strong foundation for modern software development. GitHub is not only a platform for storing code—it is an essential tool for collaboration, documentation, project management, and professional growth.
+By mastering these concepts, you have built a strong foundation for modern software development.
 
-As you continue through the **SAM3 Learning Journey**, every notebook, project, experiment, and piece of documentation you create will strengthen your GitHub portfolio and demonstrate your skills as an Artificial Intelligence and Computer Vision engineer.
+GitHub is not only a platform for storing code. It is also an essential tool for collaboration, documentation, project management, automation, and professional growth.
 
----
+As you continue through the SAM3 Learning Journey, every notebook, project, experiment, and piece of documentation you create will strengthen your GitHub portfolio and demonstrate your development skills.
 
-# 📚 References
+📚 References
+GitHub Documentation
+Git Documentation
+GitHub Skills
+GitHub Features
+Chacon, S., & Straub, B. Pro Git (2nd Edition). Apress.
+👤 Author
+Peyman Miyandashti
 
-- GitHub. *GitHub Documentation*. https://docs.github.com/
-- Git. *Official Git Documentation*. https://git-scm.com/doc
-- GitHub Skills. *Interactive GitHub Courses*. https://skills.github.com/
-- Chacon, S., & Straub, B. *Pro Git* (2nd Edition). Apress.
-- Microsoft. *GitHub Features and Documentation*. https://github.com/features
+Information Technology Engineering & Digital Innovation Student
+Universidad Politécnica de Baja California (UPBC)
 
----
+📍 Mexicali, Baja California, Mexico
 
-# 👤 Author
+🌍 Languages
+English • Spanish • Farsi (Persian) • Arabic • Azerbaijani • Turkish • Dari (Afghani)
 
-## Peyman Miyandashti
+💻 Specializations
 
-**Information Technology Engineering & Digital Innovation Student**  
-**Universidad Politécnica de Baja California (UPBC)**
+Artificial Intelligence
+Computer Vision
+Machine Learning
+Deep Learning
+Python Development
+Software Engineering
+Cybersecurity
+Data Science
 
-📍 **Mexicali, Baja California, Mexico**
+🎯 Current Focus
 
-🌍 **Languages:** English • Spanish • Farsi (Persian) • Arabic • Azerbaijani • Turkish • Dari (Afghani)
+Segment Anything Model 3 (SAM3)
+Computer Vision
+Artificial Intelligence
+Python
+Google Colab
+Hugging Face
+Roboflow
+<p align="left"> <a href="https://github.com/Peyman-mxli"> <img src="https://img.shields.io/badge/GitHub-Peyman--mxli-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"> </a> <a href="https://www.linkedin.com/in/Peyman-mxli"> <img src="https://img.shields.io/badge/LinkedIn-Peyman_Miyandashti-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"> </a> </p>
 
-💻 **Specializations**
+"Learning never stops. Every commit is another step toward becoming a better engineer."
 
-- Artificial Intelligence (AI)
-- Computer Vision
-- Machine Learning
-- Deep Learning
-- Python Development
-- Software Engineering
-- Cybersecurity
-- Data Science
 
-🎯 **Current Focus**
-
-- Segment Anything Model 3 (SAM3)
-- Computer Vision
-- Artificial Intelligence
-- Python
-- Google Colab
-- Hugging Face
-- Roboflow
-
-🔗 **Connect with Me**
-
-- GitHub: https://github.com/Peyman-mxli
-- LinkedIn: https://www.linkedin.com/in/peyman-miyandashti-1614b81ba/
-
----
-
-> **"Learning never stops. Every commit is another step toward becoming a better engineer."**
-
+The important fix is the **4-backtick outer block** around the Markdown example. That prevents the inner Python code fence from swallowing the rest of your README.
