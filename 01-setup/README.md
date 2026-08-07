@@ -25,25 +25,41 @@ During this section you will learn how to install and configure:
 
 ---
 
-# 📚 Contents
+## 📦 Contents
 
-This folder will gradually include step-by-step guides for every setup task.
+This folder contains the complete setup guides required before starting the **SAM3 Learning Journey**.
 
-Example:
-
-```
+```text
 01-setup
 │
-├── 01-GitHub-Account.md
-├── 02-Google-Colab.md
-├── 03-NVIDIA-T4-GPU.md
-├── 04-Hugging-Face.md
-├── 05-Roboflow.md
-├── 06-Python-Environment.md
-├── 07-Install-Libraries.md
+├── 01-GitHub
+│   └── README.md
+│
+├── 02-Git
+│   └── README.md
+│
+├── 03-VS-Code
+│   └── README.md
+│
+├── 04-Python
+│   └── README.md
+│
+├── 05-Google-Colab
+│   └── README.md
+│
+├── 06-Hugging-Face
+│   └── README.md
+│
+├── 07-Roboflow
+│   └── README.md
+│
+├── 08-NVIDIA-T4
+│   └── README.md
+│
 └── README.md
 ```
 
+Each folder contains a complete beginner-to-professional guide for installing, configuring, and understanding the tools required throughout the SAM3 course.
 ---
 
 # 🎯 Objective
