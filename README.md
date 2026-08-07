@@ -2,6 +2,7 @@
   <img src="09-assets/SAM3.png" alt="SAM3 Learning Journey Banner" width="100%">
 </p>
 
+
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
 
@@ -18,7 +19,12 @@
   <img src="https://img.shields.io/badge/CENTRO-INFOTEC_2026-00A86B?style=for-the-badge" alt="CENTRO INFOTEC">
 </p>
 
-# SAM3-Learning-Journey
+
+<h1 align="center">SAM3-Learning-Journey</h1>
+
+<p align="center">
+A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, practical projects, and resources.
+</p>
 
 A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, practical projects, and resources.
 # ✨ Overview
