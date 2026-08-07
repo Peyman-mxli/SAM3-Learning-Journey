@@ -20,7 +20,9 @@
 </p>
 
 
-<h1 align="center">SAM3-Learning-Journey</h1>
+<h1 align="center" style="color:#0A84FF;">
+SAM3-Learning-Journey
+</h1>
 
 <p align="center">
 <b>A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, practical projects, and resources.</b>
