@@ -154,11 +154,55 @@ SAM3-Learning-Journey
 | 🧠 Segment Anything Model 3 (SAM3) | Meta's foundation model for image and video segmentation. |
 | 🌐 GitHub | Version control and project documentation. |
 | 📝 Markdown | Documentation and repository organization. |
-# 🧠 What You Will Learn
+---
+# 🗺️ Learning Roadmap
 
-By following this repository, you will learn how to prepare a complete AI development environment, understand the workflow used during the SAM3 course, execute notebooks in Google Colab, configure GPU acceleration, and apply modern Computer Vision techniques using real-world examples.
+The following roadmap outlines the topics covered throughout the SAM3 Computer Vision course. Each module builds on the previous one, gradually developing the skills required to design, implement, and deploy modern computer vision solutions.
 
-Each section is designed to be beginner-friendly while maintaining professional documentation standards.
+| Phase | Topic | Status |
+|--------|-------|--------|
+| 00 | Welcome & Environment Setup | ✅ Completed |
+| 01 | Agentic AI Programming Methodologies | 🟡 In Progress |
+| 02 | Supervision Fundamentals | ⬜ Pending |
+| 03 | Video Detection | ⬜ Pending |
+| 04 | Segmentation with SAM | ⬜ Pending |
+| 05 | Promptable SAM | ⬜ Pending |
+| 06 | Points and Video | ⬜ Pending |
+| 07 | Production Deployment | ⬜ Pending |
+| 08 | Technical Assessment | ⬜ Pending |
+---
+# 📅 Course Progress
+
+| Session | Topic | Date | Status |
+|---------|-------|------|--------|
+| Welcome | Course Introduction | August 7, 2026 | ✅ Completed |
+| Session 01 | Agentic AI Programming | August 10, 2026 | 🟡 In Progress |
+| Session 02 | Supervision | — | ⬜ Pending |
+| Session 03 | Video Detection | — | ⬜ Pending |
+| Session 04 | Segmentation with SAM | — | ⬜ Pending |
+| Session 05 | Promptable SAM | — | ⬜ Pending |
+| Session 06 | Points & Video | — | ⬜ Pending |
+| Final Assessment | Technical Evaluation | September 2, 2026 | ⬜ Pending |
+---
+# 📚 Resources
+
+## Official Resources
+
+- Meta
+- CENTRO
+- INFOTEC
+- Google Colab
+- Hugging Face
+- Roboflow
+- Dataset COCO
+
+## Additional Learning Resources
+
+- Official SAM3 Documentation
+- Python Documentation
+- OpenCV Documentation
+- PyTorch Documentation
+- ---
 
 # ⚠️ Professional Impact
 
@@ -167,25 +211,45 @@ This repository is more than a collection of notes.
 It represents a documented learning process that demonstrates continuous improvement, technical curiosity, and the ability to organize complex information into clear and practical documentation.
 
 Maintaining repositories like this also helps build a stronger GitHub portfolio for future academic and professional opportunities.
-___________________________________________________________________________________________________________________________________________
+---
 # 👤 Author
 
-# Peyman Miyandashti
+## Peyman Miyandashti
 
 🎓 Information Technology & Digital Innovation Engineering
 
-🏛️ Universidad Politécnica de Baja California (UPBC)
+🏛 Universidad Politécnica de Baja California (UPBC)
 
 📍 Mexicali, Baja California, Mexico
 
-🌍 Originally from Iran
+📱 +52 686 509 0453
 
-💻 Artificial Intelligence • Computer Vision • Machine Learning • Cybersecurity • Software Development
+💻 Interests
 
-🌐 Languages:
-English • Spanish • Persian (Farsi) • Arabic • Azerbaijani • Turkish • Dari
+- Artificial Intelligence
+- Computer Vision
+- Machine Learning
+- Deep Learning
+- Software Development
+- Cybersecurity
 
-🔗 GitHub:
+🌐 Languages
+
+- English
+- Spanish
+- Farsi
+- Arabic
+- Azerbaijani
+- Turkish
+- Dari (Afghani)
+
+♟️ Hobbies
+
+- Playing Chess
+- Playing Video Games (World of Warcraft)
+
+🔗 GitHub
+
 https://github.com/Peyman-mxli
 
 📅 2026
