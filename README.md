@@ -92,17 +92,54 @@ This repository covers:
 - AI Workflows
 - Practical Exercises
 
-  # 📂 Repository Structure
+# 📂 Repository Structure
 
-The repository will be organized as follows:
+The repository is organized into dedicated folders to keep notes, notebooks, documentation, projects, and resources well structured throughout the course.
 
-setup/
-docs/
-notebooks/
-examples/
-resources/
-screenshots/
-course-notes/
+```text
+SAM3-Learning-Journey
+│
+├── 📁 01-setup
+│   └── Environment setup and installation guides
+│
+├── 📁 02-docs
+│   └── Technical documentation and tutorials
+│
+├── 📁 03-notebooks
+│   └── Google Colab & Jupyter notebooks
+│
+├── 📁 04-examples
+│   └── Code examples and experiments
+│
+├── 📁 05-projects
+│   └── Practical AI and Computer Vision projects
+│
+├── 📁 06-resources
+│   └── Useful links, papers and references
+│
+├── 📁 07-screenshots
+│   └── Images documenting the learning process
+│
+├── 📁 08-course-notes
+│   └── Personal notes from every session
+│
+└── 📁 09-assets
+    └── Images, icons and repository resources
+```
+
+### Folder Overview
+
+| Folder | Purpose |
+|---------|---------|
+| **01-setup** | Installation guides and environment configuration |
+| **02-docs** | Documentation and technical references |
+| **03-notebooks** | Google Colab and Jupyter notebooks |
+| **04-examples** | Sample code and experiments |
+| **05-projects** | Complete AI projects developed during the course |
+| **06-resources** | External documentation, datasets and references |
+| **07-screenshots** | Visual documentation of the learning journey |
+| **08-course-notes** | Notes from every SAM3 session |
+| **09-assets** | Repository images, banners and icons |
 
 # 🧠 What You Will Learn
 
