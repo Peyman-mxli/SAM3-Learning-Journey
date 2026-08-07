@@ -1,5 +1,9 @@
 # ☁️ Google Colab
+<p align="center">
+  <img src="../../09-assets/banners/Google-Colab-Banner.png" alt="Google Colab Banner" width="100%">
+</p>
 
+<div align="center">
 
 
 # ☁️ Google Colaboratory
