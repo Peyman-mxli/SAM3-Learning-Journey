@@ -962,6 +962,7 @@ Open-source contributions are highly valued by employers because they demonstrat
 
 ---
 
+
 # 🎓 Why GitHub Matters for SAM3
 
 Throughout the **SAM3 Learning Journey**, GitHub will serve as the foundation of the entire course.
