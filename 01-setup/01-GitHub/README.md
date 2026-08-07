@@ -884,9 +884,9 @@ without writing HTML.
 
 [Visit GitHub](https://github.com)
 
-```python
+         python
 print("Hello GitHub!")
-```
+ ---
 
 ## Why Markdown Is Important
 
