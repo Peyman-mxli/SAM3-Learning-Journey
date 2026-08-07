@@ -28,8 +28,12 @@
 - [🍴 Forks](#-forks)
 - [🌐 GitHub Pages](#-github-pages)
 - [📝 Markdown](#-markdown)
-- [🎓 Why GitHub Matters for SAM3](#why-github-matters-for-sam3)
+- [🌍 Open Source](#-open-source)
+- [🎓 Why GitHub Matters for SAM3](#-why-github-matters-for-sam3)
+- [✅ Best Practices](#-best-practices)
 - [📖 Summary](#-summary)
+- [📚 References](#-references)
+- [👤 Author](#-author)
 
 ---
 # 🐙 GitHub
