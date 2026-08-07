@@ -34,16 +34,18 @@ A comprehensive learning repository documenting my journey through the SAM3 Comp
 
 # 📚 Table of Contents
 
-- [✨ Overview](#-overview)
-- [🎯 Objectives](#-objectives)
-- [💡 Why It Matters](#-why-it-matters)
-- [📦 Core Topics](#-core-topics)
-- [📂 Repository Structure](#-repository-structure)
-- [🛠️ Technologies Used](#️-technologies-used)
-- [🗺️ Learning Roadmap](#️-learning-roadmap)
-- [📅 Course Progress](#-course-progress)
-- [📚 Resources](#-resources)
-- [👤 Author](#-author)
+| Section | Description |
+|---------|-------------|
+| ✨ [Overview](#-overview) | Introduction to the repository and its purpose. |
+| 🎯 [Objectives](#-objectives) | Learning goals throughout the course. |
+| 💡 [Why It Matters](#-why-it-matters) | Why this repository is useful. |
+| 📦 [Core Topics](#-core-topics) | Main technologies and concepts covered. |
+| 📂 [Repository Structure](#-repository-structure) | Folder organization. |
+| 🛠️ [Technologies Used](#️-technologies-used) | Tools and software used. |
+| 🗺️ [Learning Roadmap](#️-learning-roadmap) | Course learning path. |
+| 📅 [Course Progress](#-course-progress) | Progress across all sessions. |
+| 📚 [Resources](#-resources) | External references and documentation. |
+| 👤 [Author](#-author) | Repository author information. |
 
 ---
 
