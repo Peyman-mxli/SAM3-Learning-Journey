@@ -1,6 +1,6 @@
 # SAM3-Learning-Journey
 
-A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, and practical projects.
+A comprehensive learning repository documenting my journey through the SAM3 Computer Vision course by Meta, including setup guides, notebooks, notes, experiments, practical projects, and resources.
 # ✨ Overview
 
 This repository documents my learning journey through the **SAM3: Computer Vision with Segment Anything Model 3** course developed by **Meta**, **CENTRO**, and **INFOTEC**.
