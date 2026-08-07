@@ -30,7 +30,6 @@
 - [📝 Markdown](#-markdown)
 - [🌍 Open Source](#-open-source)
 - [🎓 Why GitHub Matters for SAM3](#-why-github-matters-for-sam3)
-- [✅ Best Practices](#-best-practices)
 - [📖 Summary](#-summary)
 
 ---
