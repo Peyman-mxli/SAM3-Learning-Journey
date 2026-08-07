@@ -903,7 +903,8 @@ Who created it.
 
 For this reason, Markdown has become the standard documentation language on GitHub.
 
-🌍 Open Source
+---
+## 🌍 Open Source
 
 Open-source software is software whose source code is publicly available for anyone to view, study, modify, and improve.
 
@@ -951,7 +952,9 @@ Network with other developers.
 
 Open-source contributions are highly valued because they demonstrate practical experience, communication skills, and collaboration.
 
-🎓 Why GitHub Matters for SAM3
+---
+
+## 🎓 Why GitHub Matters for SAM3
 
 Throughout the SAM3 Learning Journey, GitHub will serve as the foundation for organizing and documenting the entire course.
 
@@ -973,7 +976,9 @@ By maintaining this repository throughout the course, you will not only learn ho
 
 Rather than simply completing assignments, this repository will become a permanent record of your learning journey and a resource that can continue growing long after the course has ended.
 
-📌 Key Concepts Learned
+---
+
+## 📌 Key Concepts Learned
 
 After completing this section, you should understand:
 
@@ -982,13 +987,18 @@ How Markdown is used for technical documentation.
 What open-source software is.
 Why developers contribute to open-source projects.
 Why GitHub is an essential tool throughout the SAM3 Learning Journey.
-✅ Best Practices
+
+--
+
+## ✅ Best Practices
 
 Following good GitHub practices helps you build repositories that are organized, professional, and easy for others to understand.
 
 Whether you are working alone or with a team, these habits will improve the quality of your projects.
 
-📌 Organize Your Repository
+---
+
+## 📌 Organize Your Repository
 
 A well-structured repository is easier to navigate and maintain.
 
@@ -1011,7 +1021,10 @@ Project
 ├── assets
 ├── notebooks
 └── examples
-📝 Write Clear Documentation
+
+---
+
+## 📝 Write Clear Documentation
 
 Every repository should include a professional README.md.
 
@@ -1028,7 +1041,9 @@ Author information.
 
 Good documentation saves time and helps other developers understand your work quickly.
 
-💾 Write Meaningful Commit Messages
+---
+
+## 💾 Write Meaningful Commit Messages
 
 Avoid vague commit messages such as:
 
@@ -1050,7 +1065,9 @@ Update installation guide
 
 A clear commit history makes a project easier to understand and maintain.
 
-🌿 Use Branches
+---
+
+## 🌿 Use Branches
 
 For larger or collaborative projects, avoid making every change directly on the main branch.
 
@@ -1066,7 +1083,9 @@ Merge them into the main branch.
 
 This workflow reduces mistakes and keeps the primary project stable.
 
-🤝 Collaborate Professionally
+---
+
+## 🤝 Collaborate Professionally
 
 When contributing to projects:
 
@@ -1081,7 +1100,9 @@ Communicate respectfully with contributors.
 
 Professional collaboration is one of the most important skills in software engineering.
 
-🚀 Keep Learning
+---
+
+## 🚀 Keep Learning
 
 GitHub continues to evolve with new tools and capabilities.
 
@@ -1100,7 +1121,9 @@ Tags
 
 Learning these tools can significantly improve your development workflow.
 
-📖 Summary
+---
+
+## 📖 Summary
 
 GitHub has transformed the way software is developed and shared around the world.
 
@@ -1130,13 +1153,18 @@ GitHub is not only a platform for storing code. It is also an essential tool for
 
 As you continue through the SAM3 Learning Journey, every notebook, project, experiment, and piece of documentation you create will strengthen your GitHub portfolio and demonstrate your development skills.
 
-📚 References
+---
+
+## 📚 References
 GitHub Documentation
 Git Documentation
 GitHub Skills
 GitHub Features
 Chacon, S., & Straub, B. Pro Git (2nd Edition). Apress.
-👤 Author
+
+---
+
+## 👤 Author
 Peyman Miyandashti
 
 Information Technology Engineering & Digital Innovation Student
@@ -1144,7 +1172,7 @@ Universidad Politécnica de Baja California (UPBC)
 
 📍 Mexicali, Baja California, Mexico
 
-🌍 Languages
+## 🌍 Languages
 English • Spanish • Farsi (Persian) • Arabic • Azerbaijani • Turkish • Dari (Afghani)
 
 💻 Specializations
@@ -1158,7 +1186,7 @@ Software Engineering
 Cybersecurity
 Data Science
 
-🎯 Current Focus
+## 🎯 Current Focus
 
 Segment Anything Model 3 (SAM3)
 Computer Vision
@@ -1167,6 +1195,7 @@ Python
 Google Colab
 Hugging Face
 Roboflow
+
 <p align="left"> <a href="https://github.com/Peyman-mxli"> <img src="https://img.shields.io/badge/GitHub-Peyman--mxli-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"> </a> <a href="https://www.linkedin.com/in/Peyman-mxli"> <img src="https://img.shields.io/badge/LinkedIn-Peyman_Miyandashti-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"> </a> </p>
 
 "Learning never stops. Every commit is another step toward becoming a better engineer."
