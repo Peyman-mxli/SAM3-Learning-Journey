@@ -49,7 +49,6 @@ A comprehensive learning repository documenting my journey through the SAM3 Comp
 
 # ✨ Overview
 
-# ✨ Overview
 
 This repository documents my learning journey through the **SAM3: Computer Vision with Segment Anything Model 3** course developed by **Meta**, **CENTRO**, and **INFOTEC**.
 
