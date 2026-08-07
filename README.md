@@ -212,44 +212,32 @@ It represents a documented learning process that demonstrates continuous improve
 
 Maintaining repositories like this also helps build a stronger GitHub portfolio for future academic and professional opportunities.
 ---
-# 👤 Author
+---# 👤 Author
 
 ## Peyman Miyandashti
 
-🎓 Information Technology & Digital Innovation Engineering
+**Information Technology Engineering & Digital Innovation Student**  
+**Universidad Politécnica de Baja California (UPBC)**
 
-🏛 Universidad Politécnica de Baja California (UPBC)
+📍 **Mexicali, Baja California, Mexico**
 
-📍 Mexicali, Baja California, Mexico
+🌍 **Languages:** English • Spanish • Farsi (Persian) • Arabic • Azerbaijani (Azeri) • Turkish • Dari (Afghani)
 
-📱 +52 686 509 0453
+💻 **Specializations:** Artificial Intelligence • Computer Vision • Machine Learning • Deep Learning • Python • Software Engineering • Cybersecurity • Data Science
 
-💻 Interests
+🎯 **Current Focus:** Segment Anything Model 3 (SAM3) • Computer Vision • AI Development • Python • Google Colab • Hugging Face • Roboflow
 
-- Artificial Intelligence
-- Computer Vision
-- Machine Learning
-- Deep Learning
-- Software Development
-- Cybersecurity
+🎮 **Hobbies:** Chess • World of Warcraft • Building AI Projects • Learning New Technologies
 
-🌐 Languages
+📱 **Phone:** +52 686 509 0453
 
-- English
-- Spanish
-- Farsi
-- Arabic
-- Azerbaijani
-- Turkish
-- Dari (Afghani)
-
-♟️ Hobbies
-
-- Playing Chess
-- Playing Video Games (World of Warcraft)
-
-🔗 GitHub
-
-https://github.com/Peyman-mxli
+<p align="left">
+  <a href="https://github.com/Peyman-mxli" target="_blank">
+    <img src="https://img.shields.io/badge/GitHub-Peyman--mxli-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  </a>
+  <a href="https://www.linkedin.com/in/Peyman-mxli" target="_blank">
+    <img src="https://img.shields.io/badge/LinkedIn-Peyman_Miyandashti-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
+  </a>
+</p>
 
 📅 2026
