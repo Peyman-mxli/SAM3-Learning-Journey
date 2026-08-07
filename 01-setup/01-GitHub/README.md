@@ -1,3 +1,41 @@
+
+<p align="center">
+  <img src="../../09-assets/banners/GitHub-Banner.png" alt="GitHub Banner" width="100%">
+</p>
+
+<h1 align="center">🐙 GitHub</h1>
+
+<p align="center">
+  <strong>The Complete Beginner's Guide to GitHub</strong><br>
+  Version Control • Collaboration • Open Source • Portfolio Development
+</p>
+
+---
+
+# 📚 Table of Contents
+
+- [What is GitHub?](#-what-is-github)
+- [History of GitHub](#-history-of-github)
+- [Why GitHub Was Created](#-why-github-was-created)
+- [How GitHub Works](#-how-github-works)
+- [Git vs GitHub](#-git-vs-github)
+- [Repositories](#-repositories)
+- [Branches](#-branches)
+- [Commits](#-commits)
+- [Pull Requests](#-pull-requests)
+- [Issues](#-issues)
+- [GitHub Actions](#-github-actions)
+- [Forks](#-forks)
+- [GitHub Pages](#-github-pages)
+- [Markdown](#-markdown)
+- [Open Source](#-open-source)
+- [Why GitHub Matters for SAM3](#-why-github-matters-for-sam3)
+- [Best Practices](#-best-practices)
+- [Summary](#-summary)
+
+---
+
+
 # 🐙 GitHub
 
 > **The Complete Beginner's Guide to GitHub**
