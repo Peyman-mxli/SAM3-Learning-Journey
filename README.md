@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="09-assets/banner.png" alt="SAM3 Learning Journey Banner" width="100%">
+  <img src="09-assets/SAM3.png" alt="SAM3 Learning Journey Banner" width="100%">
 </p>
 
 # SAM3-Learning-Journey
