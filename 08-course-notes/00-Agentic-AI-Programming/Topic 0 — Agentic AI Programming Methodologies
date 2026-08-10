@@ -1,81 +1,206 @@
-Topic 0 — Agentic AI Programming Methodologies
-
-Estimated Duration: 1 hour
-
-And the introduction becomes:
-
-Welcome to the beginning of your journey as an AI-augmented developer. In this lesson, we will not only learn how to write code, but also how to orchestrate AI agents to write, debug, and optimize code for us within the context of Computer Vision.
-
-For GitHub, though, I would make it more polished than a literal translation. Your README can start like this:
-
 # Topic 0 — Agentic AI Programming Methodologies
 
 **Course:** SAM3 — Computer Vision with Segment Anything Model 3  
 **Topic:** Agentic AI Programming  
-**Estimated Duration:** 1 hour
+**Estimated Duration:** 1 hour  
+**Language:** English Documentation / Spanish Class Recording
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Class Recording](#class-recording)
+3. [The Agentic AI Paradigm](#1-the-agentic-ai-paradigm)
+4. [Advantages in Computer Vision](#advantages-in-computer-vision)
+5. [Prompt Engineering for Code](#2-prompt-engineering-for-code)
+6. [Exercise 1 — AI-Assisted Code Generation](#exercise-1--ai-assisted-code-generation)
+7. [Interactive Debugging and Refinement](#3-interactive-debugging-and-refinement)
+8. [Exercise 2 — AI-Assisted Debugging](#exercise-2--ai-assisted-debugging)
+9. [Recommended Agentic Development Workflow](#4-recommended-agentic-development-workflow)
+10. [MCP and Roboflow](#5-mcp-and-roboflow)
+11. [Key Takeaways](#key-takeaways)
+12. [Next Steps](#next-steps)
+13. [Author](#author)
 
 ---
 
 ## Overview
 
-Welcome to the beginning of the journey toward becoming an
-AI-augmented developer.
+Welcome to the beginning of the journey toward becoming an **AI-augmented developer**.
 
-Modern software development is no longer only about writing every
-line of code manually. AI-powered development tools can assist with
-code generation, debugging, optimization, documentation, and
-software architecture.
+Modern software development is no longer only about writing every line of code manually. AI-powered development tools can assist with:
 
-In this lesson, we explore how AI agents can be used as development
-assistants in Computer Vision projects.
+- Code generation
+- Debugging
+- Code optimization
+- Documentation
+- Refactoring
+- Testing
+- Software architecture
+- Problem solving
+
+In this lesson, we explore how AI agents can be used as development assistants in **Computer Vision** projects.
+
+The goal is not to allow AI to make every technical decision. Instead, the developer learns how to effectively guide AI tools while remaining responsible for understanding, reviewing, testing, and validating the generated code.
+
+---
+
+## Class Recording
+
+### Topic 0 — Agentic AI Programming Methodologies
+
+The complete class recording for this topic is available on YouTube.
+
+**Duration:** Approximately 1 hour  
+**Language:** Spanish  
+**Course:** SAM3 — Computer Vision with Segment Anything Model 3
+
+### Watch the Class
+
+[▶ Watch the Full Class Recording on YouTube](https://youtu.be/KnRJaCdIibo)
+
+### Topics Covered in the Video
+
+- Agentic AI programming paradigm
+- Prompt Engineering for code
+- AI-assisted code generation
+- Interactive debugging and refinement
+- Computer Vision development workflows
+- OpenCV and NumPy
+- MCP and Roboflow
 
 ---
 
 ## 1. The Agentic AI Paradigm
 
-Until recently, programming largely depended on developers knowing
-syntax, libraries, APIs, and implementation details.
+Until recently, programming largely depended on developers knowing syntax, libraries, APIs, functions, and implementation details.
 
 The development paradigm is now changing.
 
 The developer increasingly acts as a:
 
-- Software Architect
-- Code Reviewer
-- Problem Solver
-- System Designer
+- **Software Architect**
+- **Code Reviewer**
+- **Problem Solver**
+- **System Designer**
+- **Technical Decision Maker**
 
-while AI tools such as GitHub Copilot, Cursor, and Gemini can assist
-with implementation tasks.
+Meanwhile, AI-powered development tools can assist with implementation and repetitive programming tasks.
+
+Examples of AI development assistants include:
+
+- GitHub Copilot
+- Cursor
+- Gemini
+- ChatGPT
+
+The objective is not to blindly accept AI-generated code.
+
+Instead, the developer should:
+
+1. Define the problem.
+2. Provide clear instructions.
+3. Review the generated solution.
+4. Execute the code.
+5. Identify problems.
+6. Refine the implementation.
+7. Validate the final result.
+
+AI becomes a development assistant while the developer remains responsible for the software.
+
+---
 
 ### Advantages in Computer Vision
 
-Computer Vision pipelines often require significant boilerplate code
-for tasks such as:
+Computer Vision pipelines often require significant amounts of repetitive or **boilerplate code**.
+
+Typical Computer Vision workflows may require:
 
 - Loading models
-- Reading and preprocessing images
+- Reading images
+- Preprocessing images
 - Processing tensors
+- Running inference
+- Processing predictions
 - Calculating metrics
+- Drawing bounding boxes
+- Creating segmentation masks
 - Visualizing results
-- Managing inference pipelines
+- Exporting results
 
-AI assistants are particularly useful for generating this repetitive
-code, allowing developers to focus more on system architecture,
-experimentation, and application logic.
+A typical pipeline might look like:
+
+```text
+Input Image
+     ↓
+Preprocessing
+     ↓
+Model
+     ↓
+Inference
+     ↓
+Predictions
+     ↓
+Post-processing
+     ↓
+Visualization
+     ↓
+Output
+```
+
+AI assistants are particularly useful for generating repetitive code for these tasks.
+
+This allows developers to focus more on:
+
+- Application architecture
+- Model behavior
+- Experimentation
+- Performance
+- Data quality
+- Business logic
+- Result validation
+
+This can be especially useful when working with technologies used throughout the SAM3 course, including:
+
+- Python
+- OpenCV
+- NumPy
+- PyTorch
+- SAM3
+- Supervision
+- Roboflow
+- Hugging Face
+- Google Colab
 
 ---
 
 ## 2. Prompt Engineering for Code
 
-A good prompt for generating Computer Vision code should contain four
-important components:
+The quality of AI-generated code depends heavily on the quality of the instructions provided to the AI.
 
-### 1. Context
+This process is commonly known as **Prompt Engineering**.
 
-Specify the technology or library being used.
+A strong programming prompt should contain four important components:
 
-Examples:
+1. Context
+2. Clear Objective
+3. Constraints
+4. Input and Output
+
+---
+
+### 2.1 Context
+
+Tell the AI which programming language, technology, framework, or library you are using.
+
+For example:
+
+```text
+I am using Python, OpenCV, and NumPy.
+```
+
+Other examples include:
 
 - OpenCV
 - NumPy
@@ -83,26 +208,81 @@ Examples:
 - Ultralytics
 - PyTorch
 - SAM3
+- Roboflow
 
-### 2. Clear Objective
+Providing context helps the AI understand which APIs and programming techniques should be used.
 
-Explain exactly what the program should accomplish.
+---
 
-Example:
+### 2.2 Clear Objective
+
+Clearly explain what you want the program to accomplish.
+
+For example:
 
 > Load an image and draw a bounding box around a detected object.
 
-### 3. Constraints
+A vague instruction such as:
 
-Specify any technical requirements.
+```text
+Make an image program.
+```
 
-Example:
+provides very little information.
+
+A more specific instruction produces a more useful result.
+
+---
+
+### 2.3 Constraints
+
+Constraints tell the AI how the solution should or should not be implemented.
+
+For example:
 
 > Do not use a Python `for` loop. Vectorize the operation using NumPy.
 
-### 4. Input and Output
+Other constraints might include:
 
-Describe what data enters the function and what should be returned.
+```text
+Use OpenCV only.
+
+Do not save the image to disk.
+
+Return the result as a NumPy array.
+
+The function must work in Google Colab.
+```
+
+Constraints are especially useful when a project has specific technical requirements.
+
+---
+
+### 2.4 Input and Output
+
+Clearly describe what information enters the program and what the program should return.
+
+For example:
+
+```text
+Input:
+A URL containing an image.
+
+Output:
+A NumPy array containing the grayscale version of the image.
+```
+
+A well-structured programming prompt can therefore follow this general structure:
+
+```text
+Context
+   +
+Objective
+   +
+Constraints
+   +
+Input / Output
+```
 
 ---
 
@@ -110,14 +290,23 @@ Describe what data enters the function and what should be returned.
 
 ### Objective
 
-Use an AI coding assistant to generate a function that downloads an
-image from a URL and converts it to grayscale using OpenCV.
+Use an AI coding assistant to generate a Python function that:
 
-### Prompt
+1. Receives an image URL.
+2. Downloads the image into memory.
+3. Reads the image using OpenCV.
+4. Converts the image to grayscale.
+5. Returns the processed image.
 
-> Write a function called `download_and_process` that receives a URL,
-> downloads the image into memory, reads it with OpenCV, converts it
-> to grayscale, and returns the processed image.
+---
+
+### Example Prompt
+
+> Write a function called `download_and_process` that receives a URL, downloads the image into memory, reads it with OpenCV, converts it to grayscale, and returns the processed image.
+
+---
+
+### Starter Code
 
 ```python
 import urllib.request
@@ -129,40 +318,104 @@ import matplotlib.pyplot as plt
 def download_and_process(url):
     # TODO: AI-generated implementation
     pass
+```
 
-The objective of this exercise is to practice giving an AI assistant
-clear instructions rather than manually implementing every step.
+The objective of this exercise is to practice giving an AI assistant clear instructions rather than manually implementing every step.
 
-3. Interactive Debugging and Refinement
+The workflow becomes:
 
-The first solution generated by an AI assistant may not always be
-correct.
+```text
+Developer defines the problem
+            ↓
+Developer writes the prompt
+            ↓
+AI proposes an implementation
+            ↓
+Developer reviews the implementation
+            ↓
+Developer executes the code
+            ↓
+Developer validates the result
+```
 
-AI tools can:
+The developer remains responsible for the final implementation.
 
-Use outdated APIs
-Generate incorrect parameters
-Misunderstand library behavior
-Produce syntactically valid but logically incorrect code
+---
 
-A better workflow is:
+## 3. Interactive Debugging and Refinement
 
-Generate the code.
-Run the code.
-Read the error message.
-Copy the traceback.
-Give the error back to the AI assistant.
-Ask the AI to explain the problem.
-Review the proposed solution.
-Run and verify the corrected code.
+The first solution generated by an AI assistant may not always be correct.
 
-The developer remains responsible for validating the final result.
+AI-generated code can sometimes:
 
-Exercise 2 — AI-Assisted Debugging
+- Use outdated APIs
+- Generate incorrect parameters
+- Misunderstand library behavior
+- Produce incorrect data types
+- Generate invalid function names
+- Miss required imports
+- Make incorrect assumptions
+- Produce syntactically valid but logically incorrect code
 
-The following example is designed to practice debugging with an
-AI assistant.
+For this reason, AI-assisted development should be an **iterative process**.
 
+---
+
+### Recommended Debugging Workflow
+
+A practical debugging process is:
+
+```text
+Generate
+   ↓
+Execute
+   ↓
+Inspect Error
+   ↓
+Read Traceback
+   ↓
+Send Error to AI
+   ↓
+Ask for Explanation
+   ↓
+Review Solution
+   ↓
+Refine Code
+   ↓
+Execute Again
+   ↓
+Validate
+```
+
+One of the most useful techniques is to provide the **actual traceback** to the AI assistant.
+
+Instead of simply saying:
+
+```text
+My code doesn't work.
+```
+
+a better prompt would be:
+
+```text
+Here is my Python code.
+
+Here is the complete traceback.
+
+Explain why the error occurs and show me how to correct it.
+
+Do not change unrelated parts of the program.
+```
+
+Providing the actual error gives the AI much more information about the problem.
+
+---
+
+## Exercise 2 — AI-Assisted Debugging
+
+The following example demonstrates how AI can assist with debugging.
+
+```python
 image = np.zeros((100, 100, 3), dtype=np.uint8)
 
 cv2.rectangle(
@@ -172,72 +425,181 @@ cv2.rectangle(
     (255, 0, 0),
     2
 )
-Example debugging prompt
+```
 
-Explain the error produced by cv2.rectangle, identify the
-incorrect argument types, and show me the Pythonic way to correct
-them.
+When experimenting with different argument types or values, OpenCV may generate errors if the provided parameters do not match what the function expects.
 
-When working with AI-generated code, always verify that the explanation
-matches the actual error produced by the program.
+---
 
-4. Recommended Agentic Development Workflow
+### Example Debugging Prompt
 
-A practical AI-assisted development workflow is:
+> Explain the error produced by `cv2.rectangle`, identify which argument is incorrect, and show me the Pythonic way to correct it.
 
-Define → Prompt → Generate → Execute → Inspect → Debug → Refine → Validate
+A stronger debugging prompt could be:
 
-AI should accelerate development, but the developer should still
-understand, review, and validate the generated code.
+```text
+The following OpenCV code produces an error.
 
-5. MCP and Roboflow
+Explain what the error means.
 
-The course also introduces the concept of using MCP with development
-tools such as Roboflow.
+Identify which argument is incorrect.
 
-This section will be expanded as MCP and Roboflow are covered in the
-course.
+Show me the Pythonic way to fix the problem.
 
-Key Takeaways
-AI can act as a coding assistant during software development.
-Developers increasingly focus on architecture and code review.
-Clear prompts produce better code.
-Computer Vision benefits greatly from AI-generated boilerplate.
-AI-generated code must always be tested and reviewed.
-Error messages and tracebacks are valuable inputs for AI-assisted
-debugging.
-AI should augment the developer rather than replace technical
-understanding.
-Next Steps
+Do not simply provide the corrected code.
+Explain why the correction works.
+```
 
-Continue applying these techniques throughout the SAM3 course when
-working with:
+This last instruction is particularly important.
 
-Python
-OpenCV
-NumPy
-Google Colab
-Hugging Face
-Roboflow
-Supervision
-SAM3
-Author
+The goal is not simply to obtain working code.
 
-Peyman Miyandashti
-SAM3 Learning Journey
-Computer Vision & Artificial Intelligence
+The goal is to **understand why the code works**.
 
+When working with AI-generated solutions, always verify that the explanation matches the actual behavior of the program.
 
-One important correction: I **wouldn't translate the sentence saying AI will make development “10× faster” as a factual claim**. That's promotional language and isn't guaranteed. The version above keeps the course's point but makes your GitHub documentation more technically credible.
+---
 
-### How I recommend we add it
+## 4. Recommended Agentic Development Workflow
 
-Since you like building these chapters systematically, we can do this the same way as before:
+A practical AI-assisted software development workflow is:
 
-**Step 1:** Create a new professional banner: `Agentic-AI-Programming-Banner.png`  
-**Step 2:** Create `08-course-notes/00-Agentic-AI-Programming/README.md`  
-**Step 3:** Add the original `.ipynb` under `03-notebooks/00-Agentic-AI-Programming/`  
-**Step 4:** Add the banner to the README using `09-assets/banners/`  
-**Step 5:** Add **Topic 0 — Agentic AI Programming Methodologies** to your main repository README/table of contents.
+```text
+DEFINE
+   ↓
+PROMPT
+   ↓
+GENERATE
+   ↓
+EXECUTE
+   ↓
+INSPECT
+   ↓
+DEBUG
+   ↓
+REFINE
+   ↓
+VALIDATE
+```
 
-This will make it look like a **learning portfolio**, not simply a dump of your teacher's Colab content—which is much better for GitHub. 
+### Define
+
+Understand the problem before asking the AI to solve it.
+
+### Prompt
+
+Provide clear context, objectives, constraints, and expected input/output.
+
+### Generate
+
+Allow the AI assistant to propose an implementation.
+
+### Execute
+
+Run the generated code in the actual development environment.
+
+### Inspect
+
+Review the output, warnings, behavior, and error messages.
+
+### Debug
+
+Provide errors and tracebacks back to the AI when necessary.
+
+### Refine
+
+Improve the implementation through additional prompts and manual review.
+
+### Validate
+
+Confirm that the final code actually solves the original problem correctly.
+
+AI can accelerate the development process, but the developer should still understand, review, and validate the generated code.
+
+---
+
+## 5. MCP and Roboflow
+
+The course also introduces the concept of using **MCP** with development tools such as **Roboflow**.
+
+**MCP (Model Context Protocol)** provides a standardized way for AI applications to connect with external tools, services, and data sources.
+
+In an agentic development workflow, this can allow an AI assistant to interact with tools beyond simple text generation.
+
+In the context of Computer Vision, integrations with platforms such as Roboflow can potentially support workflows involving:
+
+- Computer Vision datasets
+- Model development
+- Image processing
+- Model inference
+- Dataset management
+- Computer Vision pipelines
+- Development automation
+
+This section will be expanded as MCP and Roboflow are covered further during the SAM3 course.
+
+---
+
+## Key Takeaways
+
+After completing this topic, the most important concepts are:
+
+- AI can act as a coding assistant during software development.
+- Developers increasingly focus on architecture, problem solving, and code review.
+- Clear prompts generally produce more useful code.
+- Context is important when requesting programming assistance.
+- Constraints help control how AI generates solutions.
+- Input and output requirements should be clearly defined.
+- Computer Vision contains many repetitive tasks that AI can help automate.
+- Error messages and tracebacks are valuable inputs for AI-assisted debugging.
+- AI-generated code should always be tested and reviewed.
+- AI-generated explanations should also be verified.
+- Developers remain responsible for validating the final implementation.
+- AI should augment technical understanding rather than replace it.
+
+---
+
+## Next Steps
+
+The techniques introduced in this topic will be applied throughout the SAM3 Learning Journey.
+
+They will become especially useful when working with:
+
+- Python
+- OpenCV
+- NumPy
+- Google Colab
+- Hugging Face
+- Roboflow
+- Supervision
+- Computer Vision pipelines
+- SAM3
+
+As the course progresses, these technologies and AI-assisted development techniques can be combined to build increasingly sophisticated Computer Vision applications.
+
+---
+
+## Learning Philosophy
+
+> **Use AI to accelerate development, but always understand, review, test, and validate the code you build.**
+
+---
+
+## Author
+
+**Peyman Miyandashti**
+
+SAM3 Learning Journey  
+Computer Vision | Artificial Intelligence | Software Development
+
+---
+
+### Related Resources
+
+- [Watch Topic 0 Class Recording on YouTube](https://youtu.be/KnRJaCdIibo)
+- SAM3 Learning Journey — Course Notes
+- SAM3 Learning Journey — Notebooks
+
+---
+
+*This documentation is part of my SAM3 Learning Journey and records the concepts, exercises, and development practices learned throughout the course.*
