@@ -160,10 +160,10 @@ SAM3-Learning-Journey
 The following roadmap outlines the topics covered throughout the SAM3 Computer Vision course. Each module builds on the previous one, gradually developing the skills required to design, implement, and deploy modern computer vision solutions.
 
 | Phase | Topic | Status |
-|--------|-------|--------|
+|---|---|---|
 | 00 | Welcome & Environment Setup | ✅ Completed |
-| 01 | Agentic AI Programming Methodologies | 🟡 In Progress |
-| 02 | Supervision Fundamentals | ⬜ Pending |
+| 01 | Agentic AI Programming Methodologies | ✅ Completed |
+| 02 | Supervision Fundamentals | ✅ Completed |
 | 03 | Video Detection | ⬜ Pending |
 | 04 | Segmentation with SAM | ⬜ Pending |
 | 05 | Promptable SAM | ⬜ Pending |
@@ -174,10 +174,10 @@ The following roadmap outlines the topics covered throughout the SAM3 Computer V
 # 📅 Course Progress
 
 | Session | Topic | Date | Status |
-|---------|-------|------|--------|
+|---|---|---|---|
 | Welcome | Course Introduction | August 7, 2026 | ✅ Completed |
-| Session 01 | Agentic AI Programming | August 10, 2026 | 🟡 In Progress |
-| Session 02 | Supervision | — | ⬜ Pending |
+| Session 01 | Agentic AI Programming | August 10, 2026 | ✅ Completed |
+| Session 02 | Supervision | August 11, 2026 | ✅ Completed |
 | Session 03 | Video Detection | — | ⬜ Pending |
 | Session 04 | Segmentation with SAM | — | ⬜ Pending |
 | Session 05 | Promptable SAM | — | ⬜ Pending |
