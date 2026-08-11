@@ -114,14 +114,9 @@ This is one of the fundamental concepts we will use throughout the rest of the c
 
 This section follows the notebook's explanation that different models produce incompatible result formats and that Supervision standardizes them through `sv.Detections`. :contentReference[oaicite:1]{index=1}
 
-### Then
 
-Click **Commit changes...**
+---
 
-Commit message:
-
-```text
-Add Supervision introduction and learning objectives
 
 # 2. Environment Setup
 
