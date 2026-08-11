@@ -23,7 +23,7 @@ from ultralytics import YOLO
 MODEL_NAME = "yolov8n.pt"
 CONFIDENCE_THRESHOLD = 0.50
 
-INPUT_IMAGE = "input/image.jpg"
+INPUT_IMAGE = "input/image.png"
 
 OUTPUT_IMAGE = "output/annotated_image.jpg"
 OUTPUT_JSON = "output/predictions.json"
@@ -116,14 +116,18 @@ annotated_image = label_annotator.annotate(
 # Save annotated image
 # --------------------------------------------------
 
-cv2.imwrite(
+success = cv2.imwrite(
     OUTPUT_IMAGE,
     annotated_image
 )
 
+if not success:
+    raise RuntimeError(
+        f"Could not save annotated image: {OUTPUT_IMAGE}"
+    )
+
 print(
-    f"Annotated image saved to: "
-    f"{OUTPUT_IMAGE}"
+    f"Annotated image saved to: {OUTPUT_IMAGE}"
 )
 
 
@@ -134,7 +138,6 @@ print(
 predictions = []
 
 for i in range(len(detections)):
-
     x1, y1, x2, y2 = detections.xyxy[i]
 
     class_id = int(
@@ -182,17 +185,15 @@ with open(
     "w",
     encoding="utf-8"
 ) as file:
-
     json.dump(
         output_data,
         file,
-        indent=4
+        indent=4,
+        ensure_ascii=False
     )
 
-
 print(
-    f"Prediction data saved to: "
-    f"{OUTPUT_JSON}"
+    f"Prediction data saved to: {OUTPUT_JSON}"
 )
 
 
@@ -202,21 +203,29 @@ print(
 
 print()
 print("--- Detection Summary ---")
+
 print(
     f"Model: {MODEL_NAME}"
 )
+
 print(
     f"Confidence threshold: "
     f"{CONFIDENCE_THRESHOLD}"
 )
+
 print(
     f"Objects detected: "
     f"{len(detections)}"
 )
 
-for prediction in predictions:
-
+if predictions:
+    for prediction in predictions:
+        print(
+            f"- {prediction['class_name']} "
+            f"{prediction['confidence']:.1%}"
+        )
+else:
     print(
-        f"- {prediction['class_name']} "
-        f"{prediction['confidence']:.1%}"
+        "No objects were detected above the "
+        "configured confidence threshold."
     )
