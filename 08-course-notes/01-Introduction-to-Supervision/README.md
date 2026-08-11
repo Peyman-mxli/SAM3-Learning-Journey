@@ -111,10 +111,6 @@ Computer Vision Application
 
 This is one of the fundamental concepts we will use throughout the rest of the course.
 
-
-This section follows the notebook's explanation that different models produce incompatible result formats and that Supervision standardizes them through `sv.Detections`. :contentReference[oaicite:1]{index=1}
-
-
 ---
 
 
