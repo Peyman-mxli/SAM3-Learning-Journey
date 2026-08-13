@@ -136,6 +136,7 @@ This makes the labels appear visually **on top of the boxes**.
 > **Detection tells us what the model found. Annotation determines how we communicate those results visually.**
 
 ---
+
 ## 4. Preparing YOLO Detections for Visualization
 
 Before applying any Annotator, we first need detection results.
@@ -572,13 +573,13 @@ They change **how those detections are visually communicated**.
 
 ```text
              YOLO Detection
-                   │
-       ┌───────────┼───────────┐
-       ↓           ↓           ↓
-     Boxes        Blur        Halo
-       │           │           │
-       └───────────┼───────────┘
-                   ↓
+                  │
+       ┌──────────┼───────────┐
+       ↓          ↓           ↓
+     Boxes       Blur        Halo
+       │          │           │
+       └──────────┼───────────┘
+                  ↓
            Visualization
 ```
 
@@ -586,366 +587,374 @@ They change **how those detections are visually communicated**.
 
 ## 17. Customizing Annotation Colors
 
-Supervision allows us to customize how bounding boxes are displayed.
-
-One of the simplest options is changing the annotation color.
-
-In this lesson, three different configurations are compared:
-
-```python
-anotador_rojo = sv.BoxAnnotator(
-    color=sv.Color.RED,
-    thickness=3
-)
-
-anotador_verde = sv.BoxAnnotator(
-    color=sv.Color.GREEN,
-    thickness=3
-)
-
-anotador_paleta = sv.BoxAnnotator(
-    color=sv.ColorPalette.DEFAULT,
-    thickness=3
-)
-```
-
-This demonstrates two important approaches:
-
-- Using a specific color
-- Using an automatic color palette
-
----
-
-## 18. Using Predefined Colors
-
-Supervision provides predefined colors through `sv.Color`.
+Supervision allows us to customize the colors used by Annotators.
 
 For example:
 
 ```python
-sv.Color.RED
-sv.Color.GREEN
-```
-
-These colors can be passed directly to an Annotator:
-
-```python
 box_annotator = sv.BoxAnnotator(
-    color=sv.Color.RED,
-    thickness=3
+    color=sv.Color.RED
 )
 ```
 
-This creates bounding boxes using the selected color.
+This changes the visual appearance of the bounding boxes without changing the underlying detections.
 
-The same idea can be used with another color:
-
-```python
-box_annotator = sv.BoxAnnotator(
-    color=sv.Color.GREEN,
-    thickness=3
-)
-```
-
----
-
-## 19. Using ColorPalette.DEFAULT
-
-When an image contains several object classes, manually assigning a color to every class can become inconvenient.
-
-Supervision provides:
-
-```python
-sv.ColorPalette.DEFAULT
-```
-
-It can be used like this:
-
-```python
-box_annotator = sv.BoxAnnotator(
-    color=sv.ColorPalette.DEFAULT,
-    thickness=3
-)
-```
-
-According to the lesson, `ColorPalette.DEFAULT` automatically assigns different colors to different classes.
-
-This is especially useful when working with many categories.
+Conceptually:
 
 ```text
-Multiple Classes
+YOLO Detection
       ↓
-ColorPalette.DEFAULT
+sv.Detections
       ↓
-Automatic Colors
+BoxAnnotator
       ↓
-Easier Visual Differentiation
+Custom Color
+      ↓
+Visualization
 ```
+
+The color belongs to the visualization layer, not to the detection model.
 
 ---
 
-## 20. Comparing Color Configurations
+## 18. Using Color Palettes
 
-The notebook compares the three configurations side by side:
-
-```python
-fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-for ax, (titulo, ann) in zip(axes, [
-    ("Color.RED",            anotador_rojo),
-    ("Color.GREEN",          anotador_verde),
-    ("ColorPalette.DEFAULT", anotador_paleta),
-]):
-    scene = ann.annotate(
-        scene=image.copy(),
-        detections=detections
-    )
-
-    ax.imshow(
-        cv2.cvtColor(
-            scene,
-            cv2.COLOR_BGR2RGB
-        )
-    )
-
-    ax.set_title(titulo)
-    ax.axis("off")
-
-plt.tight_layout()
-plt.show()
-```
-
-The detection results remain the same.
-
-Only their visual representation changes.
-
----
-
-## 21. Customizing Bounding Box Thickness
-
-Another important visualization parameter is:
-
-```python
-thickness=
-```
-
-This controls the thickness of the bounding-box lines.
-
-The lesson compares:
-
-```python
-[1, 4, 10]
-```
-
-using:
-
-```python
-fig, axes = plt.subplots(
-    1,
-    3,
-    figsize=(18, 5)
-)
-
-for ax, thickness in zip(
-    axes,
-    [1, 4, 10]
-):
-    ann = sv.BoxAnnotator(
-        thickness=thickness
-    )
-
-    scene = ann.annotate(
-        scene=image.copy(),
-        detections=detections
-    )
-
-    ax.imshow(
-        cv2.cvtColor(
-            scene,
-            cv2.COLOR_BGR2RGB
-        )
-    )
-
-    ax.set_title(
-        f"thickness={thickness}"
-    )
-
-    ax.axis("off")
-
-plt.tight_layout()
-plt.show()
-```
-
-This produces three versions of the same detections:
-
-```text
-thickness=1      thickness=4      thickness=10
-     │                │                 │
-     ↓                ↓                 ↓
- Thin Box         Medium Box         Thick Box
-```
-
----
-
-## 22. Choosing the Appropriate Thickness
-
-There is no single thickness value that is ideal for every image.
-
-The lesson highlights two important considerations.
-
-### High-Resolution Images
-
-For high-resolution images, a larger thickness may be necessary.
-
-```text
-High Resolution
-      ↓
-More Pixels
-      ↓
-Thin Lines May Be Difficult to See
-      ↓
-Increase Thickness
-```
-
-### Small Displays
-
-For smaller displays, excessive thickness can cover part of the detected object.
-
-```text
-Small Display
-      ↓
-Limited Visible Area
-      ↓
-Very Thick Boxes
-      ↓
-Object Can Become Obscured
-```
-
-The appropriate value therefore depends on the image and how the visualization will be displayed.
-
----
-
-## 23. Visualization Is Part of the Pipeline
-
-Changing color or thickness does not affect YOLO's predictions.
+Instead of assigning a single color to every detection, Supervision can use a color palette.
 
 For example:
 
 ```python
-sv.BoxAnnotator(
-    color=sv.Color.RED,
-    thickness=10
+box_annotator = sv.BoxAnnotator(
+    color=sv.ColorPalette.DEFAULT
 )
 ```
 
-does **not** cause YOLO to detect objects differently.
+A color palette provides multiple colors that can be used when visualizing detections.
 
-Instead:
+This is useful when an image contains several objects or classes.
 
 ```text
-YOLO
- │
- ├── Object Classes
- ├── Confidence Scores
- └── Bounding Box Coordinates
-          │
-          ↓
-     Supervision
-          │
-          ├── Color
-          ├── Thickness
-          └── Visualization Style
+Detections
+    │
+    ├── Object 1 → Color A
+    ├── Object 2 → Color B
+    ├── Object 3 → Color C
+    └── Object 4 → Color D
 ```
 
-YOLO is responsible for **detection**.
-
-Supervision Annotators are responsible for **visualization**.
+Color variation can make a visualization easier to interpret.
 
 ---
 
-### Experiment Reflection
+## 19. Customizing Box Thickness
 
-The notebook asks:
+The thickness of bounding boxes can also be modified.
 
-> **What thickness is the most readable?**
+```python
+box_annotator = sv.BoxAnnotator(
+    thickness=3
+)
+```
 
-The answer depends on factors such as:
+The `thickness` parameter controls the width of the lines used to draw the bounding boxes.
+
+For example:
+
+```text
+thickness=1
+      ↓
+Thin bounding boxes
+
+thickness=3
+      ↓
+Medium bounding boxes
+
+thickness=5
+      ↓
+Thicker bounding boxes
+```
+
+The appropriate thickness depends on factors such as:
 
 - Image resolution
 - Object size
-- Display size
 - Number of detections
-- Desired visual clarity
-
-This experiment demonstrates why visualization parameters should be selected according to the context of the application.
+- Intended display size
 
 ---
 
-## 24. LabelAnnotator
+## 20. Combining Color and Thickness
 
-Bounding boxes show **where** an object is located, but they do not automatically explain what the detected object is.
+Multiple visualization settings can be configured together.
 
-For this reason, Supervision provides:
-
-```python
-sv.LabelAnnotator()
-```
-
-`LabelAnnotator` can display text associated with each detection.
-
-For example, labels can contain:
-
-```text
-person 92%
-bus 87%
-stop sign 81%
-```
-
-This makes the visualization much easier to understand.
-
----
-
-## 25. Combining BoxAnnotator and LabelAnnotator
-
-A common visualization pipeline combines:
+For example:
 
 ```python
-sv.BoxAnnotator()
-```
-
-with:
-
-```python
-sv.LabelAnnotator()
-```
-
-The notebook uses:
-
-```python
-box_ann = sv.BoxAnnotator()
-label_ann = sv.LabelAnnotator()
-```
-
-The bounding boxes are applied first:
-
-```python
-scene = box_ann.annotate(
-    scene=image.copy(),
-    detections=detections
+box_annotator = sv.BoxAnnotator(
+    color=sv.ColorPalette.DEFAULT,
+    thickness=3
 )
 ```
 
-Then the labels are added:
+This creates a `BoxAnnotator` with:
+
+```text
+Color Palette
+      +
+Line Thickness
+      ↓
+Customized Bounding Boxes
+```
+
+The detection data remains unchanged.
+
+Only the way the detections are displayed is modified.
+
+---
+
+## 21. LabelAnnotator
+
+Bounding boxes show **where** objects are located, but they do not automatically explain what each object is.
+
+For that, we can use:
 
 ```python
-scene = label_ann.annotate(
+sv.LabelAnnotator()
+```
+
+Example:
+
+```python
+label_annotator = sv.LabelAnnotator()
+```
+
+Then apply it:
+
+```python
+scene = label_annotator.annotate(
     scene=scene,
     detections=detections,
     labels=labels
 )
 ```
 
-The complete process becomes:
+The labels can contain information such as:
+
+```text
+person 92%
+car 87%
+bus 81%
+```
+
+This makes the visualization much more informative.
+
+---
+
+## 22. Customizing Label Text Size
+
+The size of the label text can be customized.
+
+For example:
+
+```python
+label_annotator = sv.LabelAnnotator(
+    text_scale=0.6
+)
+```
+
+The `text_scale` parameter controls the size of the displayed text.
+
+For example:
+
+```text
+text_scale=0.3
+      ↓
+Smaller Text
+
+text_scale=0.6
+      ↓
+Medium Text
+
+text_scale=1.0
+      ↓
+Larger Text
+```
+
+The goal is to make the labels readable without covering too much of the image.
+
+---
+
+## 23. Why Label Size Matters
+
+Label size is especially important when working with:
+
+- High-resolution images
+- Small detected objects
+- Large numbers of detections
+- Dense scenes
+- Screenshots used for documentation
+
+If the text is too small:
+
+```text
+Detection
+    ↓
+Tiny Label
+    ↓
+Difficult to Read
+```
+
+If the text is too large:
+
+```text
+Detection
+    ↓
+Large Label
+    ↓
+Object May Be Covered
+```
+
+A good visualization balances readability with image clarity.
+
+---
+
+## 24. Creating Class and Confidence Labels
+
+A useful label combines the detected class with its confidence score.
+
+```python
+labels = [
+    f"{results.names[class_id]} {confidence:.0%}"
+    for class_id, confidence in zip(
+        detections.class_id,
+        detections.confidence
+    )
+]
+```
+
+For example:
+
+```text
+person 94%
+car 89%
+dog 83%
+```
+
+This gives the viewer two important pieces of information:
+
+```text
+Class Name
+    +
+Confidence Score
+```
+
+---
+
+## 25. Understanding `zip()`
+
+The label-generation code uses:
+
+```python
+zip(
+    detections.class_id,
+    detections.confidence
+)
+```
+
+`zip()` pairs corresponding values from the two collections.
+
+Conceptually:
+
+```text
+class_id        confidence
+    0      +       0.94
+    2      +       0.89
+   16      +       0.83
+```
+
+Each pair can then be used to create one label.
+
+For example:
+
+```python
+results.names[class_id]
+```
+
+converts the numeric class ID into a readable class name.
+
+---
+
+## 26. Formatting Confidence as a Percentage
+
+The expression:
+
+```python
+{confidence:.0%}
+```
+
+formats the confidence score as a percentage.
+
+For example:
+
+```text
+0.94 → 94%
+0.89 → 89%
+0.83 → 83%
+```
+
+Without formatting, a label might look like:
+
+```text
+person 0.943728
+```
+
+With percentage formatting:
+
+```text
+person 94%
+```
+
+The second version is easier for a human to interpret.
+
+---
+
+## 27. Combining Boxes and Labels
+
+A common visualization pipeline combines `BoxAnnotator` and `LabelAnnotator`.
+
+First create the Annotators:
+
+```python
+box_annotator = sv.BoxAnnotator(
+    color=sv.ColorPalette.DEFAULT,
+    thickness=3
+)
+
+label_annotator = sv.LabelAnnotator(
+    text_scale=0.6
+)
+```
+
+Then apply the boxes:
+
+```python
+annotated_image = box_annotator.annotate(
+    scene=image.copy(),
+    detections=detections
+)
+```
+
+Then apply the labels:
+
+```python
+annotated_image = label_annotator.annotate(
+    scene=annotated_image,
+    detections=detections,
+    labels=labels
+)
+```
+
+The pipeline becomes:
 
 ```text
 Original Image
@@ -961,709 +970,115 @@ Bounding Boxes + Labels
 
 ---
 
-## 26. Customizing Label Text Size
+## 28. Reusing the Annotated Scene
 
-Supervision allows us to control the size of label text using:
-
-```python
-text_scale=
-```
-
-The notebook experiments with three different values:
+An important pattern is:
 
 ```python
-[0.3, 0.6, 1.0]
+scene=image.copy()
 ```
 
-The experiment uses:
+for the first annotation layer.
+
+After that, we reuse the resulting image:
 
 ```python
-fig, axes = plt.subplots(
-    1,
-    3,
-    figsize=(18, 5)
-)
-
-for ax, scale in zip(
-    axes,
-    [0.3, 0.6, 1.0]
-):
-    box_ann = sv.BoxAnnotator()
-
-    label_ann = sv.LabelAnnotator(
-        text_scale=scale
-    )
-
-    scene = box_ann.annotate(
-        scene=image.copy(),
-        detections=detections
-    )
-
-    scene = label_ann.annotate(
-        scene=scene,
-        detections=detections,
-        labels=labels
-    )
-
-    ax.imshow(
-        cv2.cvtColor(
-            scene,
-            cv2.COLOR_BGR2RGB
-        )
-    )
-
-    ax.set_title(
-        f"text_scale={scale}"
-    )
-
-    ax.axis("off")
-
-plt.tight_layout()
-plt.show()
+scene=annotated_image
 ```
 
----
-
-## 27. Comparing Text Scale
-
-The three values produce different label sizes:
-
-```text
-text_scale=0.3
-      ↓
- Small Text
-
-text_scale=0.6
-      ↓
- Medium Text
-
-text_scale=1.0
-      ↓
- Large Text
-```
-
-The goal is not simply to make the text as large as possible.
-
-The goal is to make the information **readable without unnecessarily covering the image**.
-
----
-
-## 28. Choosing an Appropriate Text Scale
-
-The notebook asks an important question:
-
-> **Is `text_scale=0.3` readable in this image?**
-
-There is no universal answer.
-
-The appropriate text size depends on factors such as:
-
-- Image resolution
-- Size of detected objects
-- Number of detections
-- Display size
+This allows each new Annotator to build on the previous visualization.
 
 For example:
 
 ```text
-Very Small Text
+image.copy()
       ↓
-More Image Visible
+Box Layer
       ↓
-Labels May Be Difficult to Read
-```
-
-While:
-
-```text
-Very Large Text
+annotated_image
       ↓
-Easy to Read
+Label Layer
       ↓
-May Cover Important Parts of the Image
+annotated_image
 ```
 
-A good visualization requires balancing these two factors.
+This is the foundation of multi-layer annotation pipelines.
 
 ---
 
-## 29. Labels Add Meaning to Bounding Boxes
+## 29. Why Use `image.copy()`?
 
-Consider a bounding box by itself:
-
-```text
-┌────────────────────┐
-│                    │
-│       Object       │
-│                    │
-└────────────────────┘
-```
-
-We know something was detected, but we do not immediately know its class or confidence.
-
-Adding a label provides more information:
-
-```text
-person 92%
-┌────────────────────┐
-│                    │
-│       Person       │
-│                    │
-└────────────────────┘
-```
-
-This combines:
-
-```text
-Localization
-     +
-Classification
-     +
-Confidence
-     ↓
-More Informative Visualization
-```
-
----
-
-## 30. Detection Data vs. Visual Presentation
-
-At this point, it is useful to separate the different responsibilities in the pipeline.
-
-```text
-YOLO
- │
- ├── Bounding Box Coordinates
- ├── Class IDs
- └── Confidence Scores
-          │
-          ↓
-Supervision Detections
-          │
-          ↓
-Annotators
- │
- ├── Bounding Boxes
- ├── Labels
- ├── Colors
- ├── Thickness
- └── Text Scale
-          │
-          ↓
-Final Visualization
-```
-
-The detection model produces the prediction data.
-
-Supervision controls how that information is presented visually.
-
----
-
-### Key Takeaway
-
-`LabelAnnotator` transforms detection information into readable text that can be displayed directly on the image.
-
-The `text_scale` parameter allows the visualization to be adapted to different image resolutions and object sizes.
-
----
-## 31. The Order of Annotation Layers Matters
-
-One of the most important concepts in this lesson is that Annotators are applied sequentially.
-
-Every Annotator receives the result produced by the previous Annotator.
-
-Because of this, the order in which Annotators are applied changes the final visualization.
-
-The notebook compares two different orders:
-
-```text
-Order A
-
-Image
-  ↓
-BoxAnnotator
-  ↓
-LabelAnnotator
-  ↓
-Final Image
-```
-
-and:
-
-```text
-Order B
-
-Image
-  ↓
-LabelAnnotator
-  ↓
-BoxAnnotator
-  ↓
-Final Image
-```
-
-The detections are exactly the same.
-
-Only the **drawing order** changes.
-
----
-
-## 32. Order A — Box → Label
-
-The recommended order in the notebook is:
-
-```text
-Box → Label
-```
-
-First, the bounding boxes are drawn:
+Using:
 
 ```python
-orden_a = box_ann.annotate(
-    scene=image.copy(),
-    detections=detections
-)
+image.copy()
 ```
 
-Then the labels are added:
+creates a copy of the original image before drawing annotations.
 
-```python
-orden_a = label_ann.annotate(
-    scene=orden_a,
-    detections=detections,
-    labels=labels
-)
-```
-
-The complete code is:
-
-```python
-box_ann = sv.BoxAnnotator(thickness=3)
-label_ann = sv.LabelAnnotator()
-
-orden_a = box_ann.annotate(
-    scene=image.copy(),
-    detections=detections
-)
-
-orden_a = label_ann.annotate(
-    scene=orden_a,
-    detections=detections,
-    labels=labels
-)
-```
-
-The resulting layer structure is:
-
-```text
-┌─────────────────────────┐
-│       Label Layer       │  ← Top
-├─────────────────────────┤
-│        Box Layer        │
-├─────────────────────────┤
-│     Original Image      │  ← Bottom
-└─────────────────────────┘
-```
-
-Because the label is drawn last, it appears on top of the existing bounding box.
-
-This makes the text easier to read.
-
----
-
-## 33. Order B — Label → Box
-
-The notebook also demonstrates the opposite order:
-
-```text
-Label → Box
-```
-
-First, the labels are drawn:
-
-```python
-orden_b = label_ann.annotate(
-    scene=image.copy(),
-    detections=detections,
-    labels=labels
-)
-```
-
-Then the bounding boxes are drawn:
-
-```python
-orden_b = box_ann.annotate(
-    scene=orden_b,
-    detections=detections
-)
-```
-
-The complete structure becomes:
-
-```text
-┌─────────────────────────┐
-│        Box Layer        │  ← Top
-├─────────────────────────┤
-│       Label Layer       │
-├─────────────────────────┤
-│     Original Image      │  ← Bottom
-└─────────────────────────┘
-```
-
-Because the bounding box is drawn after the label, the box line can cover part of the text.
-
----
-
-## 34. Comparing Both Orders
-
-The notebook displays both results side by side:
-
-```python
-fig, (ax1, ax2) = plt.subplots(
-    1,
-    2,
-    figsize=(14, 5)
-)
-
-ax1.imshow(
-    cv2.cvtColor(
-        orden_a,
-        cv2.COLOR_BGR2RGB
-    )
-)
-
-ax1.set_title(
-    "Box → Label (recomendado)"
-)
-
-ax1.axis("off")
-
-ax2.imshow(
-    cv2.cvtColor(
-        orden_b,
-        cv2.COLOR_BGR2RGB
-    )
-)
-
-ax2.set_title(
-    "Label → Box"
-)
-
-ax2.axis("off")
-
-plt.tight_layout()
-plt.show()
-```
-
-This experiment demonstrates that the same Annotators can produce different visual results depending on their order.
-
----
-
-## 35. Why Is Box → Label More Readable?
-
-The notebook asks:
-
-> **Why is "Box → Label" more readable?**
-
-The reason is simple.
-
-`LabelAnnotator` draws its text on top of everything that already exists in the image.
-
-Therefore:
-
-```text
-Box First
-    ↓
-Label Second
-    ↓
-Label Appears on Top
-    ↓
-Better Readability
-```
-
-If the order is reversed:
-
-```text
-Label First
-    ↓
-Box Second
-    ↓
-Box Appears on Top
-    ↓
-Box Line May Cover Text
-```
-
----
-
-## 36. Thinking in Layers
-
-This concept becomes even more important when three or more Annotators are combined.
-
-For example:
-
-```python
-scene = image.copy()
-
-scene = box_annotator.annotate(
-    scene=scene,
-    detections=detections
-)
-
-scene = halo_annotator.annotate(
-    scene=scene,
-    detections=detections
-)
-
-scene = label_annotator.annotate(
-    scene=scene,
-    detections=detections,
-    labels=labels
-)
-```
+This is useful because it preserves the original image.
 
 Conceptually:
 
 ```text
 Original Image
-      ↓
-Box
-      ↓
-Halo
-      ↓
-Label
-      ↓
-Final Visualization
+     │
+     ├──────────────► Remains unchanged
+     │
+     └── copy()
+           ↓
+       Annotation
+           ↓
+     Modified Copy
 ```
 
-The last Annotator is visually placed on top of the previous annotations.
+This is especially important when comparing multiple visualization styles.
 
 ---
 
-## 37. Annotation Composition
+## 30. Comparing Different Visualization Styles
 
-Combining several Annotators is called **composition**.
-
-Instead of producing only one visualization effect, we can build a custom visualization pipeline.
+Suppose we want to compare:
 
 ```text
-Detection Results
-       ↓
-┌─────────────────┐
-│ Annotator Layer │
-│       #1        │
-└────────┬────────┘
-         ↓
-┌─────────────────┐
-│ Annotator Layer │
-│       #2        │
-└────────┬────────┘
-         ↓
-┌─────────────────┐
-│ Annotator Layer │
-│       #3        │
-└────────┬────────┘
-         ↓
- Final Visualization
+BoxAnnotator
+RoundBoxAnnotator
+HaloAnnotator
+BlurAnnotator
+BoxCornerAnnotator
 ```
 
-Each layer can have a different responsibility.
+Each visualization should begin with:
+
+```python
+image.copy()
+```
+
+For example:
+
+```python
+scene = annotator.annotate(
+    scene=image.copy(),
+    detections=detections
+)
+```
+
+This ensures that every Annotator starts from the same original image.
+
+Otherwise, annotations from previous experiments could remain on the image and affect the comparison.
+
+---
+
+## 31. Annotation Composition
+
+Multiple Annotators can be combined to create more complex visualizations.
 
 For example:
 
 ```text
+Original Image
+      ↓
 BoxAnnotator
-     ↓
-Shows object location
-
-LabelAnnotator
-     ↓
-Shows class and confidence
-
-HaloAnnotator
-     ↓
-Adds visual emphasis
-```
-
-Together, they create a richer visualization.
-
----
-
-### Key Takeaway
-
-> **The last Annotator applied is visually placed on top of the previous annotations.**
-
-Therefore, Annotator order should be chosen intentionally.
-
-For labels, the notebook recommends:
-
-```text
-Box → Label
-```
-
-rather than:
-
-```text
-Label → Box
-```
-
-because drawing the label last helps keep the text readable.
-
----
-## 38. Extension Challenge
-
-The final exercise of this lesson is to create a custom visualization using **at least three different Annotators**.
-
-The goal is to move beyond the default bounding-box visualization and experiment with different ways of representing detections.
-
-The notebook suggests exploring:
-
-```python
-sv.DotAnnotator()
-sv.TriangleAnnotator()
-sv.EllipseAnnotator()
-```
-
-These can be combined with the Annotators already explored earlier in the lesson.
-
----
-
-## 39. DotAnnotator
-
-`DotAnnotator` provides another visual representation for detections.
-
-The notebook suggests experimenting with:
-
-```python
-sv.DotAnnotator()
-```
-
-It can be added to the annotation pipeline in the same way as the previous Annotators:
-
-```python
-scene = sv.DotAnnotator().annotate(
-    scene=scene,
-    detections=detections
-)
-```
-
-This demonstrates that Supervision visualization is not limited to traditional bounding boxes.
-
----
-
-## 40. TriangleAnnotator
-
-Another Annotator suggested by the notebook is:
-
-```python
-sv.TriangleAnnotator()
-```
-
-It can be applied using:
-
-```python
-scene = sv.TriangleAnnotator().annotate(
-    scene=scene,
-    detections=detections
-)
-```
-
-This provides another option for visually marking detected objects.
-
----
-
-## 41. EllipseAnnotator
-
-The third additional Annotator suggested in the challenge is:
-
-```python
-sv.EllipseAnnotator()
-```
-
-It can be used with:
-
-```python
-scene = sv.EllipseAnnotator().annotate(
-    scene=scene,
-    detections=detections
-)
-```
-
-Again, the underlying detections remain unchanged.
-
-Only their visual representation changes.
-
----
-
-## 42. Building a Custom Combination
-
-The notebook provides the following starting structure:
-
-```python
-scene = image.copy()
-
-# scene = sv.??Annotator().annotate(
-#     scene=scene,
-#     detections=detections
-# )
-
-# scene = sv.??Annotator().annotate(
-#     scene=scene,
-#     detections=detections
-# )
-
-# scene = sv.??Annotator().annotate(
-#     scene=scene,
-#     detections=detections,
-#     labels=labels
-# )
-```
-
-The task is to replace the placeholders with a custom combination of Annotators.
-
-For example, a visualization pipeline could conceptually follow:
-
-```text
-Original Image
-      ↓
-Annotator #1
-      ↓
-Annotator #2
-      ↓
-Annotator #3
-      ↓
-Final Custom Visualization
-```
-
----
-
-## 43. Example Custom Composition
-
-One possible experiment is:
-
-```python
-scene = image.copy()
-
-scene = sv.EllipseAnnotator().annotate(
-    scene=scene,
-    detections=detections
-)
-
-scene = sv.DotAnnotator().annotate(
-    scene=scene,
-    detections=detections
-)
-
-scene = sv.LabelAnnotator().annotate(
-    scene=scene,
-    detections=detections,
-    labels=labels
-)
-```
-
-The pipeline becomes:
-
-```text
-Original Image
       ↓
 EllipseAnnotator
       ↓
@@ -1674,317 +1089,1102 @@ LabelAnnotator
 Final Visualization
 ```
 
-This uses three different Annotators while keeping the label as the final layer.
+Each Annotator represents another visual layer.
+
+The important idea is:
+
+> **The detections remain the same while the visualization becomes richer.**
 
 ---
 
-## 44. Displaying the Final Visualization
+## 32. EllipseAnnotator
 
-The notebook displays the custom result using Matplotlib:
+`EllipseAnnotator` provides another way to represent detections.
 
 ```python
-plt.figure(figsize=(12, 7))
+ellipse_annotator = sv.EllipseAnnotator()
+```
 
-plt.imshow(
-    cv2.cvtColor(
-        scene,
-        cv2.COLOR_BGR2RGB
-    )
+It can then be applied using:
+
+```python
+scene = ellipse_annotator.annotate(
+    scene=scene,
+    detections=detections
 )
-
-plt.axis("off")
-
-plt.title(
-    "Mi combinación personalizada"
-)
-
-plt.show()
 ```
 
-This allows the final annotation composition to be inspected visually.
+Instead of only drawing rectangular bounding boxes, this Annotator adds ellipse-based visualization around detected objects.
 
----
-
-## 45. Parameters for Further Experimentation
-
-The lesson also encourages experimenting with parameters such as:
-
-```python
-color=
-```
-
-and, depending on the Annotator:
-
-```python
-thickness=
-```
-
-or:
-
-```python
-radius=
-```
-
-This makes it possible to customize both the type and appearance of the annotations.
-
-The experimentation process can therefore include:
+Conceptually:
 
 ```text
-Choose Annotator
-      ↓
-Choose Color
-      ↓
-Adjust Thickness / Radius
-      ↓
-Choose Layer Order
-      ↓
-Compare Result
+Detection
+    ↓
+EllipseAnnotator
+    ↓
+Ellipse Visualization
 ```
 
 ---
 
-## 46. Why Experiment with Different Annotators?
+## 33. DotAnnotator
 
-There is no requirement that every computer vision application use exactly the same visualization.
+`DotAnnotator` adds a point-based visual representation to detections.
 
-Different applications may require different visual representations.
+Create it using:
 
-The important concept from this lesson is that visualization can be **composed and customized**.
+```python
+dot_annotator = sv.DotAnnotator()
+```
+
+Then apply it:
+
+```python
+scene = dot_annotator.annotate(
+    scene=scene,
+    detections=detections
+)
+```
+
+This provides another visual layer that can be combined with other Annotators.
+
+---
+
+## 34. Multi-Annotator Visualization
+
+A complete multi-Annotator pipeline can combine:
+
+```python
+box_annotator = sv.BoxAnnotator(
+    color=sv.ColorPalette.DEFAULT,
+    thickness=3
+)
+
+ellipse_annotator = sv.EllipseAnnotator()
+
+dot_annotator = sv.DotAnnotator()
+
+label_annotator = sv.LabelAnnotator(
+    text_scale=0.6
+)
+```
+
+The Annotators can then be applied sequentially.
+
+---
+
+## 35. Layer 1 — Bounding Boxes
+
+Start with the original image:
+
+```python
+scene = box_annotator.annotate(
+    scene=image.copy(),
+    detections=detections
+)
+```
+
+The visualization now contains bounding boxes.
 
 ```text
-YOLO Predictions
-       ↓
-Supervision Detections
-       ↓
-Custom Annotator Pipeline
-       ↓
-Final Visualization
+Original Image
+      ↓
+Bounding Boxes
 ```
 
-The detection model and visualization system therefore have different responsibilities.
+---
+
+## 36. Layer 2 — Ellipses
+
+Use the result from the previous layer:
+
+```python
+scene = ellipse_annotator.annotate(
+    scene=scene,
+    detections=detections
+)
+```
+
+Now the visualization contains:
+
+```text
+Bounding Boxes
+      +
+Ellipses
+```
 
 ---
 
-## 47. Main Concepts Learned
+## 37. Layer 3 — Dots
 
-This lesson introduced several important concepts:
+Apply the `DotAnnotator`:
 
-- Supervision **Annotators**
-- `BoxAnnotator`
-- `RoundBoxAnnotator`
-- `HaloAnnotator`
-- `BlurAnnotator`
-- `BoxCornerAnnotator`
-- `LabelAnnotator`
-- Annotation colors
-- `ColorPalette.DEFAULT`
-- Bounding-box thickness
-- Label `text_scale`
-- Annotator composition
-- Annotation layer order
-- Custom visualization pipelines
-- `DotAnnotator`
-- `TriangleAnnotator`
-- `EllipseAnnotator`
+```python
+scene = dot_annotator.annotate(
+    scene=scene,
+    detections=detections
+)
+```
+
+The visualization now contains:
+
+```text
+Bounding Boxes
+      +
+Ellipses
+      +
+Dots
+```
 
 ---
 
-## Lesson Summary
+## 38. Layer 4 — Labels
 
-The complete workflow explored in this lesson can be summarized as:
+Finally, apply the labels:
+
+```python
+scene = label_annotator.annotate(
+    scene=scene,
+    detections=detections,
+    labels=labels
+)
+```
+
+The final visualization contains:
+
+```text
+Bounding Boxes
+      +
+Ellipses
+      +
+Dots
+      +
+Class Labels
+      +
+Confidence Scores
+```
+
+---
+
+## 39. Why Apply Labels Last?
+
+Labels contain important textual information.
+
+For example:
+
+```text
+person 94%
+car 89%
+bus 82%
+```
+
+If other visual layers are drawn after the labels, they may overlap or cover the text.
+
+Therefore, a useful layer order is:
+
+```text
+Box
+ ↓
+Ellipse
+ ↓
+Dot
+ ↓
+Label
+```
+
+This keeps the labels visible on top of the other annotation layers.
+
+---
+
+## 40. Understanding the `scene` Variable
+
+In a multi-Annotator pipeline, the variable:
+
+```python
+scene
+```
+
+represents the current version of the visualization.
+
+For example:
+
+```text
+image.copy()
+     ↓
+scene
+     ↓
+Add Boxes
+     ↓
+scene
+     ↓
+Add Ellipses
+     ↓
+scene
+     ↓
+Add Dots
+     ↓
+scene
+     ↓
+Add Labels
+     ↓
+Final scene
+```
+
+The same variable can be updated after each annotation layer.
+
+This creates a simple and reusable visualization pipeline.
+
+---
+
+## 41. Detection and Visualization Are Separate
+
+One of the most important concepts in this lesson is the separation between:
+
+```text
+Detection
+```
+
+and:
+
+```text
+Visualization
+```
+
+YOLO is responsible for detection.
+
+Supervision Annotators are responsible for visualization.
+
+```text
+YOLO
+  ↓
+Predictions
+  ↓
+sv.Detections
+  ↓
+Supervision Annotators
+  ↓
+Visualization
+```
+
+Changing the Annotator does not require changing the YOLO model.
+
+---
+
+## 42. What YOLO Controls
+
+YOLO determines:
+
+```text
+What object was detected?
+Where is the object?
+How confident is the model?
+```
+
+The detection result contains information such as:
+
+```text
+Bounding Box
+Class ID
+Confidence Score
+```
+
+These are model predictions.
+
+---
+
+## 43. What Supervision Controls
+
+Supervision determines how those predictions are displayed.
+
+For example:
+
+```text
+Bounding Box Style
+Color
+Thickness
+Labels
+Text Size
+Ellipse
+Dot
+Halo
+Blur
+Corner Style
+```
+
+These are visualization decisions.
+
+Therefore:
+
+```text
+YOLO Detection
+      ↓
+Same Detection Data
+      ↓
+Different Annotators
+      ↓
+Different Visualizations
+```
+
+---
+
+## 44. Visualization Does Not Change the Prediction
+
+Suppose YOLO detects:
+
+```text
+person 94%
+```
+
+Using:
+
+```python
+sv.BoxAnnotator()
+```
+
+does not change the prediction.
+
+Using:
+
+```python
+sv.RoundBoxAnnotator()
+```
+
+also does not change it.
+
+Using:
+
+```python
+sv.HaloAnnotator()
+```
+
+still does not change it.
+
+The detection remains:
+
+```text
+person 94%
+```
+
+Only its visual representation changes.
+
+---
+
+## 45. Confidence Threshold vs. Visualization Settings
+
+It is important to distinguish between a detection setting and a visualization setting.
+
+For example:
+
+```python
+CONFIDENCE_THRESHOLD = 0.50
+```
+
+can affect which predictions are accepted.
+
+But:
+
+```python
+thickness=3
+```
+
+only changes how a box looks.
+
+Similarly:
+
+```python
+text_scale=0.6
+```
+
+only changes the appearance of the label.
+
+Conceptually:
+
+```text
+Confidence Threshold
+        ↓
+Detection Filtering
+        ↓
+Accepted Predictions May Change
+```
+
+while:
+
+```text
+Color
+Thickness
+Text Scale
+Annotator Type
+        ↓
+Visualization
+        ↓
+Predictions Do Not Change
+```
+
+---
+
+## 46. Building a Reusable Visualization Pipeline
+
+The concepts from this lesson can be organized into a reusable pipeline.
 
 ```text
 Input Image
      ↓
-YOLO Model
+Load with OpenCV
+     ↓
+YOLO Inference
      ↓
 Detection Results
      ↓
 sv.Detections
      ↓
-┌──────────────────────┐
-│ Supervision          │
-│ Annotators           │
-├──────────────────────┤
-│ Boxes                │
-│ Labels               │
-│ Halos                │
-│ Blur                 │
-│ Corners              │
-│ Dots                 │
-│ Triangles            │
-│ Ellipses             │
-└──────────┬───────────┘
-           ↓
-Customized Visualization
+Create Labels
+     ↓
+Create Annotators
+     ↓
+Apply Annotation Layers
+     ↓
+Save Final Image
 ```
 
-The central idea is:
-
-> **Object detection determines what was found and where it was found. Annotators determine how those detections are presented visually.**
-
-By composing multiple Annotators in the correct order, we can build visualization pipelines that are clearer and better suited to the needs of a computer vision application.
+This architecture separates the different responsibilities of the application.
 
 ---
 
-## 48. Technologies Used
-
-The concepts and experiments in this lesson use the following technologies:
-
-| Technology | Purpose |
-|---|---|
-| Python | Main programming language |
-| YOLOv8 | Object detection model |
-| Ultralytics | YOLO model interface |
-| Supervision | Detection processing and visualization |
-| OpenCV | Image processing |
-| Matplotlib | Displaying and comparing images |
-| Google Colab | Notebook execution environment |
-
----
-
-## 49. Python Libraries
-
-The main libraries used in this lesson are:
+## 47. Complete Multi-Annotator Example
 
 ```python
 import cv2
 import supervision as sv
-import matplotlib.pyplot as plt
 
 from ultralytics import YOLO
-```
 
-The required packages can be installed with:
 
-```bash
-pip install supervision ultralytics
+MODEL_NAME = "yolov8n.pt"
+
+INPUT_IMAGE = "input/image.jpg"
+OUTPUT_IMAGE = "output/annotated_image.jpg"
+
+CONFIDENCE_THRESHOLD = 0.50
+
+
+# Load image
+image = cv2.imread(INPUT_IMAGE)
+
+if image is None:
+    raise FileNotFoundError(
+        f"Could not load image: {INPUT_IMAGE}"
+    )
+
+
+# Load YOLO model
+model = YOLO(MODEL_NAME)
+
+
+# Run object detection
+results = model(
+    image,
+    conf=CONFIDENCE_THRESHOLD
+)[0]
+
+
+# Convert YOLO results to Supervision
+detections = sv.Detections.from_ultralytics(
+    results
+)
+
+
+# Create labels
+labels = [
+    f"{results.names[class_id]} {confidence:.0%}"
+    for class_id, confidence in zip(
+        detections.class_id,
+        detections.confidence
+    )
+]
+
+
+# Create Annotators
+box_annotator = sv.BoxAnnotator(
+    color=sv.ColorPalette.DEFAULT,
+    thickness=3
+)
+
+ellipse_annotator = sv.EllipseAnnotator()
+
+dot_annotator = sv.DotAnnotator()
+
+label_annotator = sv.LabelAnnotator(
+    text_scale=0.6
+)
+
+
+# Layer 1 — Boxes
+scene = box_annotator.annotate(
+    scene=image.copy(),
+    detections=detections
+)
+
+
+# Layer 2 — Ellipses
+scene = ellipse_annotator.annotate(
+    scene=scene,
+    detections=detections
+)
+
+
+# Layer 3 — Dots
+scene = dot_annotator.annotate(
+    scene=scene,
+    detections=detections
+)
+
+
+# Layer 4 — Labels
+scene = label_annotator.annotate(
+    scene=scene,
+    detections=detections,
+    labels=labels
+)
+
+
+# Save result
+success = cv2.imwrite(
+    OUTPUT_IMAGE,
+    scene
+)
+
+if not success:
+    raise RuntimeError(
+        f"Could not save image: {OUTPUT_IMAGE}"
+    )
+
+
+print(
+    f"Detected objects: {len(detections)}"
+)
+
+print(
+    f"Annotated image saved to: {OUTPUT_IMAGE}"
+)
 ```
 
 ---
 
-## 50. Lesson Notebook
+## 48. Complete Pipeline Architecture
 
-The original practical lesson is contained in:
-
-```text
-01_b_anotacion_visualizacion.ipynb
-```
-
-Notebook topic:
+The complete architecture can be represented as:
 
 ```text
-02 — Anotación y Visualización
+input/image.jpg
+      ↓
+OpenCV
+      ↓
+YOLOv8
+      ↓
+Detection Results
+      ↓
+sv.Detections
+      ↓
+Create Labels
+      ↓
+BoxAnnotator
+      ↓
+EllipseAnnotator
+      ↓
+DotAnnotator
+      ↓
+LabelAnnotator
+      ↓
+output/annotated_image.jpg
 ```
 
-The notebook contains the practical experiments used throughout this documentation.
+This architecture demonstrates how object detection and visualization can be combined while remaining logically separate.
 
 ---
 
-## 51. Lesson Structure
+## 49. Practical Applications
 
-The lesson is organized into three main stages:
+Annotation and visualization are useful in many computer vision applications.
 
-```text
-Introduction and Core Concepts
-            ↓
-Practical Development and Demonstration
-            ↓
-Analysis and Edge Cases
-```
+Examples include:
 
-The notebook estimates approximately:
+- Object-detection debugging
+- Dataset inspection
+- Model evaluation
+- Security-camera analysis
+- Traffic monitoring
+- Industrial inspection
+- Retail analytics
+- Robotics
+- Autonomous systems
+- Sports analysis
+- Educational demonstrations
 
-| Section | Estimated Time |
-|---|---:|
-| Introduction and Core Concepts | 15 min |
-| Practical Development and Demonstration | 25 min |
-| Analysis and Edge Cases | 20 min |
+Visualization allows developers and users to understand what the model is detecting.
 
 ---
 
-## 52. Repository Structure
+## 50. Class Recording
 
-This lesson is documented inside the SAM3 Learning Journey repository:
+The class recording for this lesson is available on my YouTube channel:
+
+[Watch Lesson 02 — Annotation and Visualization](https://youtu.be/71h6y-YQOUA)
+
+The recording covers the practical concepts documented in this lesson, including YOLO detections, Supervision Annotators, annotation customization, label visualization, and multi-layer annotation pipelines.
+
+---
+
+## 51. Lesson Notebook
+
+The original notebook used during this lesson is included in this directory:
+
+[`01_b_anotacion_visualizacion.ipynb`](./01_b_anotacion_visualizacion.ipynb)
+
+The notebook contains the practical experiments and demonstrations used to study annotation and visualization with Supervision.
+
+It serves as the original experimental environment, while the concept notes and practical exercises provide a more structured explanation of the material.
+
+---
+
+## 52. Lesson Structure
+
+The lesson is organized into several types of learning material:
+
+```text
+02-Annotation-and-Visualization/
+│
+├── concepts/
+│   ├── README.md
+│   ├── 01-supervision-annotators.md
+│   ├── 02-annotation-customization.md
+│   └── 03-annotation-layers.md
+│
+├── practical-exercises/
+│   ├── README.md
+│   ├── 01-basic-box-annotation.md
+│   ├── 02-label-annotation.md
+│   ├── 03-annotation-customization.md
+│   └── 04-multi-annotator-challenge.md
+│
+├── 01_b_anotacion_visualizacion.ipynb
+├── CLASS-RECORDING.md
+└── README.md
+```
+
+Each section has a different purpose:
+
+| Section | Purpose |
+|---|---|
+| `README.md` | Complete lesson documentation |
+| `CLASS-RECORDING.md` | Link to the class recording |
+| Notebook | Original practical lesson notebook |
+| `concepts/` | Detailed explanations of the main concepts |
+| `practical-exercises/` | Hands-on exercises based on the lesson |
+
+---
+
+## 53. Repository Structure
+
+This lesson connects to several other sections of the SAM3 Learning Journey repository.
 
 ```text
 SAM3-Learning-Journey/
 │
-├── 08-course-notes/
-│   │
-│   ├── 00-Agentic-AI-Programming/
-│   │
-│   ├── 01-Introduction-to-Supervision/
-│   │
+├── 03-notebooks/
+│   └── Original Google Colab / Jupyter notebooks
+│
+├── 04-examples/
 │   └── 02-Annotation-and-Visualization/
+│
+├── 05-projects/
+│   └── 02-Multi-Annotator-Visualization-Pipeline/
+│
+├── 08-course-notes/
+│   └── 02-Annotation-and-Visualization/
+│       │
+│       ├── concepts/
+│       │   ├── README.md
+│       │   ├── 01-supervision-annotators.md
+│       │   ├── 02-annotation-customization.md
+│       │   └── 03-annotation-layers.md
+│       │
+│       ├── practical-exercises/
+│       │   ├── README.md
+│       │   ├── 01-basic-box-annotation.md
+│       │   ├── 02-label-annotation.md
+│       │   ├── 03-annotation-customization.md
+│       │   └── 04-multi-annotator-challenge.md
+│       │
+│       ├── 01_b_anotacion_visualizacion.ipynb
+│       ├── CLASS-RECORDING.md
 │       └── README.md
 │
 └── 09-assets/
     └── banners/
 ```
 
-This structure keeps the course material organized by topic while separating documentation from reusable visual assets.
+This structure separates:
+
+- Original notebooks
+- Reusable code examples
+- Complete practical projects
+- Detailed course notes
+- Concept explanations
+- Practical exercises
+- Class recordings
+- Repository assets
+
+This makes the learning journey easier to navigate and maintain as new SAM3 lessons are added.
 
 ---
 
-## 53. What I Learned
+## Related Material
 
-After completing this lesson, I can now explain the difference between **object detection data** and **object detection visualization**.
+### Class Recording
 
-I learned that YOLO is responsible for detecting objects, while Supervision Annotators provide flexible tools for presenting those detections.
+The complete class recording is documented here:
+
+[`CLASS-RECORDING.md`](./CLASS-RECORDING.md)
+
+You can also watch the lesson directly on YouTube:
+
+[Watch Lesson 02 — Annotation and Visualization](https://youtu.be/71h6y-YQOUA)
+
+---
+
+### Course Notebook
+
+The original lesson notebook is available here:
+
+[`01_b_anotacion_visualizacion.ipynb`](./01_b_anotacion_visualizacion.ipynb)
+
+---
+
+### Concepts
+
+Detailed concept explanations are available in:
+
+[`concepts/`](./concepts/)
+
+The concepts section contains:
+
+1. [`01-supervision-annotators.md`](./concepts/01-supervision-annotators.md)
+2. [`02-annotation-customization.md`](./concepts/02-annotation-customization.md)
+3. [`03-annotation-layers.md`](./concepts/03-annotation-layers.md)
+
+These files separate the main theoretical concepts from the larger lesson README.
+
+---
+
+### Practical Exercises
+
+Hands-on exercises are available in:
+
+[`practical-exercises/`](./practical-exercises/)
+
+The exercises progress from basic visualization to a complete multi-Annotator workflow:
+
+1. [`01-basic-box-annotation.md`](./practical-exercises/01-basic-box-annotation.md)
+2. [`02-label-annotation.md`](./practical-exercises/02-label-annotation.md)
+3. [`03-annotation-customization.md`](./practical-exercises/03-annotation-customization.md)
+4. [`04-multi-annotator-challenge.md`](./practical-exercises/04-multi-annotator-challenge.md)
+
+The learning progression is:
+
+```text
+Basic Bounding Boxes
+        ↓
+Boxes + Labels
+        ↓
+Annotation Customization
+        ↓
+Multi-Annotator Challenge
+```
+
+---
+
+### Code Examples
+
+Small reusable Python examples based on this lesson are available in:
+
+[`../../04-examples/02-Annotation-and-Visualization/`](../../04-examples/02-Annotation-and-Visualization/)
+
+These examples are designed to isolate individual concepts so they can be studied and executed independently.
+
+---
+
+### Practical Project
+
+The lesson concepts were combined into a complete reusable project:
+
+[`../../05-projects/02-Multi-Annotator-Visualization-Pipeline/`](../../05-projects/02-Multi-Annotator-Visualization-Pipeline/)
+
+The project combines:
+
+- YOLOv8
+- Ultralytics
+- OpenCV
+- Supervision
+- `sv.Detections`
+- `BoxAnnotator`
+- `EllipseAnnotator`
+- `DotAnnotator`
+- `LabelAnnotator`
+- Confidence thresholds
+- Class and confidence labels
+- Multiple visualization layers
+- Automatic output generation
+
+The project pipeline is:
+
+```text
+Input Image
+     ↓
+OpenCV
+     ↓
+YOLOv8
+     ↓
+Detection Results
+     ↓
+sv.Detections
+     ↓
+BoxAnnotator
+     ↓
+EllipseAnnotator
+     ↓
+DotAnnotator
+     ↓
+LabelAnnotator
+     ↓
+Annotated Image
+```
+
+**Project status:** Completed and tested successfully in Google Colab.
+
+---
+
+## Learning Progression
+
+The complete learning workflow for this lesson is:
+
+```text
+Class
+  ↓
+Class Recording
+  ↓
+Course Notebook
+  ↓
+Detailed Lesson Notes
+  ↓
+Concept Notes
+  ↓
+Code Examples
+  ↓
+Practical Exercises
+  ↓
+Complete Project
+```
+
+This structure transforms the original lesson into multiple forms of reusable learning material.
+
+---
+
+## 54. What I Learned
+
+After completing this lesson, I learned how object-detection results can be transformed into useful visual representations.
+
+I learned that object detection and visualization are separate responsibilities.
+
+YOLO performs the detection:
+
+```text
+What object is present?
+Where is the object?
+How confident is the model?
+```
+
+Supervision controls the visualization:
+
+```text
+How should the bounding box look?
+What color should be used?
+Should a label be displayed?
+How large should the text be?
+Should another visual effect be added?
+```
 
 I also learned how to:
 
-- Inspect detection information before visualization
-- Draw bounding boxes
-- Add labels
-- Apply alternative visualization styles
-- Customize colors
+- Convert Ultralytics YOLO results into `sv.Detections`
+- Inspect bounding-box coordinates
+- Access class IDs
+- Access confidence scores
+- Create readable class and confidence labels
+- Use `BoxAnnotator`
+- Use `RoundBoxAnnotator`
+- Use `HaloAnnotator`
+- Use `BlurAnnotator`
+- Use `BoxCornerAnnotator`
+- Use `EllipseAnnotator`
+- Use `DotAnnotator`
+- Use `LabelAnnotator`
 - Customize bounding-box thickness
-- Adjust label text size
+- Customize colors and color palettes
+- Customize label text size
 - Combine multiple Annotators
-- Control visualization through layer order
-- Build custom annotation pipelines
-
-The most important concept is that Annotators can be treated as **visual layers**.
-
-```text
-Detection
-    ↓
-Visualization Layer
-    ↓
-Visualization Layer
-    ↓
-Visualization Layer
-    ↓
-Final Result
-```
-
-The order of these layers directly affects the final visualization.
+- Reuse the same detection data across multiple visualization styles
+- Build layered annotation pipelines
+- Understand why annotation order matters
+- Preserve the original image using `image.copy()`
+- Save the final visualization with OpenCV
 
 ---
 
-## 54. Key Takeaway
+## Detection vs. Visualization
+
+The most important architectural concept from this lesson is:
+
+```text
+Detection ≠ Visualization
+```
+
+Detection produces structured information:
+
+```text
+Bounding Boxes
+Class IDs
+Confidence Scores
+```
+
+Visualization converts that information into something humans can easily interpret:
+
+```text
+Boxes
+Labels
+Colors
+Dots
+Ellipses
+Halos
+Blur
+Other Visual Layers
+```
+
+Therefore:
 
 ```text
 YOLO
   ↓
-Detects Objects
+Detection Data
   ↓
-Supervision Detections
+sv.Detections
   ↓
-Annotators
+Supervision
   ↓
-Visualizes Results
+Visual Representation
 ```
 
-**Detection answers:**
+---
 
-> What did the model find and where?
+## From Lesson to Project
 
-**Annotation answers:**
+This lesson also demonstrates how a course concept can evolve into a complete project.
 
-> How should those results be shown to the user?
+```text
+Learn Annotators
+      ↓
+Experiment in Notebook
+      ↓
+Document Concepts
+      ↓
+Create Small Examples
+      ↓
+Complete Practical Exercises
+      ↓
+Combine Annotation Layers
+      ↓
+Build Reusable Project
+```
+
+The final result is:
+
+```text
+02-Multi-Annotator-Visualization-Pipeline
+```
+
+This project demonstrates how the concepts studied during the lesson can be organized into a reusable computer vision application.
+
+---
+
+## 55. Key Takeaway
+
+The central idea of this lesson is:
+
+> **Object detection determines what the model sees, while annotation determines how those detections are communicated visually.**
+
+A single set of detections can support many different visual representations.
+
+```text
+                    ┌── Bounding Boxes
+                    │
+                    ├── Rounded Boxes
+                    │
+                    ├── Labels
+YOLO → Detections ──┼── Ellipses
+                    │
+                    ├── Dots
+                    │
+                    ├── Halos
+                    │
+                    └── Blur
+```
+
+This means the detection model does not need to change when we want to change the visualization.
+
+The complete architecture is:
+
+```text
+Input Image
+     ↓
+YOLOv8
+     ↓
+Detection Results
+     ↓
+sv.Detections
+     ↓
+Visualization Configuration
+     ↓
+Supervision Annotators
+     ↓
+Annotation Layers
+     ↓
+Final Visualization
+```
+
+This separation makes computer vision applications more:
+
+- Flexible
+- Reusable
+- Readable
+- Customizable
+- Easier to debug
+- Easier to document
+
+---
+
+## Lesson Status
+
+| Component | Status |
+|---|---|
+| Main Lesson Notes | Completed |
+| Class Recording | Completed |
+| Course Notebook | Added |
+| Concepts | Completed |
+| Practical Exercises | Completed |
+| Code Examples | Completed |
+| Multi-Annotator Project | Completed & Tested |
+
+**Lesson 02 — Annotation and Visualization: Completed**
 
 ---
 
@@ -1992,9 +2192,7 @@ Visualizes Results
 
 **Peyman Miyandashti**
 
-SAM3 Learning Journey  
+SAM3 Computer Vision Learning Journey  
 Computer Vision · Artificial Intelligence · Machine Learning
 
 [LinkedIn](https://www.linkedin.com/in/peyman-mxli/) | [GitHub](https://github.com/Peyman-mxli)
-
----
