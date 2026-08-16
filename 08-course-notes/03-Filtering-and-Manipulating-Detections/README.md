@@ -8,13 +8,13 @@ Object detection models such as YOLO can return many detected objects. However, 
 
 We may want to:
 
-* Keep only specific object classes
-* Remove low-confidence predictions
-* Filter objects according to their size
-* Combine multiple filtering conditions
-* Remove duplicate bounding boxes
-* Select the most confident detections
-* Filter objects according to their position in an image
+- Keep only specific object classes
+- Remove low-confidence predictions
+- Filter objects according to their size
+- Combine multiple filtering conditions
+- Remove duplicate bounding boxes
+- Select the most confident detections
+- Filter objects according to their position in an image
 
 In this lesson, I learned how to perform these operations using the `sv.Detections` class from the **Supervision** library.
 
@@ -24,20 +24,20 @@ In this lesson, I learned how to perform these operations using the `sv.Detectio
 
 By the end of this lesson, I learned how to:
 
-* Understand `sv.Detections` as a filterable data structure
-* Create Boolean masks for detections
-* Filter detections by confidence score
-* Filter detections by class
-* Combine multiple filtering conditions
-* Use element-wise Boolean operators such as `&`
-* Merge detections from multiple sources
-* Apply Non-Maximum Suppression (NMS)
-* Understand the effect of different NMS thresholds
-* Filter detections according to bounding-box area
-* Sort detections by confidence
-* Select the Top-N most confident detections
-* Calculate the center of bounding boxes
-* Filter objects according to their position in an image
+- Understand `sv.Detections` as a filterable data structure
+- Create Boolean masks for detections
+- Filter detections by confidence score
+- Filter detections by class
+- Combine multiple filtering conditions
+- Use element-wise Boolean operators such as `&`
+- Merge detections from multiple sources
+- Apply Non-Maximum Suppression (NMS)
+- Understand the effect of different NMS thresholds
+- Filter detections according to bounding-box area
+- Sort detections by confidence
+- Select the Top-N most confident detections
+- Calculate the center of bounding boxes
+- Filter objects according to their position in an image
 
 ---
 
@@ -45,12 +45,12 @@ By the end of this lesson, I learned how to:
 
 The practical examples in this lesson use:
 
-* Python
-* Ultralytics YOLO
-* Supervision
-* OpenCV
-* NumPy
-* Matplotlib
+- Python
+- [Ultralytics YOLO](https://github.com/ultralytics/ultralytics)
+- [Supervision](https://github.com/roboflow/supervision)
+- [OpenCV](https://opencv.org/)
+- [NumPy](https://numpy.org/)
+- [Matplotlib](https://matplotlib.org/)
 
 Main imports:
 
@@ -70,13 +70,13 @@ The `sv.Detections` object can be understood similarly to a table.
 
 Each detected object represents one row containing information such as:
 
-| Bounding Box          | Confidence | Class ID |
-| --------------------- | ---------: | -------: |
-| `[10, 20, 50, 80]`    |       0.92 |        0 |
-| `[100, 30, 200, 120]` |       0.71 |        0 |
-| `[300, 10, 600, 400]` |       0.85 |        5 |
+| Bounding Box | Confidence | Class ID |
+|---|---:|---:|
+| `[10, 20, 50, 80]` | 0.92 | 0 |
+| `[100, 30, 200, 120]` | 0.71 | 0 |
+| `[300, 10, 600, 400]` | 0.85 | 5 |
 
-This makes it possible to filter detections in a way that is similar to filtering rows in a spreadsheet or values in a NumPy array.
+This makes it possible to filter detections in a way similar to filtering rows in a spreadsheet or values in a NumPy array.
 
 For example:
 
@@ -96,14 +96,13 @@ In the COCO dataset, class `0` represents a **person**.
 
 Filtering in Supervision relies heavily on **Boolean masks**.
 
-A Boolean mask is an array containing:
+A Boolean mask is an array containing values such as:
 
 ```text
 True
 False
 True
 False
-...
 ```
 
 Each value corresponds to one detection.
@@ -138,8 +137,6 @@ Object detection models assign a **confidence score** to each prediction.
 
 The confidence score represents how certain the model is about a detected object.
 
-For example:
-
 ```python
 mask = detections.confidence > 0.5
 high_confidence = detections[mask]
@@ -149,18 +146,18 @@ This keeps only detections with confidence greater than **50%**.
 
 Filtering low-confidence predictions is useful because they may represent:
 
-* Incorrect detections
-* Background objects
-* Ambiguous objects
-* Detection noise
+- Incorrect detections
+- Background objects
+- Ambiguous objects
+- Detection noise
 
-Increasing the confidence threshold generally produces fewer detections but increases the certainty required for each prediction.
+Increasing the confidence threshold generally produces fewer detections but requires greater certainty from the model.
 
 ---
 
 # 4. Filtering by Class
 
-We can also select detections according to their object class.
+We can select detections according to their object class.
 
 For example:
 
@@ -186,10 +183,10 @@ This is useful when an application only needs certain types of objects.
 
 Examples include:
 
-* Detecting only people in a security system
-* Detecting only vehicles in traffic analysis
-* Detecting only animals in wildlife monitoring
-* Detecting only products in a retail application
+- Detecting only people in a security system
+- Detecting only vehicles in traffic analysis
+- Detecting only animals in wildlife monitoring
+- Detecting only products in a retail application
 
 ---
 
@@ -212,11 +209,9 @@ The `&` operator performs an element-by-element logical AND operation.
 
 Both conditions must be true for a detection to remain.
 
----
+### Important: `&` vs `and`
 
-## Important: `&` vs `and`
-
-When working with NumPy arrays or `sv.Detections`, we should use:
+When working with NumPy arrays or `sv.Detections`, use:
 
 ```python
 &
@@ -244,8 +239,6 @@ Incorrect:
 (class_condition) and (confidence_condition)
 ```
 
-This distinction is important when creating more advanced filtering pipelines.
-
 ---
 
 # 6. Excluding a Class
@@ -253,8 +246,6 @@ This distinction is important when creating more advanced filtering pipelines.
 Filtering can also be reversed.
 
 Instead of selecting a class, we can remove it.
-
-For example:
 
 ```python
 without_buses = detections[
@@ -271,8 +262,6 @@ class_id 5 = bus
 The `!=` operator means:
 
 > Keep everything whose class ID is NOT equal to 5.
-
-This technique is useful when most detected classes are relevant except for one or a few unwanted categories.
 
 ---
 
@@ -299,8 +288,6 @@ filtered = detections.with_nms(
 )
 ```
 
-A threshold of `0.5` means that strongly overlapping boxes can be considered duplicates and the weaker detection can be removed.
-
 ---
 
 # 8. Creating and Merging Detections
@@ -312,19 +299,14 @@ results_low = model(image, conf=0.3)[0]
 results_high = model(image, conf=0.7)[0]
 ```
 
-These predictions are converted into Supervision detections:
+Convert them into Supervision detections:
 
 ```python
-det_low = sv.Detections.from_ultralytics(
-    results_low
-)
-
-det_high = sv.Detections.from_ultralytics(
-    results_high
-)
+det_low = sv.Detections.from_ultralytics(results_low)
+det_high = sv.Detections.from_ultralytics(results_high)
 ```
 
-They can then be combined:
+Then combine them:
 
 ```python
 merged = sv.Detections.merge([
@@ -335,11 +317,9 @@ merged = sv.Detections.merge([
 
 Because both detection sets were generated from the same image, some objects can appear more than once.
 
-This creates a useful example for understanding duplicate detections.
-
 ---
 
-# 9. Applying NMS to Merged Detections
+# 9. Applying NMS
 
 After merging the detections:
 
@@ -349,9 +329,7 @@ without_duplicates = merged.with_nms(
 )
 ```
 
-NMS evaluates overlapping bounding boxes and removes redundant predictions.
-
-The difference can then be visualized:
+The process can be represented as:
 
 ```text
 Before NMS
@@ -365,25 +343,19 @@ Keep strongest predictions
 Cleaner detection results
 ```
 
-This is an important post-processing technique in object detection systems.
-
 ---
 
 # 10. Understanding the NMS Threshold
 
 The lesson experiments with:
 
-```python
+```text
 0.3
 0.5
 0.8
 ```
 
-for the NMS threshold.
-
 A lower threshold is generally **more aggressive** because less overlap is required before one of the boxes is suppressed.
-
-For example:
 
 ```text
 Threshold 0.3
@@ -398,8 +370,6 @@ More overlap allowed
 
 The correct threshold depends on the application.
 
-If objects frequently appear close together, an overly aggressive NMS threshold could accidentally remove valid detections.
-
 ---
 
 # 11. Filtering by Object Size
@@ -410,9 +380,7 @@ Supervision can calculate the area of each detected bounding box:
 areas = detections.area
 ```
 
-The area represents the size of the bounding box in pixels squared.
-
-We can inspect statistics such as:
+We can inspect statistics:
 
 ```python
 print(areas.min())
@@ -430,26 +398,20 @@ large_objects = detections[
 
 This keeps only objects whose bounding boxes contain more than `5000 px²`.
 
----
-
-## Why Filter by Size?
+### Why Filter by Size?
 
 Very small detections can sometimes represent:
 
-* Noise
-* Distant objects
-* False positives
-* Objects that are not useful for the application
-
-Size filtering can therefore be combined with confidence and class filtering to build more reliable computer vision pipelines.
+- Noise
+- Distant objects
+- False positives
+- Objects that are not useful for the application
 
 ---
 
 # 12. Selecting the Most Confident Detections
 
-NumPy can be used to sort detections according to confidence.
-
-For example:
+NumPy can sort detections according to confidence.
 
 ```python
 top3_indices = np.argsort(
@@ -463,13 +425,15 @@ Then:
 top3 = detections[top3_indices]
 ```
 
-The process works in three steps.
+The operation:
 
 ```python
 np.argsort(detections.confidence)
 ```
 
-returns indices sorted from lowest to highest.
+sorts the indices from lowest to highest.
+
+Then:
 
 ```python
 [::-1]
@@ -483,7 +447,7 @@ Finally:
 [:3]
 ```
 
-keeps only the first three indices.
+keeps the first three.
 
 The result is the **Top 3 most confident detections**.
 
@@ -493,16 +457,16 @@ The result is the **Top 3 most confident detections**.
 
 Detections can also be filtered according to where they appear inside an image.
 
-This is especially useful in applications involving:
+This is useful for:
 
-* Regions of interest
-* Traffic lanes
-* Restricted areas
-* Entry and exit zones
-* Surveillance systems
-* Industrial inspection
+- Regions of interest
+- Traffic lanes
+- Restricted areas
+- Entry and exit zones
+- Surveillance systems
+- Industrial inspection
 
-The lesson's extension challenge asks us to keep only objects located in the **right half of the image**.
+The extension challenge asks us to keep only objects located in the **right half of the image**.
 
 ---
 
@@ -514,14 +478,14 @@ A bounding box uses the format:
 [x1, y1, x2, y2]
 ```
 
-where:
+Where:
 
-* `x1` = left coordinate
-* `y1` = top coordinate
-* `x2` = right coordinate
-* `y2` = bottom coordinate
+- `x1` = left coordinate
+- `y1` = top coordinate
+- `x2` = right coordinate
+- `y2` = bottom coordinate
 
-The horizontal center can be calculated using:
+The horizontal center is calculated using:
 
 ```python
 centers_x = (
@@ -530,7 +494,7 @@ centers_x = (
 ) / 2
 ```
 
-The center formula is:
+Formula:
 
 ```text
 center_x = (x1 + x2) / 2
@@ -540,31 +504,31 @@ center_x = (x1 + x2) / 2
 
 # 15. Right-Half Image Challenge
 
-The width of the image can be obtained with:
+The width of the image is:
 
 ```python
 image.shape[1]
 ```
 
-Therefore, the horizontal midpoint is:
+The horizontal midpoint is:
 
 ```python
 image_midpoint = image.shape[1] / 2
 ```
 
-We can create a Boolean mask:
+Create the Boolean mask:
 
 ```python
 mask = centers_x > image_midpoint
 ```
 
-And complete the challenge with:
+Then filter:
 
 ```python
 right_detections = detections[mask]
 ```
 
-The complete solution is:
+### Complete Solution
 
 ```python
 centers_x = (
@@ -579,57 +543,53 @@ mask = centers_x > image_midpoint
 right_detections = detections[mask]
 ```
 
-This keeps only detections whose horizontal center is located on the right side of the image.
-
 ---
 
-# 16. Complete Filtering Pipeline
+# 16. Complete Detection Filtering Pipeline
 
-The concepts from this lesson can be combined into a larger pipeline.
-
-For example:
+The concepts from this lesson can be combined into a complete post-processing pipeline:
 
 ```text
 Image
   ↓
 YOLO
   ↓
-Raw detections
+Raw Detections
   ↓
-Confidence filtering
+Confidence Filtering
   ↓
-Class filtering
+Class Filtering
   ↓
-Size filtering
+Size Filtering
   ↓
 NMS
   ↓
-Spatial filtering
+Spatial Filtering
   ↓
-Final detections
+Final Detections
 ```
 
-This demonstrates an important computer vision principle:
+An important lesson from this workflow is:
 
-> Model inference is only one part of the pipeline. Post-processing determines which predictions are actually useful for the application.
+> Model inference is only one part of a computer vision pipeline. Post-processing determines which predictions are actually useful for the application.
 
 ---
 
 # Key Concepts
 
-| Concept                 | Purpose                         |
-| ----------------------- | ------------------------------- |
-| `detections.confidence` | Access confidence scores        |
-| `detections.class_id`   | Access detected classes         |
-| `detections.xyxy`       | Access bounding-box coordinates |
-| `detections.area`       | Calculate bounding-box areas    |
-| Boolean masks           | Select specific detections      |
-| `&`                     | Combine filtering conditions    |
-| `!=`                    | Exclude detections              |
-| `sv.Detections.merge()` | Combine detection sets          |
-| `.with_nms()`           | Remove duplicate detections     |
-| `np.argsort()`          | Sort detections                 |
-| `image.shape[1]`        | Obtain image width              |
+| Concept | Purpose |
+|---|---|
+| `detections.confidence` | Access confidence scores |
+| `detections.class_id` | Access detected classes |
+| `detections.xyxy` | Access bounding-box coordinates |
+| `detections.area` | Calculate bounding-box areas |
+| Boolean masks | Select specific detections |
+| `&` | Combine filtering conditions |
+| `!=` | Exclude detections |
+| `sv.Detections.merge()` | Combine detection sets |
+| `.with_nms()` | Remove duplicate detections |
+| `np.argsort()` | Sort detections |
+| `image.shape[1]` | Obtain image width |
 
 ---
 
@@ -649,23 +609,23 @@ These techniques are important building blocks for creating more advanced comput
 
 # Key Takeaways
 
-* `sv.Detections` can be filtered using NumPy-style Boolean masks.
-* Confidence filtering removes uncertain predictions.
-* Class filtering allows applications to focus on specific objects.
-* Multiple conditions can be combined using `&`.
-* NMS removes overlapping duplicate detections.
-* Bounding-box area can be used to filter objects by size.
-* NumPy can sort detections according to confidence.
-* Bounding-box coordinates allow detections to be filtered spatially.
-* Detection post-processing is essential for building practical computer vision applications.
+- `sv.Detections` can be filtered using NumPy-style Boolean masks.
+- Confidence filtering removes uncertain predictions.
+- Class filtering allows applications to focus on specific objects.
+- Multiple conditions can be combined using `&`.
+- NMS removes overlapping duplicate detections.
+- Bounding-box area can be used to filter objects by size.
+- NumPy can sort detections according to confidence.
+- Bounding-box coordinates allow detections to be filtered spatially.
+- Detection post-processing is essential for practical computer vision applications.
 
 ---
 
 ## Lesson Status
 
-**Lesson:** 03 — Filtering and Manipulating Detections
-**Notebook:** `02_a_filtrado_detecciones.ipynb`
-**Topic:** Detection Filtering and Post-Processing
+**Lesson:** 03 — Filtering and Manipulating Detections  
+**Notebook:** `02_a_filtrado_detecciones.ipynb`  
+**Topic:** Detection Filtering and Post-Processing  
 **Status:** Documented
 
 ---
@@ -674,8 +634,11 @@ These techniques are important building blocks for creating more advanced comput
 
 **Peyman Miyandashti**
 
-SAM3 Computer Vision Learning Journey
+SAM3 Computer Vision Learning Journey  
 Computer Vision · Artificial Intelligence · Machine Learning
 
-**LinkedIn:** linkedin.com/in/peyman-mxli/
-**GitHub:** github.com/Peyman-mxli
+[LinkedIn](https://www.linkedin.com/in/peyman-mxli/) | [GitHub](https://github.com/Peyman-mxli)
+
+---
+
+[Back to SAM3 Learning Journey](https://github.com/Peyman-mxli/SAM3-Learning-Journey)
