@@ -13,6 +13,7 @@ The purpose of this section is to document each course session in a structured w
 | 00 | [Agentic AI Programming](./00-Agentic-AI-Programming/) | ✅ Completed |
 | 01 | [Introduction to Supervision](./01-Introduction-to-Supervision/) | ✅ Completed |
 | 02 | [Annotation and Visualization](./02-Annotation-and-Visualization/) | ✅ Completed |
+| 03 | [Filtering and Manipulating Detections](./03-Filtering-and-Manipulating-Detections/) | ✅ Completed |
 
 ---
 
@@ -127,6 +128,101 @@ This lesson also connects directly to the practical project:
 05-projects/
 └── 02-Multi-Annotator-Visualization-Pipeline/
 ```
+
+**Status:** Completed
+
+---
+
+## Session 03 — Filtering and Manipulating Detections
+
+[`03-Filtering-and-Manipulating-Detections/`](./03-Filtering-and-Manipulating-Detections/)
+
+This session focuses on **post-processing object detections** and selecting exactly which predictions should continue through a computer vision pipeline.
+
+Instead of using every raw prediction produced by YOLO, detections can be filtered according to confidence, class, size, position, and other conditions.
+
+Topics include:
+
+- `sv.Detections` filtering
+- NumPy-style Boolean masks
+- Confidence filtering
+- Class filtering
+- Combining multiple conditions
+- Element-wise Boolean operators
+- Excluding specific classes
+- Bounding-box area filtering
+- Detection merging
+- `sv.Detections.merge()`
+- Non-Maximum Suppression (NMS)
+- Intersection over Union (IoU)
+- NMS thresholds
+- Duplicate detection removal
+- Sorting detections by confidence
+- `np.argsort()`
+- Top-N detection selection
+- Bounding-box coordinates
+- Bounding-box center calculation
+- Spatial filtering
+- Left/right image filtering
+- Region-based detection logic
+
+The session develops the post-processing workflow:
+
+```text
+Input Image
+     ↓
+YOLO
+     ↓
+Raw Detections
+     ↓
+sv.Detections
+     ↓
+Confidence Filtering
+     ↓
+Class Filtering
+     ↓
+Size Filtering
+     ↓
+Merge + NMS
+     ↓
+Confidence Ranking
+     ↓
+Spatial Filtering
+     ↓
+Final Relevant Detections
+```
+
+### Detection Filtering Example
+
+A computer vision application can define increasingly specific requirements:
+
+```text
+All Detections
+      ↓
+Keep Only People
+      ↓
+Confidence > 60%
+      ↓
+Area > 5000 px²
+      ↓
+Remove Duplicate Boxes
+      ↓
+Keep Only Required Image Region
+      ↓
+Final Detections
+```
+
+This demonstrates that model inference is only one part of an object-detection system.
+
+**Post-processing determines which predictions are actually useful for the application.**
+
+### Lesson Materials
+
+- [Main Lesson Documentation](./03-Filtering-and-Manipulating-Detections/README.md)
+- [Concept Documentation](./03-Filtering-and-Manipulating-Detections/concepts/)
+- [Practical Exercises](./03-Filtering-and-Manipulating-Detections/practical-exercises/)
+- [Original Course Notebook](./03-Filtering-and-Manipulating-Detections/02_a_filtrado_detecciones.ipynb)
+- [Class Recording](./03-Filtering-and-Manipulating-Detections/CLASS-RECORDING.md)
 
 **Status:** Completed
 
@@ -260,10 +356,22 @@ The course notes currently cover technologies and concepts including:
 - Confidence scores
 - Confidence thresholds
 - Detection labels
+- Boolean masks
+- Detection filtering
+- Class filtering
+- Size filtering
+- Spatial filtering
+- Bounding-box area
+- Bounding-box center calculation
+- Detection merging
+- Non-Maximum Suppression (NMS)
+- Intersection over Union (IoU)
+- Top-N detection selection
 - Supervision Annotators
 - Annotation customization
 - Annotation layers
 - Multi-Annotator pipelines
+- Detection post-processing
 - Google Colab
 - AI-assisted programming
 
@@ -278,19 +386,21 @@ As the course progresses, this list will expand toward more advanced computer vi
 | 00 | Agentic AI Programming | ✅ | ✅ | ✅ | Completed |
 | 01 | Introduction to Supervision | ✅ | ✅ | ✅ | Completed |
 | 02 | Annotation and Visualization | ✅ | ✅ | ✅ | Completed |
+| 03 | Filtering and Manipulating Detections | ✅ | ✅ | ✅ | Completed |
 
 ---
 
 ## Progress Overview
 
 ```text
-00 — Agentic AI Programming          ✅ Completed
-01 — Introduction to Supervision     ✅ Completed
-02 — Annotation and Visualization    ✅ Completed
-03 — Next Course Session             ⏳ Upcoming
+00 — Agentic AI Programming                ✅ Completed
+01 — Introduction to Supervision           ✅ Completed
+02 — Annotation and Visualization          ✅ Completed
+03 — Filtering and Manipulating Detections ✅ Completed
+04 — Next Course Session                   ⏳ Upcoming
 ```
 
-**Completed course sessions: 3**
+**Completed course sessions: 4**
 
 ---
 
@@ -307,6 +417,10 @@ The goal of these notes is not only to preserve the course material, but also to
 - Computer vision pipelines
 - Detection visualization
 - Annotation systems
+- Detection filtering
+- Detection post-processing
+- Non-Maximum Suppression
+- Spatial analysis
 - Practical AI development
 
 Each completed session expands the repository from basic concepts toward complete computer vision applications.
@@ -315,7 +429,7 @@ Each completed session expands the repository from basic concepts toward complet
 
 ## Repository Learning Progression
 
-The overall learning progression can be represented as:
+The overall learning progression can now be represented as:
 
 ```text
 Agentic AI Programming
@@ -323,6 +437,8 @@ Agentic AI Programming
 Introduction to Supervision
         ↓
 Annotation and Visualization
+        ↓
+Filtering and Manipulating Detections
         ↓
 Advanced Computer Vision Concepts
         ↓
