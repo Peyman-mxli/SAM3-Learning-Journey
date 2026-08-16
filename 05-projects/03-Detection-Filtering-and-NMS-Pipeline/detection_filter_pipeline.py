@@ -13,7 +13,7 @@ from ultralytics import YOLO
 
 MODEL_NAME = "yolov8n.pt"
 
-INPUT_IMAGE = "assets/input/image.jpg"
+INPUT_IMAGE = "assets/input/pedestrian-plaza-detection-test.png"
 OUTPUT_IMAGE = "assets/output/filtered_detections.jpg"
 
 CONFIDENCE_THRESHOLD = 0.50
@@ -215,7 +215,7 @@ if (
 
     labels = [
         (
-            f"{results.names[class_id]} "
+            f"{results.names[int(class_id)]} "
             f"{confidence:.1%}"
         )
         for class_id, confidence in zip(
@@ -293,6 +293,7 @@ if not success:
 # --------------------------------------------------
 
 print()
+
 print(
     "Detection Filtering Pipeline Complete"
 )
@@ -309,3 +310,4 @@ print(
     f"Final detections: "
     f"{len(detections)}"
 )
+```
