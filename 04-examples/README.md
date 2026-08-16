@@ -66,6 +66,50 @@ The examples demonstrate how the same YOLO detection results can be presented us
 
 ---
 
+### 03 — Filtering and Manipulating Detections
+
+[`03-Filtering-and-Manipulating-Detections/`](./03-Filtering-and-Manipulating-Detections/)
+
+Examples covering:
+
+- Confidence filtering
+- Boolean masks
+- Class filtering
+- Multiple filtering conditions
+- Class exclusion
+- Bounding-box area
+- Size filtering
+- Detection merging
+- Non-Maximum Suppression
+- Confidence sorting
+- Top-N detection selection
+- Bounding-box center calculations
+- Spatial filtering
+
+These examples demonstrate how raw YOLO predictions can be transformed into application-specific detections using **Supervision** and **NumPy**.
+
+The filtering workflow can be represented as:
+
+```text
+Raw Detections
+      ↓
+Confidence Filtering
+      ↓
+Class Filtering
+      ↓
+Size Filtering
+      ↓
+NMS
+      ↓
+Top-N Selection
+      ↓
+Spatial Filtering
+      ↓
+Application-Specific Detections
+```
+
+---
+
 ## Repository Organization
 
 The SAM3 Learning Journey separates different types of material:
@@ -124,11 +168,11 @@ Detection Results
     ↓
 sv.Detections
     ↓
+Filtering / Manipulation
+    ↓
 Supervision Annotators
     ↓
-Boxes / Labels / Effects
-    ↓
-Final Visualization
+Visualization / Output
 ```
 
 ---
@@ -165,6 +209,14 @@ Examples in this directory may use:
 │   ├── 04_layer_order.py
 │   └── 05_custom_composition.py
 │
+├── 03-Filtering-and-Manipulating-Detections/
+│   ├── README.md
+│   ├── 01_confidence_filtering.py
+│   ├── 02_class_and_boolean_filtering.py
+│   ├── 03_size_filtering.py
+│   ├── 04_nms_and_top_n.py
+│   └── 05_spatial_filtering.py
+│
 └── README.md
 ```
 
@@ -172,7 +224,7 @@ Examples in this directory may use:
 
 ## 02 — Annotation and Visualization Examples
 
-The newest examples focus on transforming raw object detections into clear visual results.
+These examples focus on transforming raw object detections into clear visual results.
 
 ### Basic Box and Label
 
@@ -276,6 +328,216 @@ Custom Visualization
 
 ---
 
+## 03 — Filtering and Manipulating Detections Examples
+
+These examples focus on selecting, removing, ranking, and manipulating object detections after model inference.
+
+### Confidence Filtering
+
+```text
+01_confidence_filtering.py
+```
+
+Demonstrates how a Boolean confidence mask can remove low-confidence predictions:
+
+```python
+high_confidence = detections[
+    detections.confidence > 0.50
+]
+```
+
+The basic concept is:
+
+```text
+All Detections
+      ↓
+Confidence > Threshold
+      ↓
+High-Confidence Detections
+```
+
+---
+
+### Class and Boolean Filtering
+
+```text
+02_class_and_boolean_filtering.py
+```
+
+Demonstrates how detections can be selected according to class:
+
+```python
+detections.class_id == 0
+```
+
+Multiple conditions can also be combined:
+
+```python
+(
+    detections.class_id == 0
+)
+&
+(
+    detections.confidence > 0.60
+)
+```
+
+This example also demonstrates class exclusion using:
+
+```python
+detections.class_id != 0
+```
+
+---
+
+### Size Filtering
+
+```text
+03_size_filtering.py
+```
+
+Demonstrates how bounding-box area can be used to remove small detections:
+
+```python
+large_detections = detections[
+    detections.area > 5000
+]
+```
+
+The example also inspects:
+
+```text
+Minimum Area
+Maximum Area
+Average Area
+```
+
+before applying the size filter.
+
+---
+
+### NMS and Top-N Selection
+
+```text
+04_nms_and_top_n.py
+```
+
+Demonstrates how multiple detection collections can be merged:
+
+```python
+merged = sv.Detections.merge([
+    detections_low,
+    detections_high
+])
+```
+
+Non-Maximum Suppression is then applied:
+
+```python
+after_nms = merged.with_nms(
+    threshold=0.50
+)
+```
+
+Finally, NumPy sorts the detections by confidence:
+
+```python
+indices_top = np.argsort(
+    after_nms.confidence
+)[::-1][:TOP_N]
+```
+
+This produces a workflow such as:
+
+```text
+Detection Set A
+        +
+Detection Set B
+        ↓
+      Merge
+        ↓
+       NMS
+        ↓
+Confidence Sorting
+        ↓
+      Top-N
+```
+
+---
+
+### Spatial Filtering
+
+```text
+05_spatial_filtering.py
+```
+
+Demonstrates how bounding-box coordinates can be used to filter detections according to their location.
+
+The horizontal center of each bounding box is calculated with:
+
+```python
+centers_x = (
+    detections.xyxy[:, 0]
+    + detections.xyxy[:, 2]
+) / 2
+```
+
+The image midpoint is calculated with:
+
+```python
+image_midpoint = image.shape[1] / 2
+```
+
+The final filter keeps detections located in the right half:
+
+```python
+right_side_detections = detections[
+    centers_x > image_midpoint
+]
+```
+
+This introduces the idea of **region-based detection filtering**.
+
+---
+
+## From Examples to Project
+
+The five Lesson 03 examples isolate individual concepts:
+
+```text
+01_confidence_filtering.py
+        ↓
+02_class_and_boolean_filtering.py
+        ↓
+03_size_filtering.py
+        ↓
+04_nms_and_top_n.py
+        ↓
+05_spatial_filtering.py
+```
+
+These concepts are then combined into:
+
+[Project 03 — Detection Filtering and NMS Pipeline](../05-projects/03-Detection-Filtering-and-NMS-Pipeline/)
+
+The progression is:
+
+```text
+Small Examples
+      ↓
+Understand Individual Techniques
+      ↓
+Combine Techniques
+      ↓
+Complete Filtering Pipeline
+      ↓
+Test in Google Colab
+      ↓
+Generate Real Output
+```
+
+---
+
 ## Purpose
 
 The purpose of this directory is to transform the concepts studied during the course into practical, reusable code.
@@ -305,8 +567,9 @@ As new SAM3 sessions are completed, additional example directories will be added
 | 00 | Agentic AI Programming | 2 |
 | 01 | Introduction to Supervision | 8 |
 | 02 | Annotation and Visualization | 5 |
+| 03 | Filtering and Manipulating Detections | 5 |
 
-**Total runnable examples: 15**
+**Total runnable examples: 20**
 
 ---
 
