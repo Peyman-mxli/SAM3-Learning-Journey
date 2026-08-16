@@ -11,14 +11,14 @@ The project uses:
 - OpenCV
 - NumPy
 
-The goal is to take raw object detections and keep only the predictions that are useful for the application.
+The goal is to take raw object detections and progressively filter them until only the predictions relevant to the application remain.
 
 The pipeline includes:
 
 - Confidence filtering
 - Class filtering
 - Size filtering
-- Non-Maximum Suppression
+- Non-Maximum Suppression (NMS)
 - Top-N confidence selection
 - Spatial filtering
 - Final annotated visualization
@@ -42,7 +42,7 @@ Class Filtering
      ↓
 Size Filtering
      ↓
-Merge / NMS
+NMS
      ↓
 Top-N Selection
      ↓
@@ -61,13 +61,15 @@ Annotated Output
 03-Detection-Filtering-and-NMS-Pipeline/
 │
 ├── assets/
+│   ├── README.md
+│   │
 │   ├── input/
-│   │   └── image.jpg
+│   │   ├── README.md
+│   │   └── pedestrian-plaza-detection-test.png
 │   │
-│   ├── output/
-│   │   └── filtered_detections.jpg
-│   │
-│   └── screenshots/
+│   └── output/
+│       ├── README.md
+│       └── filtered_detections.jpg
 │
 ├── detection_filter_pipeline.py
 ├── requirements.txt
@@ -76,112 +78,270 @@ Annotated Output
 
 ---
 
+## Input Image
+
+The project uses a pedestrian street scene containing multiple people at different positions and distances from the camera.
+
+This makes the image useful for testing:
+
+- Person detection
+- Confidence thresholds
+- Bounding-box size filtering
+- Top-N selection
+- Spatial filtering
+
+### Original Image
+
+![Pedestrian Plaza Detection Test](assets/input/pedestrian-plaza-detection-test.png)
+
+The pipeline loads this image from:
+
+```python
+INPUT_IMAGE = "assets/input/pedestrian-plaza-detection-test.png"
+```
+
+---
+
 ## Main Features
 
 ### Confidence Filtering
 
-Removes detections below a selected confidence threshold.
+Detections below the configured confidence threshold are removed.
 
-Example:
+The project uses:
+
+```python
+CONFIDENCE_THRESHOLD = 0.50
+```
+
+Filtering is performed with:
 
 ```python
 detections = detections[
-    detections.confidence > 0.5
+    detections.confidence > CONFIDENCE_THRESHOLD
 ]
 ```
+
+This keeps predictions with confidence greater than 50%.
 
 ---
 
 ### Class Filtering
 
-Keeps only detections belonging to selected object classes.
+The project focuses specifically on detecting people.
 
-Example:
-
-```python
-detections = detections[
-    detections.class_id == 0
-]
-```
-
-For the COCO dataset:
+COCO class:
 
 ```text
 class_id 0 = person
 ```
 
+The target class is configured with:
+
+```python
+TARGET_CLASS_ID = 0
+```
+
+Filtering is performed with:
+
+```python
+detections = detections[
+    detections.class_id == TARGET_CLASS_ID
+]
+```
+
+All detections belonging to other classes are removed.
+
 ---
 
 ### Size Filtering
 
-Removes detections whose bounding boxes are too small.
+Small bounding boxes can represent distant objects, irrelevant detections, or noise.
 
-Example:
+The project uses:
+
+```python
+MIN_AREA = 5000
+```
+
+Filtering is performed with:
 
 ```python
 detections = detections[
-    detections.area > 5000
+    detections.area > MIN_AREA
 ]
 ```
 
-This helps eliminate small or irrelevant detections.
+Only detections with a bounding-box area greater than 5000 pixels² continue through the pipeline.
 
 ---
 
 ### Non-Maximum Suppression
 
-NMS removes redundant overlapping bounding boxes.
+Non-Maximum Suppression removes redundant bounding boxes that represent the same object.
 
-Example:
+The project uses:
+
+```python
+NMS_THRESHOLD = 0.50
+```
+
+NMS is applied with:
 
 ```python
 detections = detections.with_nms(
-    threshold=0.5
+    threshold=NMS_THRESHOLD
 )
 ```
 
-This keeps the strongest predictions while removing duplicate detections.
+This helps prevent duplicate detections from appearing in the final result.
 
 ---
 
 ### Top-N Detection Selection
 
-The detections can be ranked according to confidence.
+After filtering and NMS, detections are ranked according to confidence.
 
-Example:
+The project uses:
+
+```python
+TOP_N = 5
+```
+
+The detections are sorted from highest to lowest confidence:
 
 ```python
 indices = np.argsort(
     detections.confidence
-)[::-1][:3]
+)[::-1][:TOP_N]
 
 detections = detections[
     indices
 ]
 ```
 
-This keeps only the three most confident predictions.
+Only the five most confident remaining detections continue to the spatial filtering stage.
 
 ---
 
 ### Spatial Filtering
 
-The project can also filter objects based on their position inside the image.
+The final filtering stage keeps detections whose center is located in the right half of the image.
 
-For example, keep only objects located in the right half:
+The feature is enabled with:
+
+```python
+FILTER_RIGHT_HALF = True
+```
+
+The horizontal center of each bounding box is calculated using:
 
 ```python
 centers_x = (
     detections.xyxy[:, 0]
     + detections.xyxy[:, 2]
 ) / 2
+```
 
+The image midpoint is calculated with:
+
+```python
 image_midpoint = image.shape[1] / 2
+```
 
+The final mask keeps only detections whose center is located to the right of that midpoint:
+
+```python
 detections = detections[
     centers_x > image_midpoint
 ]
 ```
+
+---
+
+## Final Output
+
+The pipeline draws a vertical line representing the horizontal midpoint of the image.
+
+Only detections that survive every filtering stage are displayed in the final result.
+
+### Generated Result
+
+![Filtered Detections](assets/output/filtered_detections.jpg)
+
+The output is saved to:
+
+```text
+assets/output/filtered_detections.jpg
+```
+
+---
+
+## Successful Test
+
+The project was successfully executed in **Google Colab**.
+
+YOLOv8 initially detected:
+
+```text
+13 objects
+```
+
+The detections were progressively reduced by the pipeline:
+
+```text
+Initial detections:             13
+        ↓
+Confidence filtering:            9
+        ↓
+Class filtering:                 8
+        ↓
+Size filtering:                  8
+        ↓
+Non-Maximum Suppression:         8
+        ↓
+Top-5 selection:                 5
+        ↓
+Spatial filtering:               2
+        ↓
+Final detections:                2
+```
+
+The execution completed successfully with:
+
+```text
+Detection Filtering Pipeline Complete
+
+Input image:
+assets/input/pedestrian-plaza-detection-test.png
+
+Output image:
+assets/output/filtered_detections.jpg
+
+Final detections: 2
+```
+
+The final visualization contains two person detections located in the right half of the image.
+
+---
+
+## Processing Configuration
+
+The current pipeline configuration is:
+
+```python
+MODEL_NAME = "yolov8n.pt"
+
+CONFIDENCE_THRESHOLD = 0.50
+MIN_AREA = 5000
+NMS_THRESHOLD = 0.50
+TOP_N = 5
+
+TARGET_CLASS_ID = 0
+FILTER_RIGHT_HALF = True
+```
+
+These values can be modified to experiment with different filtering strategies.
 
 ---
 
@@ -207,40 +367,37 @@ pip install -r requirements.txt
 
 ## Running the Project
 
-Place an image inside:
+Clone the repository:
 
-```text
-assets/input/
+```bash
+git clone https://github.com/Peyman-mxli/SAM3-Learning-Journey.git
 ```
 
-For example:
+Move into the project directory:
 
-```text
-assets/input/image.jpg
+```bash
+cd SAM3-Learning-Journey/05-projects/03-Detection-Filtering-and-NMS-Pipeline
 ```
 
-Then run:
+Install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the pipeline:
 
 ```bash
 python detection_filter_pipeline.py
 ```
 
----
+The program will process:
 
-## Expected Output
+```text
+assets/input/pedestrian-plaza-detection-test.png
+```
 
-The project will:
-
-1. Load the input image
-2. Run YOLOv8 object detection
-3. Convert predictions into `sv.Detections`
-4. Apply detection filtering
-5. Remove duplicate detections with NMS
-6. Select relevant predictions
-7. Annotate the final detections
-8. Save the result
-
-The output image will be saved to:
+and generate:
 
 ```text
 assets/output/filtered_detections.jpg
@@ -248,49 +405,69 @@ assets/output/filtered_detections.jpg
 
 ---
 
-## Example Processing Logic
+## Processing Logic
 
 ```text
-Raw Detections
-      ↓
-Confidence > 50%
-      ↓
-Selected Classes
-      ↓
-Area > Minimum Size
-      ↓
-NMS
-      ↓
-Top-N
-      ↓
-Spatial Condition
-      ↓
-Final Output
+pedestrian-plaza-detection-test.png
+                ↓
+             YOLOv8
+                ↓
+        13 Raw Detections
+                ↓
+       Confidence > 50%
+                ↓
+          9 Detections
+                ↓
+       Person Class Only
+                ↓
+          8 Detections
+                ↓
+         Area > 5000
+                ↓
+          8 Detections
+                ↓
+          NMS (0.50)
+                ↓
+          8 Detections
+                ↓
+            Top 5
+                ↓
+          5 Detections
+                ↓
+      Right-Half Filtering
+                ↓
+          2 Detections
+                ↓
+    filtered_detections.jpg
 ```
-
-This demonstrates how raw model predictions can be transformed into application-specific results.
 
 ---
 
 ## Why This Project Matters
 
-Object detection models often return more information than an application needs.
+Object-detection models often return more information than an application actually needs.
 
-A real computer vision system may require rules such as:
+A real computer vision system may need rules such as:
 
 ```text
-Only people
-+
-Confidence > 60%
-+
-Large enough bounding box
-+
-No duplicate detections
-+
-Located in a specific region
+Detect people
+      +
+Confidence > 50%
+      +
+Minimum bounding-box size
+      +
+Remove duplicate detections
+      +
+Keep highest-confidence detections
+      +
+Restrict detections to a region
+      =
+Application-Specific Results
 ```
 
-This project demonstrates how Supervision and NumPy can implement these rules efficiently.
+This project demonstrates how raw YOLO predictions can be transformed into application-specific results using **Supervision and NumPy**.
+
+Instead of simply displaying every prediction produced by the model, the pipeline decides which detections should remain.
 
 ---
 
@@ -303,14 +480,16 @@ This project applies:
 - Confidence filtering
 - Class filtering
 - Bounding-box area
-- Detection merging
 - Non-Maximum Suppression
-- Intersection over Union
+- Intersection over Union concepts
 - NumPy sorting
 - Top-N detection selection
 - Bounding-box center calculations
 - Spatial filtering
-- Detection visualization
+- Detection annotation
+- OpenCV image processing
+- YOLOv8 inference
+- Computer vision post-processing pipelines
 
 ---
 
