@@ -1,4 +1,3 @@
-```python
 from pathlib import Path
 
 import cv2
@@ -93,10 +92,11 @@ print(
 # Confidence filtering
 # --------------------------------------------------
 
-detections = detections[
-    detections.confidence
-    > CONFIDENCE_THRESHOLD
-]
+if detections.confidence is not None:
+    detections = detections[
+        detections.confidence
+        > CONFIDENCE_THRESHOLD
+    ]
 
 print(
     f"After confidence filtering: "
@@ -108,10 +108,11 @@ print(
 # Class filtering
 # --------------------------------------------------
 
-detections = detections[
-    detections.class_id
-    == TARGET_CLASS_ID
-]
+if detections.class_id is not None:
+    detections = detections[
+        detections.class_id
+        == TARGET_CLASS_ID
+    ]
 
 print(
     f"After class filtering: "
@@ -123,10 +124,11 @@ print(
 # Size filtering
 # --------------------------------------------------
 
-detections = detections[
-    detections.area
-    > MIN_AREA
-]
+if len(detections) > 0:
+    detections = detections[
+        detections.area
+        > MIN_AREA
+    ]
 
 print(
     f"After size filtering: "
@@ -138,9 +140,10 @@ print(
 # Non-Maximum Suppression
 # --------------------------------------------------
 
-detections = detections.with_nms(
-    threshold=NMS_THRESHOLD
-)
+if len(detections) > 0:
+    detections = detections.with_nms(
+        threshold=NMS_THRESHOLD
+    )
 
 print(
     f"After NMS: "
@@ -156,7 +159,6 @@ if (
     len(detections) > 0
     and detections.confidence is not None
 ):
-
     indices = np.argsort(
         detections.confidence
     )[::-1][:TOP_N]
@@ -164,7 +166,6 @@ if (
     detections = detections[
         indices
     ]
-
 
 print(
     f"After Top-{TOP_N} selection: "
@@ -180,7 +181,6 @@ if (
     FILTER_RIGHT_HALF
     and len(detections) > 0
 ):
-
     centers_x = (
         detections.xyxy[:, 0]
         + detections.xyxy[:, 2]
@@ -193,7 +193,6 @@ if (
     detections = detections[
         centers_x > image_midpoint
     ]
-
 
 print(
     f"After spatial filtering: "
@@ -212,7 +211,6 @@ if (
     and detections.class_id is not None
     and detections.confidence is not None
 ):
-
     labels = [
         (
             f"{results.names[int(class_id)]} "
@@ -230,7 +228,6 @@ if (
 # --------------------------------------------------
 
 box_annotator = sv.BoxAnnotator()
-
 label_annotator = sv.LabelAnnotator()
 
 
@@ -293,7 +290,6 @@ if not success:
 # --------------------------------------------------
 
 print()
-
 print(
     "Detection Filtering Pipeline Complete"
 )
@@ -310,4 +306,3 @@ print(
     f"Final detections: "
     f"{len(detections)}"
 )
-```
