@@ -1,1097 +1,584 @@
-# Object Tracking with Supervision
+# Object Tracking
 
-Object detection tells us **what objects are present in an image or video frame**.
+This section of the **SAM3 Computer Vision Learning Journey** explores how computer vision systems move beyond detecting objects in individual images and begin maintaining object identities across consecutive video frames.
 
-Object tracking goes one step further.
+Object tracking connects object detection, video processing, detection association, persistent tracking IDs, trajectories, and tracking analytics into a complete video-based computer vision workflow.
 
-It allows us to determine whether an object detected in one frame is the **same object that appears in the next frame**.
-
-In this lesson, we extend the detection and filtering concepts from the previous sections and introduce **object tracking using Supervision and ByteTrack**.
-
-The main goal is to process a real video and assign each detected object a persistent identification number.
+The practical implementation in this section was successfully tested in **Google Colab** using Supervision and ByteTrack.
 
 ---
 
 ## Learning Objectives
 
-By the end of this lesson, you should understand how to:
+By completing this section, we learn how to:
 
-- Explain the difference between object detection and object tracking
-- Understand the purpose of `tracker_id`
-- Use `sv.ByteTrack`
-- Assign persistent IDs to detected objects
-- Track objects across multiple video frames
-- Process videos using `sv.process_video`
-- Display object classes together with tracker IDs
-- Draw object trajectories using `TraceAnnotator`
-- Filter detections before sending them to the tracker
-- Combine filtering and tracking in the same computer vision pipeline
+- Understand the difference between object detection and object tracking
+- Process video frame by frame
+- Represent detections using `sv.Detections`
+- Associate detections between consecutive frames
+- Use ByteTrack for multi-object tracking
+- Understand persistent `tracker_id` values
+- Create tracking labels
+- Draw bounding boxes around tracked objects
+- Visualize object trajectories
+- Maintain object identities while objects move
+- Export processed tracking videos
+- Convert generated videos to browser-compatible H.264
+- Prepare tracking pipelines for future YOLO integration
 
 ---
 
-## Detection vs. Tracking
+## From Object Detection to Object Tracking
 
-Object detection processes each frame independently.
+Object detection answers:
+
+```text
+What objects are visible in this frame?
+```
 
 For example:
 
 ```text
 Frame 1
-
-car
-car
-truck
+├── person
+├── person
+└── car
 ```
 
-In the next frame:
+When the next frame arrives, object detection runs again:
 
 ```text
 Frame 2
-
-car
-car
-truck
+├── person
+├── person
+└── car
 ```
 
-The detector knows which objects exist in each frame.
+Detection alone does not necessarily tell us whether a person detected in Frame 2 is the same person detected in Frame 1.
 
-However, it does **not know whether a car in Frame 1 is the same car appearing in Frame 2**.
-
-This is where object tracking becomes useful.
-
-With tracking:
+Object tracking adds this relationship.
 
 ```text
-Frame 1
-
-car   → ID 1
-car   → ID 2
-truck → ID 3
+Frame 1 → person #1
+Frame 2 → person #1
+Frame 3 → person #1
+Frame 4 → person #1
 ```
 
-In the next frame:
-
-```text
-Frame 2
-
-car   → ID 1
-car   → ID 2
-truck → ID 3
-```
-
-Even though the objects moved, the tracker attempts to maintain their identities.
+The object changes position, but the tracking system attempts to maintain its identity.
 
 ---
 
-## What Does a Tracker Do?
+## Core Tracking Pipeline
 
-A tracker compares detections between consecutive frames.
-
-It attempts to determine whether newly detected objects correspond to objects that were already detected previously.
-
-The tracker then assigns each object an identification number.
-
-Conceptually:
+The main conceptual workflow is:
 
 ```text
-Frame N
-   ↓
+Input Video
+    ↓
+Video Frames
+    ↓
 Object Detection
-   ↓
-Detections
-   ↓
-Tracker
-   ↓
-Detections + tracker_id
+    ↓
+sv.Detections
+    ↓
+Detection Filtering
+    ↓
+ByteTrack
+    ↓
+tracker_id
+    ↓
+Tracking Annotations
+    ↓
+Object Trajectories
+    ↓
+Tracking Analytics
+    ↓
+Processed Video
 ```
-
-Then:
-
-```text
-Frame N+1
-   ↓
-Object Detection
-   ↓
-New Detections
-   ↓
-Tracker
-   ↓
-Same tracker_id when the object is recognized
-```
-
-This allows us to follow individual objects through a video.
-
----
-
-## The `tracker_id` Property
-
-Supervision detections can contain a property called:
-
-```python
-detections.tracker_id
-```
-
-Before tracking is performed, this value is normally:
-
-```python
-None
-```
-
-For example:
-
-```python
-results = model(frame, verbose=False)[0]
-
-detections = sv.Detections.from_ultralytics(results)
-
-print(detections.tracker_id)
-```
-
-Before using a tracker:
-
-```text
-tracker_id: None
-```
-
-After sending the detections through ByteTrack:
-
-```python
-detections = tracker.update_with_detections(detections)
-```
-
-the detections receive tracking IDs.
-
-For example:
-
-```text
-tracker_id: [1 2 3 4]
-```
-
-Each number represents an object currently being tracked.
 
 ---
 
 ## ByteTrack
 
-In this lesson, object tracking is introduced using:
+ByteTrack is used to associate detections between consecutive video frames.
 
-```python
-sv.ByteTrack()
-```
-
-Create the tracker:
-
-```python
-tracker = sv.ByteTrack()
-```
-
-Then update it using the detections from the current frame:
-
-```python
-detections = tracker.update_with_detections(detections)
-```
-
-ByteTrack attempts to associate the current detections with objects detected in previous frames.
-
-The objective is to preserve the same `tracker_id` while an object moves through the video.
-
----
-
-## Installing the Required Libraries
-
-The lesson uses Supervision and Ultralytics:
-
-```python
-!pip install supervision ultralytics
-```
-
-Import the required libraries:
-
-```python
-import supervision as sv
-from ultralytics import YOLO
-import cv2
-import numpy as np
-import urllib.request
-from pathlib import Path
-```
-
----
-
-## Preparing the Video
-
-Create the assets directory:
-
-```python
-Path("assets").mkdir(exist_ok=True)
-```
-
-Download the sample vehicle video:
-
-```python
-urllib.request.urlretrieve(
-    "https://media.roboflow.com/supervision/video-examples/vehicles.mp4",
-    "assets/vehicles.mp4"
-)
-```
-
-The video is stored at:
-
-```text
-assets/vehicles.mp4
-```
-
----
-
-## Inspecting Video Information
-
-Supervision provides the `VideoInfo` class for inspecting video metadata.
-
-```python
-video_info = sv.VideoInfo.from_video_path(
-    "assets/vehicles.mp4"
-)
-```
-
-We can inspect:
-
-```python
-print(video_info.width)
-print(video_info.height)
-print(video_info.fps)
-print(video_info.total_frames)
-```
-
-The approximate duration can be calculated with:
-
-```python
-video_info.total_frames / video_info.fps
-```
-
----
-
-## Loading the YOLO Model
-
-The lesson uses YOLOv8 Nano:
-
-```python
-model = YOLO("yolov8n.pt")
-```
-
-YOLO performs object detection.
-
-ByteTrack performs object tracking.
-
-```text
-Video Frame
-    ↓
-YOLO
-    ↓
-Object Detections
-    ↓
-sv.Detections
-    ↓
-ByteTrack
-    ↓
-Tracked Detections
-```
-
----
-
-## Inspecting `tracker_id` Before Tracking
-
-Extract a frame from the video:
-
-```python
-cap = cv2.VideoCapture(
-    "assets/vehicles.mp4"
-)
-
-ret, first_frame = cap.read()
-
-cap.release()
-```
-
-Run YOLO:
-
-```python
-results = model(
-    first_frame,
-    verbose=False
-)[0]
-```
-
-Convert the results:
-
-```python
-detections = sv.Detections.from_ultralytics(
-    results
-)
-```
-
-Inspect the tracker IDs:
-
-```python
-print(detections.tracker_id)
-```
-
-At this stage:
-
-```text
-tracker_id = None
-```
-
-This is expected because YOLO detects objects but does not assign tracking IDs.
-
----
-
-## Applying ByteTrack
-
-Create the tracker:
-
-```python
-tracker = sv.ByteTrack()
-```
-
-Pass the detections through the tracker:
-
-```python
-detections = tracker.update_with_detections(
-    detections
-)
-```
-
-Now:
-
-```python
-print(detections.tracker_id)
-```
-
-should return tracking IDs.
-
-The important distinction is:
-
-```text
-YOLO
-  ↓
-Detects objects
-
-ByteTrack
-  ↓
-Tracks individual objects
-```
-
----
-
-## Resetting the Tracker
-
-The tracker stores information about previously tracked objects.
-
-When starting a new experiment, reset it:
-
-```python
-tracker.reset()
-```
-
-This clears the previous tracking state.
-
----
-
-## Creating the Annotators
-
-The lesson uses multiple Supervision annotators:
-
-```python
-box_annotator = sv.BoxAnnotator()
-
-label_annotator = sv.LabelAnnotator()
-
-trace_annotator = sv.TraceAnnotator()
-```
-
-Each annotator has a different purpose.
-
----
-
-### BoxAnnotator
-
-`BoxAnnotator` draws bounding boxes around detected objects.
-
-```python
-box_annotator = sv.BoxAnnotator()
-```
-
----
-
-### LabelAnnotator
-
-`LabelAnnotator` displays information about each tracked object.
-
-For example:
-
-```text
-ID:1
-ID:2
-ID:3
-```
-
-We can also combine class names and tracker IDs:
-
-```text
-car #1
-truck #2
-car #3
-```
-
-This tells us both:
-
-```text
-WHAT is the object?
-```
-
-and:
-
-```text
-WHICH specific object is it?
-```
-
----
-
-### TraceAnnotator
-
-`TraceAnnotator` visualizes the trajectory of tracked objects.
-
-```python
-trace_annotator = sv.TraceAnnotator()
-```
-
-Unlike a normal bounding box, a trace represents an object's movement across multiple frames.
+Instead of treating each detection as completely independent, the tracker compares detections over time and attempts to determine which detections belong to the same physical object.
 
 Conceptually:
 
 ```text
-Previous position
-      •
-       \
-        •
-         \
-          •
-           \
-            [CAR]
-```
-
-The trace depends on `tracker_id` because Supervision needs to know which positions belong to the same object.
-
----
-
-## Creating the Frame Processing Function
-
-Video processing requires a callback function.
-
-```python
-def process_frame(
-    frame: np.ndarray,
-    frame_idx: int
-) -> np.ndarray:
-
-    results = model(
-        frame,
-        verbose=False
-    )[0]
-
-    detections = sv.Detections.from_ultralytics(
-        results
-    )
-
-    detections = tracker.update_with_detections(
-        detections
-    )
-
-    labels = [
-        f"ID:{tracker_id}"
-        for tracker_id in detections.tracker_id
-    ]
-
-    annotated = box_annotator.annotate(
-        scene=frame.copy(),
-        detections=detections
-    )
-
-    annotated = label_annotator.annotate(
-        scene=annotated,
-        detections=detections,
-        labels=labels
-    )
-
-    annotated = trace_annotator.annotate(
-        scene=annotated,
-        detections=detections
-    )
-
-    return annotated
-```
-
-This callback performs the tracking process for each frame.
-
----
-
-## Processing the Video
-
-Supervision provides:
-
-```python
-sv.process_video()
-```
-
-Example:
-
-```python
-sv.process_video(
-    source_path="assets/vehicles.mp4",
-    target_path="assets/vehicles_tracked.mp4",
-    callback=process_frame,
-    show_progress=True
-)
-```
-
-The processed video is saved as:
-
-```text
-assets/vehicles_tracked.mp4
-```
-
----
-
-## Complete Tracking Pipeline
-
-The complete workflow is:
-
-```text
-Input Video
-     ↓
-Read Frame
-     ↓
-YOLO Detection
-     ↓
-sv.Detections
-     ↓
+Detection
+    ↓
 ByteTrack
-     ↓
-tracker_id
-     ↓
-BoxAnnotator
-     ↓
-LabelAnnotator
-     ↓
-TraceAnnotator
-     ↓
-Annotated Frame
-     ↓
-Output Video
+    ↓
+Object Association
+    ↓
+Persistent tracker_id
 ```
 
-This process repeats for every frame in the video.
-
----
-
-## Inspecting IDs Across Frames
-
-One important experiment is to inspect tracking IDs manually across several frames.
-
-```python
-tracker.reset()
-
-cap = cv2.VideoCapture(
-    "assets/vehicles.mp4"
-)
-
-for frame_num in range(3):
-
-    ret, frame = cap.read()
-
-    if not ret:
-        break
-
-    results = model(
-        frame,
-        verbose=False
-    )[0]
-
-    detections = sv.Detections.from_ultralytics(
-        results
-    )
-
-    detections = tracker.update_with_detections(
-        detections
-    )
-
-    print(
-        f"Frame {frame_num}: "
-        f"{len(detections)} objects | "
-        f"IDs: {detections.tracker_id}"
-    )
-
-cap.release()
-```
-
-A possible result could look like:
+A tracked object may therefore appear as:
 
 ```text
-Frame 0 → [1, 2, 3]
-Frame 1 → [1, 2, 3]
-Frame 2 → [1, 2, 3]
+person #1
 ```
 
-This indicates that the tracker is maintaining the identities of those objects across frames.
+while another object of the same class may appear as:
+
+```text
+person #2
+```
+
+The class is the same, but the tracking identity is different.
 
 ---
 
-## Displaying Class and Tracker ID
+## `tracker_id`
 
-We can combine:
+After detections are processed by ByteTrack, Supervision can associate a tracking ID with each tracked detection.
 
-```python
-class_id
-```
-
-with:
+Conceptually:
 
 ```python
-tracker_id
+detections.tracker_id
 ```
 
 Example:
 
-```python
-labels = [
-    f"{results.names[class_id]} #{tracker_id}"
-    for class_id, tracker_id in zip(
-        detections.class_id,
-        detections.tracker_id
-    )
-]
-```
-
-The resulting labels can look like:
-
 ```text
-car #1
-car #2
-truck #3
-bus #4
+[1, 2, 3]
 ```
+
+These IDs make it possible to distinguish individual objects across consecutive frames.
 
 ---
 
-## `class_id` vs. `tracker_id`
+## Tracking Labels
 
-These properties represent different information.
+Tracking labels can combine the detected object class with its tracking ID.
 
-### `class_id`
-
-Answers:
+Example:
 
 ```text
-What type of object is this?
-```
-
-Examples:
-
-```text
-person
-car
-truck
-bus
-```
-
-### `tracker_id`
-
-Answers:
-
-```text
-Which specific object is this?
-```
-
-For example:
-
-```text
-Object      class_id      tracker_id
-
-Car A           2              1
-Car B           2              2
-Car C           2              3
-```
-
-All three objects belong to the same class.
-
-However, each one is a different tracked object.
-
----
-
-## Filtering Before Tracking
-
-The filtering concepts from the previous lesson can be combined directly with tracking.
-
-Suppose we only want to track cars.
-
-In the COCO dataset:
-
-```python
-TARGET_CLASS = 2
-```
-
-represents the `car` class.
-
-Filter the detections:
-
-```python
-detections = detections[
-    detections.class_id == TARGET_CLASS
-]
-```
-
-Then send those detections to ByteTrack:
-
-```python
-detections = tracker.update_with_detections(
-    detections
-)
-```
-
----
-
-## Why Filter Before Tracking?
-
-The order of operations matters.
-
-A useful pipeline is:
-
-```text
-YOLO
- ↓
-Detections
- ↓
-Filtering
- ↓
-Tracking
- ↓
-Annotation
-```
-
-For example, imagine YOLO detects:
-
-```text
-car
-person
-truck
-car
-bus
-car
-```
-
-If our application only cares about cars, filtering produces:
-
-```text
-car
-car
-car
-```
-
-Only these detections are then sent to the tracker.
-
-This directly connects this lesson with the previous lesson on filtering and manipulating detections.
-
----
-
-## Tracking Only Cars
-
-```python
-TARGET_CLASS = 2
-
-tracker.reset()
-
-def callback_only_cars(
-    frame: np.ndarray,
-    _: int
-) -> np.ndarray:
-
-    results = model(
-        frame,
-        verbose=False
-    )[0]
-
-    detections = sv.Detections.from_ultralytics(
-        results
-    )
-
-    detections = detections[
-        detections.class_id == TARGET_CLASS
-    ]
-
-    detections = tracker.update_with_detections(
-        detections
-    )
-
-    labels = [
-        f"car #{tracker_id}"
-        for tracker_id in detections.tracker_id
-    ]
-
-    scene = box_annotator.annotate(
-        scene=frame.copy(),
-        detections=detections
-    )
-
-    scene = label_annotator.annotate(
-        scene=scene,
-        detections=detections,
-        labels=labels
-    )
-
-    return scene
-```
-
-Process the video:
-
-```python
-sv.process_video(
-    source_path="assets/vehicles.mp4",
-    target_path="assets/vehicles_cars.mp4",
-    callback=callback_only_cars,
-    show_progress=True
-)
-```
-
----
-
-## Extension Challenge — Counting Visible Frames
-
-Tracking IDs allow us to build additional analytics.
-
-For example, we can count how many frames each object remains visible.
-
-Create a dictionary:
-
-```python
-frame_count = {}
-```
-
-Update it:
-
-```python
-for tracker_id in detections.tracker_id:
-
-    frame_count[tracker_id] = (
-        frame_count.get(tracker_id, 0) + 1
-    )
-```
-
-We could then create labels such as:
-
-```text
-#1 (15f)
-#2 (8f)
-#3 (32f)
-```
-
-where:
-
-```text
-f = frames
-```
-
-Persistent tracking IDs can therefore become the foundation for more advanced video analytics.
-
----
-
-## Connection to the Previous Lesson
-
-The previous lesson introduced:
-
-**Filtering and Manipulating Detections**
-
-We learned how to filter detections using:
-
-- Confidence
-- Class
-- Object size
-- Position
-- Boolean masks
-- NMS
-- Detection combinations
-
-Now those concepts can be used before tracking.
-
-The learning progression becomes:
-
-```text
-Object Detection
-      ↓
-sv.Detections
-      ↓
-Filtering and Manipulation
-      ↓
-Object Tracking
-      ↓
-Persistent tracker_id
-      ↓
-Video Annotation
-      ↓
-Object Trajectories
-```
-
-This is an important transition from analyzing independent images to understanding objects **across time**.
-
----
-
-## Key Concepts
-
-### Detection
-
-Determines:
-
-```text
-What objects exist in this frame?
-```
-
-### Tracking
-
-Determines:
-
-```text
-Which specific object is this across multiple frames?
-```
-
-### `class_id`
-
-Identifies the object's category.
-
-```text
-car
-person
-truck
-bus
-```
-
-### `tracker_id`
-
-Identifies the individual object.
-
-```text
-car #1
-car #2
+person #1
+person #2
 car #3
 ```
 
-### Trace
-
-Visualizes how a tracked object moves through the video.
+This makes the tracking result much easier to interpret visually.
 
 ---
 
-## What I Learned
+## Object Trajectories
 
-In this lesson, I learned that object detection and object tracking solve different problems.
+Tracking systems can also store recent positions of tracked objects.
 
-Object detection identifies objects independently in each frame, while object tracking connects those detections across time.
+These positions can be visualized as trajectories.
 
-I learned how `tracker_id` allows individual objects to maintain an identity while moving through a video.
-
-I also learned how to:
-
-- Use `sv.ByteTrack`
-- Update detections with tracking information
-- Inspect `tracker_id`
-- Reset a tracker
-- Process complete videos
-- Create labels using tracker IDs
-- Combine class names with tracking IDs
-- Draw object trajectories
-- Filter detections before tracking
-- Build simple tracking-based analytics
-
-This creates the foundation for more advanced video computer vision applications.
-
----
-
-## Practical Applications
-
-Object tracking can be used in many real-world systems.
-
-### Traffic Analysis
-
-Track vehicles through intersections or highways.
+Conceptually:
 
 ```text
-Vehicle Detection
-      ↓
-Vehicle Tracking
-      ↓
-Traffic Analysis
+Previous Positions
+        ↓
+● → ● → ● → ●
+            ↑
+     Current Position
 ```
 
-### People Tracking
+Trajectories make it possible to understand:
 
-Track people moving through stores, buildings, or public spaces.
-
-### Sports Analytics
-
-Track players or objects during games.
-
-### Industrial Monitoring
-
-Track products moving through production lines.
-
-### Security Systems
-
-Follow detected objects across surveillance footage.
-
-### Computer Vision Analytics
-
-Tracking IDs can be used to calculate:
-
-- Object counts
-- Time visible
-- Movement paths
-- Entry and exit events
-- Direction of movement
-- Speed estimates
-- Zone interactions
+- Movement direction
+- Movement history
+- Object paths
+- Object behavior
+- Interaction between tracked objects
 
 ---
 
-## Important Takeaways
+## Tracking Analytics
 
-1. Object detection and object tracking are different tasks.
-2. YOLO detects objects but does not maintain their identity across frames.
-3. ByteTrack associates detections between frames.
-4. `tracker_id` identifies individual tracked objects.
-5. Multiple objects can share the same `class_id` while having different `tracker_id` values.
-6. `TraceAnnotator` uses tracking information to visualize object movement.
-7. `sv.process_video` applies processing to every frame of a video.
-8. Filtering can be performed before tracking to focus on specific objects.
-9. Tracking IDs make higher-level video analytics possible.
-10. Object tracking is an important step toward complete computer vision video pipelines.
+Once objects have persistent identities, additional analytics become possible.
 
----
+Examples include:
 
-## Learning Journey Progress
+- Counting unique objects
+- Measuring movement
+- Following individual objects
+- Detecting line crossings
+- Measuring time spent in an area
+- Analyzing trajectories
+- Monitoring entrances and exits
+- Measuring object flow
 
-This lesson extends the concepts from the previous sections:
+The transition is:
 
 ```text
-Agentic AI Programming
-        ↓
-Introduction to Supervision
-        ↓
-Annotation and Visualization
-        ↓
-Filtering and Manipulating Detections
-        ↓
-Object Tracking
+Detection
+    ↓
+Tracking
+    ↓
+Persistent Identity
+    ↓
+Movement History
+    ↓
+Tracking Analytics
 ```
 
-Each lesson adds another layer to the computer vision pipeline.
+---
+
+# Practical Exercise
+
+The practical exercise for this section is located in:
+
+```text
+practical/
+```
+
+It demonstrates the core tracking workflow using:
+
+- Python
+- OpenCV
+- NumPy
+- Supervision
+- ByteTrack
+- Synthetic detections
+- Tracking annotations
+- Object trajectories
+- FFmpeg
+- Google Colab
+
+[Open the Object Tracking practical documentation](./practical/README.md)
+
+---
+
+## Practical Input Video
+
+The practical uses a custom 10-second demonstration video:
+
+```text
+practical/assets/input/tracking_demo.mp4
+```
+
+Video properties:
+
+```text
+Duration: 10 seconds
+Resolution: 960 × 540
+Frame Rate: 30 FPS
+Total Frames: 300
+Format: MP4
+```
+
+The video contains several moving synthetic objects created specifically for learning object-tracking concepts.
+
+[View the input assets documentation](./practical/assets/input/README.md)
+
+[Open the tracking demo video](./practical/assets/input/tracking_demo.mp4)
+
+---
+
+## Why Synthetic Detections Are Used
+
+The demonstration video contains synthetic objects rather than standard real-world YOLO classes.
+
+Because of this, the first practical focuses directly on the tracking stage instead of depending on potentially unreliable YOLO classifications.
+
+The practical pipeline is therefore:
+
+```text
+Synthetic Video
+      ↓
+Known Object Positions
+      ↓
+Synthetic Detections
+      ↓
+sv.Detections
+      ↓
+ByteTrack
+      ↓
+tracker_id
+      ↓
+Tracking Visualization
+```
+
+This isolates the tracking problem and makes ByteTrack behavior easier to understand.
+
+---
+
+## Practical Implementation
+
+The main Python implementation is:
+
+[`object_tracking_practical.py`](./practical/object_tracking_practical.py)
+
+The script:
+
+1. Opens the input video.
+2. Reads the video properties.
+3. Initializes ByteTrack.
+4. Creates Supervision annotators.
+5. Reads the video frame by frame.
+6. Generates synthetic detections.
+7. Converts them into `sv.Detections`.
+8. Sends detections to ByteTrack.
+9. Retrieves persistent tracking IDs.
+10. Creates tracking labels.
+11. Draws bounding boxes.
+12. Draws movement traces.
+13. Adds frame information.
+14. Writes processed frames to an output video.
+
+---
+
+## Practical Tracking Pipeline
+
+The completed practical follows:
+
+```text
+tracking_demo.mp4
+        ↓
+Read Video Frames
+        ↓
+Synthetic Object Detections
+        ↓
+sv.Detections
+        ↓
+ByteTrack
+        ↓
+tracker_id
+        ↓
+Bounding Boxes
+        ↓
+Tracking Labels
+        ↓
+Object Trajectories
+        ↓
+tracked_demo.mp4
+        ↓
+H.264 Conversion
+        ↓
+tracked_demo_h264.mp4
+```
+
+---
+
+## Practical Tracking Result
+
+The practical successfully tracks three moving objects.
+
+The final labels include:
+
+```text
+object_a #1
+object_b #2
+object_c #3
+```
+
+Each object maintains its own tracking identity while moving through the scene.
+
+---
+
+## Final Output Video
+
+The final browser-compatible tracking result is:
+
+```text
+practical/assets/output/tracked_demo_h264.mp4
+```
+
+[View the output assets documentation](./practical/assets/output/README.md)
+
+[Open the final tracked video](./practical/assets/output/tracked_demo_h264.mp4)
+
+The final video demonstrates:
+
+- Bounding boxes
+- Persistent tracking IDs
+- Tracking labels
+- Object trajectories
+- Frame information
+- Multi-object tracking across 300 frames
+
+---
+
+## H.264 Conversion
+
+The initial OpenCV output was generated as:
+
+```text
+tracked_demo.mp4
+```
+
+The video was successfully processed, but the original `mp4v` encoding was not reliably playable in the Google Colab browser player.
+
+The final video was therefore converted with FFmpeg:
+
+```bash
+ffmpeg -y \
+-i assets/output/tracked_demo.mp4 \
+-c:v libx264 \
+-pix_fmt yuv420p \
+-movflags +faststart \
+assets/output/tracked_demo_h264.mp4
+```
+
+This produced the browser-compatible final result:
+
+```text
+tracked_demo_h264.mp4
+```
+
+---
+
+## Google Colab Validation
+
+The practical was successfully executed and validated in Google Colab.
+
+Environment:
+
+```text
+OpenCV: 5.0.0
+NumPy: 2.0.2
+Supervision: 0.30.0
+```
+
+Environment verification:
+
+```text
+Environment test: SUCCESS
+```
+
+Input verification:
+
+```text
+Video exists: True
+Video path: assets/input/tracking_demo.mp4
+```
+
+Tracking execution:
+
+```text
+Video Information
+-----------------
+Width: 960
+Height: 540
+FPS: 30.0
+Frames: 300
+
+Tracking completed successfully.
+Output saved to: assets/output/tracked_demo.mp4
+```
+
+Output verification:
+
+```text
+Output exists: True
+Output path: assets/output/tracked_demo.mp4
+```
+
+The final H.264 version was then displayed and visually verified directly inside Google Colab.
+
+---
+
+# Class Recording
+
+The class recording associated with this section is documented in:
+
+[`CLASS-RECORDING.md`](./CLASS-RECORDING.md)
+
+The recording is available on YouTube:
+
+[Watch the Object Tracking class recording on YouTube](https://youtu.be/UXN0l33NqF4)
+
+The recording can be used together with the concept notes and practical implementation to review the complete lesson.
+
+---
+
+# Section Structure
+
+```text
+04-Object-Tracking/
+├── README.md
+├── CLASS-RECORDING.md
+│
+├── concepts/
+│   └── ...
+│
+└── practical/
+    ├── README.md
+    ├── object_tracking_practical.py
+    │
+    └── assets/
+        ├── README.md
+        │
+        ├── input/
+        │   ├── README.md
+        │   └── tracking_demo.mp4
+        │
+        └── output/
+            ├── README.md
+            └── tracked_demo_h264.mp4
+```
+
+---
+
+# What We Completed
+
+This section now includes:
+
+- Object Tracking theory
+- Detection-to-tracking workflow
+- ByteTrack concepts
+- `tracker_id` explanation
+- Tracking annotations
+- Object trajectories
+- Tracking analytics concepts
+- Class recording
+- Practical documentation
+- Custom 10-second input video
+- Python tracking implementation
+- Google Colab testing
+- 300-frame tracking execution
+- Final annotated tracking video
+- H.264 browser-compatible output
+
+---
+
+# Next Step
+
+The natural next step is to replace synthetic detections with real object detections.
+
+The extended pipeline will become:
+
+```text
+Real-World Video
+        ↓
+YOLO
+        ↓
+sv.Detections
+        ↓
+Detection Filtering
+        ↓
+ByteTrack
+        ↓
+tracker_id
+        ↓
+Tracking Annotations
+        ↓
+Object Trajectories
+        ↓
+Tracking Analytics
+        ↓
+Processed Video
+```
+
+This will combine the object-detection techniques from previous sections with the tracking techniques developed in this section.
+
+---
+
+## Repository
+
+[View the SAM3 Learning Journey on GitHub](https://github.com/Peyman-mxli/SAM3-Learning-Journey)
 
 ---
 
@@ -1099,17 +586,5 @@ Each lesson adds another layer to the computer vision pipeline.
 
 **Peyman Miyandashti**
 
-SAM3 Computer Vision Learning Journey
-
-- GitHub: [Peyman-mxli](https://github.com/Peyman-mxli)
-- LinkedIn: [Peyman Miyandashti](https://www.linkedin.com/in/peyman-mxli/)
-
----
-
-## Repository
-
-This lesson is part of the:
-
-[SAM3 Learning Journey](https://github.com/Peyman-mxli/SAM3-Learning-Journey)
-
-Repository containing structured notes, examples, experiments, and projects created while learning computer vision, Supervision, object tracking, and Segment Anything Model 3.
+- [GitHub](https://github.com/Peyman-mxli)
+- [LinkedIn](https://www.linkedin.com/in/peyman-mxli/)
