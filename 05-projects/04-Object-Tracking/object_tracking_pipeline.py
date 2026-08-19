@@ -1,4 +1,3 @@
-```python
 """
 object_tracking_pipeline.py
 
@@ -213,22 +212,6 @@ trace_annotator = sv.TraceAnnotator()
 
 # --------------------------------------------------
 # Tracking analytics
-#
-# frame_count:
-#
-#     tracker_id -> number of frames visible
-#
-# Example:
-#
-#     {
-#         1: 25,
-#         2: 41,
-#         3: 87
-#     }
-#
-# unique_tracker_ids:
-#
-#     stores every unique tracker ID observed
 # --------------------------------------------------
 
 frame_count = {}
@@ -285,11 +268,6 @@ def process_frame(
 
     # ----------------------------------------------
     # Filter detections BEFORE tracking
-    #
-    # Keep only the target class.
-    #
-    # TARGET_CLASS_ID = 2
-    # COCO class 2 = car
     # ----------------------------------------------
 
     detections = detections[
@@ -319,20 +297,12 @@ def process_frame(
                 tracker_id
             )
 
-            # --------------------------------------
-            # Count visible frames
-            # --------------------------------------
-
             frame_count[tracker_id] = (
                 frame_count.get(
                     tracker_id,
                     0
                 ) + 1
             )
-
-            # --------------------------------------
-            # Store unique tracker ID
-            # --------------------------------------
 
             unique_tracker_ids.add(
                 tracker_id
@@ -341,10 +311,6 @@ def process_frame(
 
     # ----------------------------------------------
     # Create object labels
-    #
-    # Example:
-    #
-    # car #5 | 42f | 1.40s
     # ----------------------------------------------
 
     labels = []
@@ -364,34 +330,18 @@ def process_frame(
                 tracker_id
             )
 
-            # --------------------------------------
-            # Get detected class name
-            # --------------------------------------
-
             class_name = results.names[
                 class_id
             ]
-
-            # --------------------------------------
-            # Get visible frame count
-            # --------------------------------------
 
             frames_visible = frame_count[
                 tracker_id
             ]
 
-            # --------------------------------------
-            # Convert frames into seconds
-            # --------------------------------------
-
             visible_seconds = (
                 frames_visible /
                 VIDEO_FPS
             )
-
-            # --------------------------------------
-            # Create label
-            # --------------------------------------
 
             label = (
                 f"{class_name} "
@@ -476,10 +426,6 @@ def process_frame(
         cv2.LINE_AA
     )
 
-
-    # ----------------------------------------------
-    # Return annotated frame
-    # ----------------------------------------------
 
     return annotated_frame
 
@@ -693,4 +639,3 @@ print(
 print(
     "\nObject Tracking Project: SUCCESS"
 )
-```
