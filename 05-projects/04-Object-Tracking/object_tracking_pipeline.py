@@ -330,7 +330,6 @@ def process_frame(
                 ) + 1
             )
 
-
             # --------------------------------------
             # Store unique tracker ID
             # --------------------------------------
@@ -365,7 +364,6 @@ def process_frame(
                 tracker_id
             )
 
-
             # --------------------------------------
             # Get detected class name
             # --------------------------------------
@@ -373,7 +371,6 @@ def process_frame(
             class_name = results.names[
                 class_id
             ]
-
 
             # --------------------------------------
             # Get visible frame count
@@ -383,7 +380,6 @@ def process_frame(
                 tracker_id
             ]
 
-
             # --------------------------------------
             # Convert frames into seconds
             # --------------------------------------
@@ -392,7 +388,6 @@ def process_frame(
                 frames_visible /
                 VIDEO_FPS
             )
-
 
             # --------------------------------------
             # Create label
