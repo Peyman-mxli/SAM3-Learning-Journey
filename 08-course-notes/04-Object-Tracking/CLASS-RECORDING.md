@@ -8,9 +8,9 @@ This file documents the class recording associated with the **Object Tracking** 
 
 The class recording is available on YouTube:
 
-[Watch the class recording on YouTube](https://youtu.be/VcJh5Y6BDlE)
+[Watch the Object Tracking class recording on YouTube](https://youtu.be/UXN0l33NqF4)
 
-The recording supports the course material documented in this section and can be used together with the concept notes, practical exercises, examples, and project implementation.
+The recording supports the course material documented in this section and can be used together with the concept notes, practical exercises, code examples, and project implementations.
 
 ---
 
@@ -18,7 +18,7 @@ The recording supports the course material documented in this section and can be
 
 **Topic:** Object Tracking
 
-This section documents the transition from processing independent object detections to maintaining object identities across consecutive video frames.
+This section documents the transition from processing independent object detections to tracking objects across consecutive video frames while maintaining their identities.
 
 The lesson connects:
 
@@ -55,6 +55,8 @@ ByteTrack
 tracker_id
     ↓
 Tracking Annotation
+    ↓
+Object Trajectories
     ↓
 Tracking Analytics
     ↓
