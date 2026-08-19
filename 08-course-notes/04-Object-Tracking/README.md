@@ -1,5 +1,3 @@
-# File: `08-course-notes/04-Object-Tracking/README.md`
-
 # Object Tracking with Supervision
 
 Object detection tells us **what objects are present in an image or video frame**.
