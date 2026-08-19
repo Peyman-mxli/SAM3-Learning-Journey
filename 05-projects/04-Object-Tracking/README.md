@@ -16,7 +16,7 @@ This allows the same object to be followed across consecutive video frames.
 
 ## Project Goal
 
-The objective of this project is to process a real video and create an annotated output containing:
+The objective of this project is to process a real traffic video and create an annotated output containing:
 
 - Object detections
 - Persistent tracking IDs
@@ -91,10 +91,15 @@ NumPy
 ├── object_tracking_pipeline.py
 │
 └── assets/
+    │
+    ├── README.md
+    │
     ├── input/
+    │   ├── README.md
     │   └── vehicles.mp4
     │
     └── output/
+        ├── README.md
         └── tracked_vehicles.mp4
 ```
 
@@ -102,19 +107,33 @@ NumPy
 
 ## Input
 
-The project expects an input video at:
+The project uses a real traffic video stored at:
 
 ```text
 assets/input/vehicles.mp4
 ```
 
-The course lesson uses the sample vehicle video:
+For the final GitHub version, the input video was prepared as a short real-world traffic sample.
+
+The final test input contains:
+
+```text
+Duration: 10 seconds
+Frames: 250
+Resolution: 1280 × 720
+Content: Real highway traffic
+Target Object: Cars
+```
+
+A short input video keeps the repository lightweight while still providing enough consecutive frames to demonstrate object tracking.
+
+The original course sample comes from:
 
 ```text
 https://media.roboflow.com/supervision/video-examples/vehicles.mp4
 ```
 
-The script can automatically download the video if it does not already exist.
+The project script can also automatically download the sample video if the expected input file does not exist.
 
 ---
 
@@ -126,16 +145,22 @@ The processed tracking video is saved to:
 assets/output/tracked_vehicles.mp4
 ```
 
-The output video contains tracking information for the selected objects.
+The output contains:
 
-Example labels may look like:
+- Detected cars
+- Bounding boxes
+- Persistent tracker IDs
+- Tracking trajectories
+- Frame visibility counts
+- Visible-time estimates
+- Unique tracked-car counter
+
+Example labels look like:
 
 ```text
-car #1 | 25f | 0.83s
-
-car #2 | 47f | 1.57s
-
-car #3 | 91f | 3.03s
+car #1 | 44f | 1.76s
+car #2 | 44f | 1.76s
+car #3 | 29f | 1.16s
 ```
 
 where:
@@ -153,15 +178,15 @@ represents the detected class,
 represents the tracking ID,
 
 ```text
-25f
+44f
 ```
 
-represents the number of frames visible,
+represents the number of frames the object has been visible,
 
 and:
 
 ```text
-0.83s
+1.76s
 ```
 
 represents the estimated visible time.
@@ -211,7 +236,27 @@ model = YOLO(
 )
 ```
 
-YOLO performs object detection on each video frame.
+YOLO performs object detection on every video frame.
+
+---
+
+## Target Object Class
+
+The project tracks cars.
+
+In the COCO dataset:
+
+```python
+TARGET_CLASS_ID = 2
+```
+
+represents:
+
+```text
+car
+```
+
+This means YOLO can detect many different object classes, but only cars are passed into the tracking stage.
 
 ---
 
@@ -229,7 +274,7 @@ Example:
 tracker = sv.ByteTrack()
 ```
 
-The tracker receives detections and attempts to maintain object identities between consecutive frames.
+ByteTrack receives the filtered detections and attempts to maintain the identity of each car across consecutive frames.
 
 ---
 
@@ -241,9 +286,9 @@ Before processing a new video:
 tracker.reset()
 ```
 
-This clears the previous tracking state.
+This clears any previous tracking state.
 
-The tracker must maintain state during one complete video-processing sequence.
+The tracker must then maintain its state during the complete processing sequence.
 
 ---
 
@@ -258,7 +303,7 @@ results = model(
 )[0]
 ```
 
-YOLO provides detection information such as:
+YOLO provides information such as:
 
 ```text
 Bounding Boxes
@@ -278,7 +323,7 @@ detections = sv.Detections.from_ultralytics(
 )
 ```
 
-This gives the pipeline access to properties such as:
+This provides access to properties such as:
 
 ```python
 detections.xyxy
@@ -303,7 +348,90 @@ is normally:
 None
 ```
 
-This is because YOLO detects objects but does not assign persistent tracking identities.
+YOLO detects objects but does not assign persistent tracking identities.
+
+ByteTrack is responsible for adding those identities.
+
+---
+
+## Filtering Before Tracking
+
+The project filters detections before sending them to ByteTrack.
+
+```python
+detections = detections[
+    detections.class_id == TARGET_CLASS_ID
+]
+```
+
+Because:
+
+```python
+TARGET_CLASS_ID = 2
+```
+
+only cars remain.
+
+The resulting detections are then passed to:
+
+```python
+detections = tracker.update_with_detections(
+    detections
+)
+```
+
+---
+
+## Why Filter Before Tracking?
+
+The project follows:
+
+```text
+YOLO
+ ↓
+Detections
+ ↓
+Filter
+ ↓
+ByteTrack
+```
+
+instead of:
+
+```text
+YOLO
+ ↓
+Detections
+ ↓
+ByteTrack
+ ↓
+Filter
+```
+
+Filtering first means ByteTrack only needs to manage objects relevant to the application.
+
+For example:
+
+```text
+YOLO detects:
+
+person
+car
+truck
+car
+bus
+car
+```
+
+After filtering:
+
+```text
+car
+car
+car
+```
+
+Only those cars are tracked.
 
 ---
 
@@ -329,13 +457,13 @@ may contain values such as:
 [1, 2, 3, 4]
 ```
 
-Each value identifies an individual tracked object.
+Each value represents an individual tracked object.
 
 ---
 
 ## `class_id` vs. `tracker_id`
 
-These two values represent different information.
+These values represent different information.
 
 ### `class_id`
 
@@ -345,7 +473,7 @@ Answers:
 What type of object is this?
 ```
 
-For example:
+Examples:
 
 ```text
 car
@@ -362,7 +490,7 @@ Answers:
 Which individual object is this?
 ```
 
-For example:
+Examples:
 
 ```text
 car #1
@@ -370,108 +498,13 @@ car #2
 car #3
 ```
 
-Several objects may belong to the same class while having different tracking IDs.
-
----
-
-## Filtering Before Tracking
-
-This project also applies filtering before ByteTrack.
-
-The lesson demonstrates tracking only cars.
-
-In the COCO dataset:
-
-```python
-TARGET_CLASS = 2
-```
-
-represents:
-
-```text
-car
-```
-
-The detections are filtered using:
-
-```python
-detections = detections[
-    detections.class_id == TARGET_CLASS
-]
-```
-
-Then the filtered detections are sent to ByteTrack:
-
-```python
-detections = tracker.update_with_detections(
-    detections
-)
-```
-
----
-
-## Why Filter Before Tracking?
-
-The order is:
-
-```text
-YOLO
- ↓
-Detections
- ↓
-Filter
- ↓
-ByteTrack
-```
-
-instead of:
-
-```text
-YOLO
- ↓
-Detections
- ↓
-ByteTrack
- ↓
-Filter
-```
-
-Filtering first means ByteTrack only manages objects relevant to the application.
-
-For example:
-
-```text
-YOLO detects:
-
-person
-car
-truck
-car
-bus
-car
-```
-
-After filtering:
-
-```text
-car
-car
-car
-```
-
-Only those objects are tracked.
+Several objects can belong to the same class while having different tracker IDs.
 
 ---
 
 ## Tracking Labels
 
-Tracker IDs can be displayed using:
-
-```python
-sv.LabelAnnotator()
-```
-
-A simple tracking label can be created with:
+A simple tracker label can be created with:
 
 ```python
 labels = [
@@ -481,7 +514,7 @@ labels = [
 ]
 ```
 
-This produces:
+Example:
 
 ```text
 ID:1
@@ -489,50 +522,32 @@ ID:2
 ID:3
 ```
 
----
-
-## Class and Tracker ID Labels
-
-A more informative label combines the class name with the tracker ID.
-
-Example:
-
-```python
-labels = [
-    f"{results.names[int(class_id)]} "
-    f"#{tracker_id}"
-    for class_id, tracker_id in zip(
-        detections.class_id,
-        detections.tracker_id
-    )
-]
-```
-
-Example output:
+The final project uses more informative labels containing:
 
 ```text
-car #1
-car #2
-truck #3
+Class Name
+Tracker ID
+Visible Frames
+Visible Time
+```
+
+For example:
+
+```text
+car #4 | 173f | 6.92s
 ```
 
 ---
 
 ## Bounding Box Annotation
 
-Bounding boxes are drawn using:
-
-```python
-sv.BoxAnnotator()
-```
-
-Create the annotator:
+Bounding boxes are created using:
 
 ```python
 box_annotator = sv.BoxAnnotator()
 ```
 
-Apply it:
+and applied with:
 
 ```python
 annotated_frame = box_annotator.annotate(
@@ -545,13 +560,13 @@ annotated_frame = box_annotator.annotate(
 
 ## Label Annotation
 
-Labels are drawn using:
+Labels are created using:
 
 ```python
-sv.LabelAnnotator()
+label_annotator = sv.LabelAnnotator()
 ```
 
-Example:
+and applied with:
 
 ```python
 annotated_frame = label_annotator.annotate(
@@ -565,19 +580,13 @@ annotated_frame = label_annotator.annotate(
 
 ## Object Trajectories
 
-The project also uses:
-
-```python
-sv.TraceAnnotator()
-```
-
-Create it:
+The project uses:
 
 ```python
 trace_annotator = sv.TraceAnnotator()
 ```
 
-Apply it:
+and:
 
 ```python
 annotated_frame = trace_annotator.annotate(
@@ -594,43 +603,39 @@ tracker_id
 
 to associate positions belonging to the same object across multiple frames.
 
+This creates a visual trajectory showing how the tracked vehicle moves through the scene.
+
 ---
 
 ## Tracking Analytics
 
-The project uses persistent tracking IDs to create simple analytics.
+The project uses persistent tracker IDs to create simple analytics.
 
-A dictionary stores how many frames each object remains visible:
+A dictionary stores how many frames each tracked car remains visible:
 
 ```python
 frame_count = {}
 ```
 
-For every tracker ID:
+For each tracker ID:
 
 ```python
-for tracker_id in detections.tracker_id:
-
-    tracker_id = int(
-        tracker_id
-    )
-
-    frame_count[tracker_id] = (
-        frame_count.get(
-            tracker_id,
-            0
-        ) + 1
-    )
+frame_count[tracker_id] = (
+    frame_count.get(
+        tracker_id,
+        0
+    ) + 1
+)
 ```
 
 ---
 
 ## Frame Visibility Count
 
-Suppose object:
+Suppose:
 
 ```text
-#5
+car #5
 ```
 
 appears in 60 processed frames.
@@ -659,15 +664,11 @@ f = frames
 
 ## Visible Time
 
-The approximate visible time can be calculated using the video's FPS.
-
-The formula is:
+The approximate visible time is calculated using the video's FPS.
 
 ```text
 Visible Time =
-Frames Visible
-──────────────
-     FPS
+Frames Visible / FPS
 ```
 
 In Python:
@@ -675,41 +676,36 @@ In Python:
 ```python
 visible_seconds = (
     frames_visible /
-    video_fps
+    VIDEO_FPS
 )
 ```
 
 For example:
 
 ```text
-frames visible = 90
+Frames Visible = 146
+FPS = 25
 
-FPS = 30
+146 / 25 = 5.84 seconds
 ```
 
-Then:
+The label can therefore display:
 
 ```text
-90 / 30 = 3 seconds
-```
-
-The label could display:
-
-```text
-car #5 | 90f | 3.00s
+car #1 | 146f | 5.84s
 ```
 
 ---
 
 ## Unique Tracker IDs
 
-The project can also store every tracker ID inside a Python set.
+The project stores every observed tracker ID inside a Python set:
 
 ```python
 unique_tracker_ids = set()
 ```
 
-Then:
+New IDs are added using:
 
 ```python
 unique_tracker_ids.add(
@@ -717,12 +713,77 @@ unique_tracker_ids.add(
 )
 ```
 
-The number of unique tracker IDs is:
+The total number of observed tracker IDs is:
 
 ```python
 len(
     unique_tracker_ids
 )
+```
+
+---
+
+## Final Test Results
+
+The completed project was tested successfully in **Google Colab** using the real 10-second traffic video stored in the repository.
+
+The final processing run completed:
+
+```text
+Processing video: 100% 250/250
+```
+
+The tracking analytics were:
+
+```text
+Tracker ID 1: 146 frames | 5.84 seconds
+Tracker ID 2: 54 frames  | 2.16 seconds
+Tracker ID 3: 47 frames  | 1.88 seconds
+Tracker ID 4: 173 frames | 6.92 seconds
+Tracker ID 5: 176 frames | 7.04 seconds
+Tracker ID 6: 27 frames  | 1.08 seconds
+```
+
+Unique tracker IDs:
+
+```text
+[1, 2, 3, 4, 5, 6]
+```
+
+Total unique tracked cars:
+
+```text
+6
+```
+
+The pipeline successfully generated:
+
+```text
+assets/output/tracked_vehicles.mp4
+```
+
+The final GitHub output video was converted to a browser-compatible H.264 MP4 and verified visually.
+
+The video displays:
+
+```text
+Car Detection
+     ↓
+Bounding Box
+     ↓
+Persistent Tracker ID
+     ↓
+Frame Count
+     ↓
+Visible Time
+     ↓
+Tracking Trace
+```
+
+The final test completed with:
+
+```text
+Object Tracking Project: SUCCESS
 ```
 
 ---
@@ -745,7 +806,7 @@ If the tracker loses the object and it later returns:
 Frame 20 → car #11
 ```
 
-the same physical vehicle may now have a different ID.
+the same physical vehicle may receive a different ID.
 
 Therefore:
 
@@ -754,6 +815,8 @@ unique tracker IDs
 ```
 
 should not automatically be interpreted as perfectly accurate unique real-world object counts.
+
+They represent identities maintained by ByteTrack during the tracking sequence.
 
 ---
 
@@ -794,7 +857,7 @@ video_info.total_frames / video_info.fps
 
 The project processes frames using a callback.
 
-Example structure:
+Simplified structure:
 
 ```python
 def process_frame(
@@ -812,7 +875,7 @@ def process_frame(
     )
 
     detections = detections[
-        detections.class_id == TARGET_CLASS
+        detections.class_id == TARGET_CLASS_ID
     ]
 
     detections = tracker.update_with_detections(
@@ -822,7 +885,7 @@ def process_frame(
     return frame
 ```
 
-The callback contains the main computer vision logic.
+The complete callback additionally performs tracking analytics and annotations.
 
 ---
 
@@ -872,7 +935,7 @@ YOLO
      ↓
 sv.Detections
      ↓
-Class Filter
+Car Filter
      ↓
 ByteTrack
      ↓
@@ -897,7 +960,19 @@ tracked_vehicles.mp4
 
 ## Running the Project
 
-From the project directory:
+From:
+
+```text
+05-projects/04-Object-Tracking/
+```
+
+install the dependencies if necessary:
+
+```bash
+pip install supervision ultralytics opencv-python numpy
+```
+
+Then run:
 
 ```bash
 python object_tracking_pipeline.py
@@ -906,52 +981,51 @@ python object_tracking_pipeline.py
 The script will:
 
 ```text
-1. Create required directories
-2. Download the sample video if needed
-3. Load YOLO
-4. Create ByteTrack
-5. Read video information
-6. Process every video frame
-7. Filter selected objects
-8. Track them
-9. Generate tracking analytics
-10. Create an annotated output video
+1. Create the required directories
+2. Locate the input traffic video
+3. Download the sample video if necessary
+4. Read the video information
+5. Load YOLOv8n
+6. Create ByteTrack
+7. Process every video frame
+8. Detect objects
+9. Filter cars
+10. Track cars
+11. Maintain tracker IDs
+12. Count visible frames
+13. Calculate visible time
+14. Record unique tracker IDs
+15. Draw boxes
+16. Draw labels
+17. Draw trajectories
+18. Generate the output video
 ```
 
 ---
 
-## Expected Console Output
+## Successful Console Output
 
-The exact values depend on the tracking results, but the console may display information such as:
+A successful final run includes:
 
 ```text
-Video information:
+Processing video: 100% 250/250
 
-Resolution: ...
-FPS: ...
-Total frames: ...
-Duration: ...
+Unique tracker IDs:
+[1, 2, 3, 4, 5, 6]
 
-Starting object tracking...
+Total unique tracked cars:
+6
 
-Tracking analytics
-----------------------------------------
+Output video created successfully.
 
-Tracker ID 1: 75 frames | 2.50 seconds
-Tracker ID 2: 41 frames | 1.37 seconds
-Tracker ID 3: 98 frames | 3.27 seconds
-
-Total unique tracked objects: 3
-
-Output video saved to:
-assets/output/tracked_vehicles.mp4
+Object Tracking Project: SUCCESS
 ```
 
 ---
 
 ## Learning Outcomes
 
-This project demonstrates how multiple computer vision concepts can be combined into one pipeline.
+This project demonstrates how multiple computer vision concepts can be combined into one complete video-processing pipeline.
 
 It connects:
 
@@ -960,13 +1034,17 @@ Object Detection
         ↓
 Supervision Detections
         ↓
-Filtering
+Class Filtering
         ↓
 Object Tracking
+        ↓
+Persistent IDs
         ↓
 Tracking Annotation
         ↓
 Tracking Analytics
+        ↓
+Video Output
 ```
 
 ---
@@ -1036,7 +1114,7 @@ Detection Filtering
 This project adds:
 
 ```text
-Tracking
+Object Tracking
 ```
 
 The progression becomes:
@@ -1054,7 +1132,9 @@ ByteTrack
       ↓
 Persistent tracker_id
       ↓
-Video Analytics
+Tracking Analytics
+      ↓
+Video Processing
 ```
 
 ---
@@ -1074,7 +1154,7 @@ Object Speed Estimation
 SAM-Based Video Workflows
 ```
 
-These applications all build on the ability to maintain object identities across video frames.
+These applications all build on the ability to maintain object identities across consecutive video frames.
 
 ---
 
@@ -1086,10 +1166,17 @@ Project Type: Video Computer Vision
 Detector: YOLOv8n
 Tracking: ByteTrack
 Detection Representation: sv.Detections
+Target Class: Car (COCO Class ID 2)
 Filtering: Class-based
 Annotation: Boxes + Labels + Traces
 Analytics: Frame Count + Visible Time + Unique IDs
-Status: Ready for implementation and testing
+Input: Real 10-second traffic video
+Input Frames: 250
+Final Tracked Cars: 6
+Output: tracked_vehicles.mp4
+Environment: Google Colab
+Test Result: SUCCESS
+Status: Completed and successfully tested
 ```
 
 ---
