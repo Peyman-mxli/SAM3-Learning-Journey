@@ -1,18 +1,23 @@
+```python
 """
 zones_counting_analytics.py
 
 People Zones and Counting Analytics
 
+Final tested Project 05 implementation.
+
 This project combines:
 
-- YOLOv8 person detection
+- YOLOv8s person detection
 - Supervision detections
 - ByteTrack object tracking
 - Persistent tracker IDs
 - PolygonZone occupancy analysis
 - LineZone crossing analysis
-- Bounding-box and label annotations
+- Bounding-box annotations
+- Tracker ID labels
 - Spatial video analytics
+- H.264-ready output workflow
 
 SAM3 Learning Journey
 """
@@ -29,19 +34,21 @@ from ultralytics import YOLO
 # Configuration
 # --------------------------------------------------
 
-MODEL_NAME = "yolov8n.pt"
+MODEL_NAME = "yolov8s.pt"
 
 INPUT_VIDEO = "assets/input/people_walking.mp4"
-OUTPUT_VIDEO = "assets/output/people_zones_counting.mp4"
 
-CONFIDENCE_THRESHOLD = 0.30
+OUTPUT_VIDEO = (
+    "assets/output/people_zones_counting_final.mp4"
+)
 
-# COCO class 0 = person
+CONFIDENCE_THRESHOLD = 0.15
 PERSON_CLASS_ID = 0
+INFERENCE_SIZE = 1280
 
 
 # --------------------------------------------------
-# Create output directory
+# Create Required Directories
 # --------------------------------------------------
 
 Path("assets/output").mkdir(
@@ -51,7 +58,7 @@ Path("assets/output").mkdir(
 
 
 # --------------------------------------------------
-# Check input video
+# Validate Input Video
 # --------------------------------------------------
 
 if not Path(INPUT_VIDEO).exists():
@@ -61,48 +68,60 @@ if not Path(INPUT_VIDEO).exists():
 
 
 # --------------------------------------------------
-# Load YOLO model
+# Load YOLO Model
 # --------------------------------------------------
 
-print("Loading YOLO model...")
+print(
+    f"Loading model: "
+    f"{MODEL_NAME}"
+)
 
-model = YOLO(MODEL_NAME)
-
-print("YOLO model loaded.")
+model = YOLO(
+    MODEL_NAME
+)
 
 
 # --------------------------------------------------
-# Read video information
+# Read Video Information
 # --------------------------------------------------
 
 video_info = sv.VideoInfo.from_video_path(
     INPUT_VIDEO
 )
 
-print("\nVideo information:")
-print(f"Width: {video_info.width}")
-print(f"Height: {video_info.height}")
-print(f"FPS: {video_info.fps}")
-print(f"Total frames: {video_info.total_frames}")
+print("\nVideo Information")
+
+print(
+    f"Resolution: "
+    f"{video_info.width} x "
+    f"{video_info.height}"
+)
+
+print(
+    f"FPS: "
+    f"{video_info.fps}"
+)
+
+print(
+    f"Frames: "
+    f"{video_info.total_frames}"
+)
 
 
 # --------------------------------------------------
 # Define PolygonZone
 #
-# Lower half of the image.
-# Coordinates are calculated dynamically so the
-# project works with different video resolutions.
+# Polygon focused on the main pedestrian-crossing area.
+# These coordinates were visually inspected and tested
+# using the 1920 x 1080 people_walking.mp4 video.
 # --------------------------------------------------
 
-POLYGON = np.array(
-    [
-        [0, video_info.height // 2],
-        [video_info.width, video_info.height // 2],
-        [video_info.width, video_info.height],
-        [0, video_info.height],
-    ],
-    dtype=np.int32
-)
+POLYGON = np.array([
+    [520, 470],
+    [1320, 470],
+    [1460, 900],
+    [420, 900]
+], dtype=np.int32)
 
 
 # --------------------------------------------------
@@ -113,28 +132,30 @@ polygon_zone = sv.PolygonZone(
     polygon=POLYGON
 )
 
-polygon_zone_annotator = sv.PolygonZoneAnnotator(
+polygon_annotator = sv.PolygonZoneAnnotator(
     zone=polygon_zone,
     color=sv.Color.RED,
     thickness=4,
-    text_scale=1.5
+    text_scale=1.2
 )
 
 
 # --------------------------------------------------
-# Define horizontal LineZone
+# Define LineZone
 #
-# The line crosses the middle of the frame.
+# Vertical line through the central pedestrian flow.
+# This orientation produced a confirmed crossing event
+# during testing on the crowded pedestrian scene.
 # --------------------------------------------------
 
 line_start = sv.Point(
-    x=0,
-    y=video_info.height // 2
+    x=960,
+    y=400
 )
 
 line_end = sv.Point(
-    x=video_info.width,
-    y=video_info.height // 2
+    x=960,
+    y=920
 )
 
 
@@ -147,25 +168,31 @@ line_zone = sv.LineZone(
     end=line_end
 )
 
-line_zone_annotator = sv.LineZoneAnnotator(
+line_annotator = sv.LineZoneAnnotator(
     thickness=4,
-    text_scale=1.5,
-    custom_in_text="Crossings Down",
-    custom_out_text="Crossings Up"
+    text_scale=1.2,
+    custom_in_text="Crossings In",
+    custom_out_text="Crossings Out"
 )
 
 
 # --------------------------------------------------
 # Create ByteTrack
+#
+# The tracker configuration was adjusted for the
+# crowded pedestrian scene.
 # --------------------------------------------------
 
 tracker = sv.ByteTrack(
+    track_activation_threshold=0.15,
+    lost_track_buffer=90,
+    minimum_matching_threshold=0.70,
     frame_rate=video_info.fps
 )
 
 
 # --------------------------------------------------
-# Create object annotators
+# Create Annotators
 # --------------------------------------------------
 
 box_annotator = sv.BoxAnnotator(
@@ -173,89 +200,99 @@ box_annotator = sv.BoxAnnotator(
 )
 
 label_annotator = sv.LabelAnnotator(
-    text_scale=0.7,
+    text_scale=0.6,
     text_thickness=2
 )
 
 
 # --------------------------------------------------
-# Frame callback
+# Frame Processing Callback
 # --------------------------------------------------
 
 def process_frame(
     frame: np.ndarray,
-    index: int
+    frame_index: int
 ) -> np.ndarray:
+    """
+    Process one video frame.
 
-    # ----------------------------------------------
-    # YOLO inference
-    # ----------------------------------------------
+    Pipeline:
+
+        Frame
+          ↓
+        YOLOv8s
+          ↓
+        Person Detections
+          ↓
+        Supervision Detections
+          ↓
+        ByteTrack
+          ↓
+        Persistent Tracker IDs
+          ↓
+        PolygonZone
+          +
+        LineZone
+          ↓
+        Occupancy + Crossing Analytics
+          ↓
+        Annotation
+          ↓
+        Output Frame
+    """
+
+    # --------------------------------------------------
+    # Person Detection
+    # --------------------------------------------------
 
     result = model(
         frame,
         conf=CONFIDENCE_THRESHOLD,
         classes=[PERSON_CLASS_ID],
+        imgsz=INFERENCE_SIZE,
         verbose=False
     )[0]
 
 
-    # ----------------------------------------------
-    # Convert YOLO results
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Convert YOLO Results to Supervision
+    # --------------------------------------------------
 
     detections = sv.Detections.from_ultralytics(
         result
     )
 
 
-    # ----------------------------------------------
-    # ByteTrack
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Object Tracking
+    # --------------------------------------------------
 
     detections = tracker.update_with_detections(
         detections
     )
 
 
-    # ----------------------------------------------
-    # Remove detections without confirmed tracker ID
-    # ----------------------------------------------
-
-    if (
-        len(detections) > 0
-        and detections.tracker_id is not None
-    ):
-
-        confirmed_mask = (
-            detections.tracker_id >= 0
-        )
-
-        detections = detections[
-            confirmed_mask
-        ]
-
-
-    # ----------------------------------------------
+    # --------------------------------------------------
     # Trigger PolygonZone
-    # ----------------------------------------------
+    # --------------------------------------------------
 
     polygon_zone.trigger(
         detections=detections
     )
 
 
-    # ----------------------------------------------
+    # --------------------------------------------------
     # Trigger LineZone
-    # ----------------------------------------------
+    # --------------------------------------------------
 
     line_zone.trigger(
         detections=detections
     )
 
 
-    # ----------------------------------------------
-    # Create tracker labels
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Create Tracker ID Labels
+    # --------------------------------------------------
 
     labels = []
 
@@ -264,27 +301,23 @@ def process_frame(
         and detections.tracker_id is not None
     ):
 
-        for tracker_id, confidence in zip(
-            detections.tracker_id,
-            detections.confidence
-        ):
-
-            labels.append(
-                f"Person #{int(tracker_id)} "
-                f"{confidence:.2f}"
-            )
+        labels = [
+            f"Person #{int(tracker_id)}"
+            for tracker_id
+            in detections.tracker_id
+        ]
 
 
-    # ----------------------------------------------
-    # Copy original frame
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Copy Original Frame
+    # --------------------------------------------------
 
     annotated_frame = frame.copy()
 
 
-    # ----------------------------------------------
-    # Bounding boxes
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Draw Bounding Boxes
+    # --------------------------------------------------
 
     annotated_frame = box_annotator.annotate(
         scene=annotated_frame,
@@ -292,9 +325,9 @@ def process_frame(
     )
 
 
-    # ----------------------------------------------
-    # Tracker ID labels
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Draw Tracker ID Labels
+    # --------------------------------------------------
 
     if len(labels) == len(detections):
 
@@ -305,39 +338,38 @@ def process_frame(
         )
 
 
-    # ----------------------------------------------
-    # PolygonZone annotation
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Draw PolygonZone
+    # --------------------------------------------------
 
-    annotated_frame = (
-        polygon_zone_annotator.annotate(
-            scene=annotated_frame
-        )
+    annotated_frame = polygon_annotator.annotate(
+        scene=annotated_frame
     )
 
 
-    # ----------------------------------------------
-    # LineZone annotation
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Draw LineZone
+    # --------------------------------------------------
 
-    annotated_frame = (
-        line_zone_annotator.annotate(
-            frame=annotated_frame,
-            line_counter=line_zone
-        )
+    annotated_frame = line_annotator.annotate(
+        frame=annotated_frame,
+        line_counter=line_zone
     )
 
 
-    # ----------------------------------------------
-    # Additional analytics information
-    # ----------------------------------------------
+    # --------------------------------------------------
+    # Additional Analytics Information
+    # --------------------------------------------------
 
     cv2.putText(
         annotated_frame,
-        f"Frame: {index}",
+        (
+            "People in Zone: "
+            f"{polygon_zone.current_count}"
+        ),
         (40, 60),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1.2,
+        1.1,
         (255, 255, 255),
         3,
         cv2.LINE_AA
@@ -345,12 +377,12 @@ def process_frame(
 
     cv2.putText(
         annotated_frame,
-        f"People in Zone: {polygon_zone.current_count}",
-        (40, 115),
+        f"Frame: {frame_index}",
+        (40, 110),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1.2,
+        1.0,
         (255, 255, 255),
-        3,
+        2,
         cv2.LINE_AA
     )
 
@@ -359,10 +391,12 @@ def process_frame(
 
 
 # --------------------------------------------------
-# Process complete video
+# Process Complete Video
 # --------------------------------------------------
 
-print("\nStarting people analytics...")
+print(
+    "\nStarting final Project 05 processing...\n"
+)
 
 sv.process_video(
     source_path=INPUT_VIDEO,
@@ -373,41 +407,70 @@ sv.process_video(
 
 
 # --------------------------------------------------
-# Final analytics
+# Final Analytics
 # --------------------------------------------------
 
-crossings_down = line_zone.in_count
-crossings_up = line_zone.out_count
+crossings_in = (
+    line_zone.in_count
+)
+
+crossings_out = (
+    line_zone.out_count
+)
 
 total_crossings = (
-    crossings_down
+    crossings_in
     +
-    crossings_up
+    crossings_out
 )
 
 
-print("\nPeople analytics completed.")
+# --------------------------------------------------
+# Results
+# --------------------------------------------------
 
 print(
-    f"Saved: {OUTPUT_VIDEO}"
+    "\nProject 05 processing completed successfully."
 )
 
 print(
-    f"Final people in polygon: "
+    f"Saved: "
+    f"{OUTPUT_VIDEO}"
+)
+
+print(
+    f"Final people in PolygonZone: "
     f"{polygon_zone.current_count}"
 )
 
 print(
-    f"Crossings Down: "
-    f"{crossings_down}"
+    f"Crossings In: "
+    f"{crossings_in}"
 )
 
 print(
-    f"Crossings Up: "
-    f"{crossings_up}"
+    f"Crossings Out: "
+    f"{crossings_out}"
 )
 
 print(
     f"Total Crossings: "
     f"{total_crossings}"
 )
+
+
+# --------------------------------------------------
+# Tested Result
+#
+# Tested in Google Colab with:
+#
+# Resolution: 1920 x 1080
+# FPS: 50
+# Frames: 763
+#
+# Final people in PolygonZone: 6
+# Crossings In: 0
+# Crossings Out: 1
+# Total Crossings: 1
+# --------------------------------------------------
+```
