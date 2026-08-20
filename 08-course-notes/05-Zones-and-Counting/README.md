@@ -120,7 +120,7 @@ The important property is:
 zone.current_count
 ```
 
-This represents the number of detected objects currently inside the polygon.
+This represents the number of detected or tracked objects currently inside the polygon.
 
 ---
 
@@ -191,7 +191,7 @@ A line measures **movement across a boundary**.
 
 A polygon is defined using a collection of `(x, y)` coordinates.
 
-Example:
+In the practical, the lower-left half of the video was used:
 
 ```python
 POLYGON_LEFT = np.array([
@@ -374,12 +374,38 @@ After tracking, objects can contain a persistent:
 tracker_id
 ```
 
-Labels can therefore be generated using:
+During practical testing, new detections initially received:
+
+```text
+-1
+```
+
+until ByteTrack established confirmed tracks.
+
+Confirmed objects then received persistent IDs such as:
+
+```text
+0
+1
+2
+4
+5
+```
+
+For the final practical pipeline, unconfirmed `-1` tracks were filtered before zone analysis:
+
+```python
+if detections.tracker_id is not None:
+    confirmed_mask = detections.tracker_id != -1
+    detections = detections[confirmed_mask]
+```
+
+Labels can then be generated using:
 
 ```python
 labels = [
     f"ID:{tracker_id}"
-    for tracker_id in detections_inside_zone.tracker_id
+    for tracker_id in detections.tracker_id
 ]
 ```
 
@@ -407,7 +433,7 @@ This connects the concepts from the previous Object Tracking session directly wi
 
 `LineZone` creates a virtual counting boundary.
 
-For example, a horizontal line across the middle of the video can be defined using:
+In the practical, a horizontal line across the middle of the video was defined using:
 
 ```python
 line_start = sv.Point(
@@ -430,6 +456,13 @@ line_zone = sv.LineZone(
 )
 ```
 
+For the tested 3840 × 2160 video, this produced:
+
+```text
+Start: (0, 1080)
+End:   (3840, 1080)
+```
+
 Objects crossing this line can now be counted.
 
 ---
@@ -444,7 +477,7 @@ line_zone.trigger(
 )
 ```
 
-Unlike `PolygonZone`, we normally inspect:
+Unlike `PolygonZone`, we inspect:
 
 ```python
 line_zone.in_count
@@ -453,11 +486,11 @@ line_zone.out_count
 
 These values accumulate during video processing.
 
-For example:
+The practical ultimately produced:
 
 ```text
-Crossings down: 15
-Crossings up: 9
+Crossings Down: 3
+Crossings Up:   3
 ```
 
 This provides directional traffic information.
@@ -501,7 +534,7 @@ Both types of zones can be used in the same video pipeline.
 The same tracked detections can trigger both systems:
 
 ```python
-zone.trigger(
+polygon_zone.trigger(
     detections=detections
 )
 
@@ -513,6 +546,7 @@ line_zone.trigger(
 The frame can then display:
 
 - Bounding boxes
+- Persistent tracker IDs
 - Polygon region
 - Current polygon occupancy
 - Counting line
@@ -525,41 +559,205 @@ This creates a more complete traffic-analysis pipeline.
 
 # 14. Combined Processing Pipeline
 
-A complete conceptual pipeline looks like this:
+The complete pipeline implemented and tested during this session was:
 
 ```text
 Input Video
     ↓
 Read Frame
     ↓
-YOLO
+YOLOv8
     ↓
-Detections
+Supervision Detections
     ↓
 ByteTrack
     ↓
-Tracked Detections
+Confirmed Tracked Detections
     ↓
- ┌───────────────────────┐
- │                       │
- ↓                       ↓
-PolygonZone          LineZone
- │                       │
- ↓                       ↓
-Current Count        Crossing Count
- │                       │
- └───────────┬───────────┘
+┌─────────────────────────┐
+│                         │
+↓                         ↓
+PolygonZone            LineZone
+│                         │
+↓                         ↓
+Current Occupancy      Crossing Count
+│                         │
+└────────────┬────────────┘
              ↓
-         Annotation
+        Annotation
              ↓
-        Output Video
+       Output Video
 ```
 
 This is an important pattern for building real-world computer vision systems.
 
 ---
 
-# 15. Real-World Applications
+# 15. Practical Implementation
+
+A complete practical implementation was created for this session and tested in Google Colab.
+
+The implementation combines:
+
+- YOLOv8 object detection
+- Supervision detections
+- ByteTrack object tracking
+- Confirmed tracker IDs
+- `PolygonZone`
+- `LineZone`
+- Bounding-box annotation
+- Tracker-ID labels
+- Occupancy counting
+- Directional crossing counting
+- Full video processing
+
+The implementation is available here:
+
+[View `zones_and_counting_practical.py`](./practical/zones_and_counting_practical.py)
+
+The complete practical documentation is available here:
+
+[View Practical README](./practical/README.md)
+
+---
+
+## Tested Environment
+
+The practical was successfully tested with:
+
+```text
+OpenCV:       4.14.0
+NumPy:        2.2.2
+Supervision:  0.30.0
+Ultralytics:  8.4.128
+YOLO Model:   yolov8n.pt
+Tracker:      ByteTrackTracker
+```
+
+The environment test completed successfully before processing the video.
+
+---
+
+## Input Video
+
+The practical uses:
+
+```text
+practical/assets/input/vehicles.mp4
+```
+
+The original video used during testing had:
+
+```text
+Resolution:   3840 × 2160
+FPS:          25.0
+Total Frames: 538
+Duration:     approximately 21.5 seconds
+```
+
+A compressed repository-friendly version is stored in the practical input assets.
+
+[View Input Assets](./practical/assets/input/README.md)
+
+---
+
+## PolygonZone Practical Result
+
+The red polygon was positioned over the lower-left portion of the highway.
+
+During the single-frame tracking test, the system successfully produced:
+
+```text
+Confirmed tracked objects: 3
+Objects inside zone: 2
+zone.current_count: 2
+IDs inside zone: [4 5]
+```
+
+The complete PolygonZone video processing successfully reached:
+
+```text
+538 / 538 frames
+```
+
+and produced a final occupancy value of:
+
+```text
+Final current_count: 1
+```
+
+---
+
+## LineZone Practical Result
+
+The LineZone was positioned horizontally at:
+
+```text
+y = 1080
+```
+
+across the complete width of the frame:
+
+```text
+Start: (0, 1080)
+End:   (3840, 1080)
+```
+
+The complete LineZone video processing successfully reached:
+
+```text
+538 / 538 frames
+```
+
+with:
+
+```text
+Crossings Down: 3
+Crossings Up:   3
+```
+
+---
+
+## Final Combined Result
+
+The extension challenge was completed by combining `PolygonZone` and `LineZone` in the same video-processing callback.
+
+The final combined processing completed successfully:
+
+```text
+Processing video: 100%
+538 / 538 frames
+
+Combined processing completed.
+
+Final polygon occupancy: 1
+Crossings Down: 3
+Crossings Up: 3
+```
+
+The final output is available here:
+
+[Watch the Final Combined Output](./practical/assets/output/vehicles_combined.mp4)
+
+The output demonstrates:
+
+```text
+YOLOv8 Detection
+        +
+ByteTrack Tracking
+        +
+Persistent IDs
+        +
+PolygonZone Occupancy
+        +
+LineZone Crossings
+        =
+Spatial Video Analytics
+```
+
+---
+
+# 16. Real-World Applications
 
 Zone-based counting can be applied to many real-world problems.
 
@@ -623,7 +821,7 @@ Zone analysis can help detect:
 
 ---
 
-# 16. Occupancy vs Flow
+# 17. Occupancy vs Flow
 
 One of the most important concepts from this session is the distinction between **occupancy** and **flow**.
 
@@ -655,7 +853,7 @@ These are different metrics and should not be confused.
 
 ---
 
-# 17. Combined Concept
+# 18. Combined Concept
 
 The main concepts from this session can be summarized as:
 
@@ -681,18 +879,23 @@ Counting converts those events into useful measurements.
 
 ---
 
-# 18. Extension Challenge
+# 19. Extension Challenge
 
-The session challenge is to display both a `PolygonZone` and a `LineZone` in the same video.
+The session challenge was to display both a `PolygonZone` and a `LineZone` in the same video.
 
-Both triggers must be called using the same tracked detections:
+Both triggers were called using the same tracked detections:
 
 ```python
-zone.trigger(detections=detections)
-line_zone.trigger(detections=detections)
+polygon_zone.trigger(
+    detections=detections
+)
+
+line_zone.trigger(
+    detections=detections
+)
 ```
 
-Then the annotators can be applied:
+The annotators were then applied to the same frame:
 
 ```python
 annotated = box_annotator.annotate(
@@ -710,11 +913,69 @@ annotated = line_zone_annotator.annotate(
 )
 ```
 
-This combines **occupancy analysis** and **flow analysis** in a single computer vision pipeline.
+This challenge was successfully completed.
+
+The final implementation combines **occupancy analysis** and **flow analysis** in a single computer vision pipeline.
 
 ---
 
-# 19. Key Takeaways
+# 20. Concepts Documentation
+
+Detailed concept notes for this session are available in the `concepts` directory.
+
+- [Concepts Overview](./concepts/README.md)
+- [PolygonZone](./concepts/01-PolygonZone.md)
+- [LineZone](./concepts/02-LineZone.md)
+- [Occupancy vs Flow](./concepts/03-Occupancy-vs-Flow.md)
+- [Tracking with Zones](./concepts/04-Tracking-with-Zones.md)
+- [PolygonZone Trigger and Filtering](./concepts/05-PolygonZone-Trigger-and-Filtering.md)
+- [Zone Annotation and Visualization](./concepts/06-Zone-Annotation-and-Visualization.md)
+- [Combining PolygonZone and LineZone](./concepts/07-Combining-PolygonZone-and-LineZone.md)
+
+---
+
+# 21. Practical Resources
+
+The practical directory contains the complete tested implementation and assets.
+
+- [Practical README](./practical/README.md)
+- [Python Implementation](./practical/zones_and_counting_practical.py)
+- [Assets Documentation](./practical/assets/README.md)
+- [Input Assets](./practical/assets/input/README.md)
+- [Output Assets](./practical/assets/output/README.md)
+- [Final Combined Video](./practical/assets/output/vehicles_combined.mp4)
+
+Directory structure:
+
+```text
+practical/
+├── README.md
+├── zones_and_counting_practical.py
+└── assets/
+    ├── README.md
+    ├── input/
+    │   ├── README.md
+    │   └── vehicles.mp4
+    └── output/
+        ├── README.md
+        └── vehicles_combined.mp4
+```
+
+---
+
+# 22. Class Recording
+
+The completed Zones and Counting practical is available on YouTube:
+
+[Watch — SAM3: Zonas y Conteo | PolygonZone, LineZone y ByteTrack](https://youtu.be/43i0z9b81Z4)
+
+Additional recording documentation:
+
+[View `CLASS-RECORDING.md`](./CLASS-RECORDING.md)
+
+---
+
+# 23. Key Takeaways
 
 From this session, I learned that:
 
@@ -726,8 +987,10 @@ From this session, I learned that:
 6. `line_zone.in_count` and `line_zone.out_count` represent directional crossings.
 7. Tracking should happen before zone analysis.
 8. Persistent `tracker_id` values make movement analysis possible.
-9. Polygon and line zones can operate simultaneously.
-10. Zone-based analysis transforms object detection into useful spatial analytics.
+9. Unconfirmed tracker IDs can be filtered before zone analysis.
+10. Polygon and line zones can operate simultaneously.
+11. Occupancy and flow are different spatial analytics metrics.
+12. YOLO, ByteTrack, and Supervision can be combined into a complete video analytics pipeline.
 
 ---
 
@@ -745,7 +1008,15 @@ Instead of only detecting and tracking objects, the system can now understand wh
 The complete idea is:
 
 ```text
-Detect → Track → Analyze Position → Count → Visualize
+Detect
+   ↓
+Track
+   ↓
+Analyze Position
+   ↓
+Count
+   ↓
+Visualize
 ```
 
 This creates the foundation for more advanced computer vision applications such as:
@@ -757,6 +1028,42 @@ This creates the foundation for more advanced computer vision applications such 
 - Parking management
 - Industrial automation
 
+The practical implementation was successfully tested from beginning to end using a real traffic video.
+
+---
+
+## Session Status
+
+**Session 06 — Zones and Counting: COMPLETED**
+
+```text
+Concept Documentation          ✓
+PolygonZone                    ✓
+LineZone                       ✓
+YOLOv8 Detection               ✓
+ByteTrack Tracking             ✓
+Persistent Tracker IDs         ✓
+Confirmed Track Filtering      ✓
+Occupancy Counting             ✓
+Directional Crossing Counting ✓
+Combined Pipeline              ✓
+Google Colab Testing           ✓
+Input Video                    ✓
+Final Combined Output Video    ✓
+Python Implementation          ✓
+Extension Challenge            ✓
+Class Recording                ✓
+GitHub Documentation           ✓
+```
+
+Final tested results:
+
+```text
+Final polygon occupancy: 1
+Crossings Down: 3
+Crossings Up: 3
+```
+
 ---
 
 ## Technologies Used
@@ -765,7 +1072,7 @@ This creates the foundation for more advanced computer vision applications such 
 - OpenCV
 - NumPy
 - Matplotlib
-- Ultralytics YOLO
+- Ultralytics YOLOv8
 - Supervision
 - ByteTrack
 - Google Colab
@@ -776,6 +1083,7 @@ This creates the foundation for more advanced computer vision applications such 
 
 - [SAM3 Course](https://sam-3-vision-computacional-5tao.vercel.app/)
 - [Session 06](https://sam-3-vision-computacional-5tao.vercel.app/modulo/06)
+- [Class Recording](https://youtu.be/43i0z9b81Z4)
 
 ---
 
