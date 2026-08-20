@@ -1,11 +1,11 @@
 """
 zones_counting_analytics.py
 
-Zones and Counting Analytics
+People Zones and Counting Analytics
 
 This project combines:
 
-- YOLOv8 object detection
+- YOLOv8 person detection
 - Supervision detections
 - ByteTrack object tracking
 - Persistent tracker IDs
@@ -31,17 +31,13 @@ from ultralytics import YOLO
 
 MODEL_NAME = "yolov8n.pt"
 
-INPUT_VIDEO = "assets/input/vehicles.mp4"
-OUTPUT_VIDEO = "assets/output/zones_counting_analytics.mp4"
+INPUT_VIDEO = "assets/input/people_walking.mp4"
+OUTPUT_VIDEO = "assets/output/people_zones_counting.mp4"
 
 CONFIDENCE_THRESHOLD = 0.30
 
-# COCO vehicle classes:
-# 2 = car
-# 3 = motorcycle
-# 5 = bus
-# 7 = truck
-VEHICLE_CLASS_IDS = [2, 3, 5, 7]
+# COCO class 0 = person
+PERSON_CLASS_ID = 0
 
 
 # --------------------------------------------------
@@ -91,27 +87,30 @@ print(f"Total frames: {video_info.total_frames}")
 
 
 # --------------------------------------------------
-# Create PolygonZone
+# Define PolygonZone
+#
+# Lower half of the image.
+# Coordinates are calculated dynamically so the
+# project works with different video resolutions.
 # --------------------------------------------------
 
-POLYGON_LEFT = np.array(
+POLYGON = np.array(
     [
         [0, video_info.height // 2],
-        [
-            video_info.width // 2,
-            video_info.height // 2
-        ],
-        [
-            video_info.width // 2,
-            video_info.height
-        ],
-        [0, video_info.height]
+        [video_info.width, video_info.height // 2],
+        [video_info.width, video_info.height],
+        [0, video_info.height],
     ],
     dtype=np.int32
 )
 
+
+# --------------------------------------------------
+# Create PolygonZone
+# --------------------------------------------------
+
 polygon_zone = sv.PolygonZone(
-    polygon=POLYGON_LEFT
+    polygon=POLYGON
 )
 
 polygon_zone_annotator = sv.PolygonZoneAnnotator(
@@ -123,7 +122,9 @@ polygon_zone_annotator = sv.PolygonZoneAnnotator(
 
 
 # --------------------------------------------------
-# Create LineZone
+# Define horizontal LineZone
+#
+# The line crosses the middle of the frame.
 # --------------------------------------------------
 
 line_start = sv.Point(
@@ -135,6 +136,11 @@ line_end = sv.Point(
     x=video_info.width,
     y=video_info.height // 2
 )
+
+
+# --------------------------------------------------
+# Create LineZone
+# --------------------------------------------------
 
 line_zone = sv.LineZone(
     start=line_start,
@@ -150,7 +156,7 @@ line_zone_annotator = sv.LineZoneAnnotator(
 
 
 # --------------------------------------------------
-# Create tracker
+# Create ByteTrack
 # --------------------------------------------------
 
 tracker = sv.ByteTrack(
@@ -159,7 +165,7 @@ tracker = sv.ByteTrack(
 
 
 # --------------------------------------------------
-# Create annotators
+# Create object annotators
 # --------------------------------------------------
 
 box_annotator = sv.BoxAnnotator(
@@ -180,25 +186,6 @@ def process_frame(
     frame: np.ndarray,
     index: int
 ) -> np.ndarray:
-    """
-    Process one video frame.
-
-    Pipeline:
-
-    YOLO
-      ↓
-    sv.Detections
-      ↓
-    Vehicle Filtering
-      ↓
-    ByteTrack
-      ↓
-    PolygonZone
-      ↓
-    LineZone
-      ↓
-    Annotations
-    """
 
     # ----------------------------------------------
     # YOLO inference
@@ -207,12 +194,13 @@ def process_frame(
     result = model(
         frame,
         conf=CONFIDENCE_THRESHOLD,
+        classes=[PERSON_CLASS_ID],
         verbose=False
     )[0]
 
 
     # ----------------------------------------------
-    # Convert YOLO results to Supervision
+    # Convert YOLO results
     # ----------------------------------------------
 
     detections = sv.Detections.from_ultralytics(
@@ -221,23 +209,7 @@ def process_frame(
 
 
     # ----------------------------------------------
-    # Keep vehicle classes
-    # ----------------------------------------------
-
-    if len(detections) > 0:
-
-        vehicle_mask = np.isin(
-            detections.class_id,
-            VEHICLE_CLASS_IDS
-        )
-
-        detections = detections[
-            vehicle_mask
-        ]
-
-
-    # ----------------------------------------------
-    # Track detections
+    # ByteTrack
     # ----------------------------------------------
 
     detections = tracker.update_with_detections(
@@ -246,12 +218,35 @@ def process_frame(
 
 
     # ----------------------------------------------
-    # Trigger spatial analytics
+    # Remove detections without confirmed tracker ID
+    # ----------------------------------------------
+
+    if (
+        len(detections) > 0
+        and detections.tracker_id is not None
+    ):
+
+        confirmed_mask = (
+            detections.tracker_id >= 0
+        )
+
+        detections = detections[
+            confirmed_mask
+        ]
+
+
+    # ----------------------------------------------
+    # Trigger PolygonZone
     # ----------------------------------------------
 
     polygon_zone.trigger(
         detections=detections
     )
+
+
+    # ----------------------------------------------
+    # Trigger LineZone
+    # ----------------------------------------------
 
     line_zone.trigger(
         detections=detections
@@ -259,33 +254,25 @@ def process_frame(
 
 
     # ----------------------------------------------
-    # Create labels
+    # Create tracker labels
     # ----------------------------------------------
 
     labels = []
 
-    for class_id, tracker_id, confidence in zip(
-        detections.class_id,
-        detections.tracker_id,
-        detections.confidence
+    if (
+        len(detections) > 0
+        and detections.tracker_id is not None
     ):
 
-        class_name = result.names[
-            int(class_id)
-        ]
+        for tracker_id, confidence in zip(
+            detections.tracker_id,
+            detections.confidence
+        ):
 
-        if tracker_id is None:
-            tracker_text = "?"
-        else:
-            tracker_text = str(
-                int(tracker_id)
+            labels.append(
+                f"Person #{int(tracker_id)} "
+                f"{confidence:.2f}"
             )
-
-        labels.append(
-            f"{class_name} "
-            f"#{tracker_text} "
-            f"{confidence:.2f}"
-        )
 
 
     # ----------------------------------------------
@@ -306,14 +293,16 @@ def process_frame(
 
 
     # ----------------------------------------------
-    # Tracker labels
+    # Tracker ID labels
     # ----------------------------------------------
 
-    annotated_frame = label_annotator.annotate(
-        scene=annotated_frame,
-        detections=detections,
-        labels=labels
-    )
+    if len(labels) == len(detections):
+
+        annotated_frame = label_annotator.annotate(
+            scene=annotated_frame,
+            detections=detections,
+            labels=labels
+        )
 
 
     # ----------------------------------------------
@@ -340,13 +329,24 @@ def process_frame(
 
 
     # ----------------------------------------------
-    # Frame information
+    # Additional analytics information
     # ----------------------------------------------
 
     cv2.putText(
         annotated_frame,
         f"Frame: {index}",
         (40, 60),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1.2,
+        (255, 255, 255),
+        3,
+        cv2.LINE_AA
+    )
+
+    cv2.putText(
+        annotated_frame,
+        f"People in Zone: {polygon_zone.current_count}",
+        (40, 115),
         cv2.FONT_HERSHEY_SIMPLEX,
         1.2,
         (255, 255, 255),
@@ -362,7 +362,7 @@ def process_frame(
 # Process complete video
 # --------------------------------------------------
 
-print("\nStarting video processing...")
+print("\nStarting people analytics...")
 
 sv.process_video(
     source_path=INPUT_VIDEO,
@@ -385,25 +385,29 @@ total_crossings = (
     crossings_up
 )
 
-print("\nProcessing completed.")
-print(f"Saved: {OUTPUT_VIDEO}")
+
+print("\nPeople analytics completed.")
 
 print(
-    "Final polygon occupancy:",
-    polygon_zone.current_count
+    f"Saved: {OUTPUT_VIDEO}"
 )
 
 print(
-    "Crossings Down:",
-    crossings_down
+    f"Final people in polygon: "
+    f"{polygon_zone.current_count}"
 )
 
 print(
-    "Crossings Up:",
-    crossings_up
+    f"Crossings Down: "
+    f"{crossings_down}"
 )
 
 print(
-    "Total Crossings:",
-    total_crossings
+    f"Crossings Up: "
+    f"{crossings_up}"
+)
+
+print(
+    f"Total Crossings: "
+    f"{total_crossings}"
 )
