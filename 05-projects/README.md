@@ -446,6 +446,234 @@ represent identities maintained by the tracker during the processed sequence rat
 
 ---
 
+### 05 — Zones and Counting Analytics
+
+[`05-Zones-and-Counting-Analytics/`](./05-Zones-and-Counting-Analytics/)
+
+A complete spatial video analytics project using **YOLOv8s**, **Supervision**, **ByteTrack**, `PolygonZone`, and `LineZone`.
+
+This project extends object tracking by introducing spatial regions and virtual counting boundaries.
+
+Instead of only tracking where people move, the application can determine how many tracked people are currently inside a defined region and whether a tracked person crosses a virtual line.
+
+The project:
+
+- Loads a real pedestrian video
+- Reads video metadata
+- Runs YOLOv8s person detection on every frame
+- Filters inference to the COCO `person` class
+- Converts YOLO predictions into `sv.Detections`
+- Tracks pedestrians using ByteTrack
+- Assigns persistent `tracker_id` values
+- Defines a custom PolygonZone
+- Calculates current PolygonZone occupancy
+- Defines a custom LineZone
+- Detects confirmed line-crossing events
+- Maintains directional crossing counters
+- Draws person bounding boxes
+- Displays `Person #ID` labels
+- Visualizes the PolygonZone
+- Visualizes the LineZone
+- Displays current people-in-zone analytics
+- Displays Crossings In / Crossings Out
+- Generates a complete annotated output video
+- Converts the final video to an H.264-compatible MP4 for browser playback
+
+### Pipeline
+
+```text
+Input Pedestrian Video
+        ↓
+VideoInfo
+        ↓
+Read Frame
+        ↓
+YOLOv8s
+        ↓
+Person Detection
+        ↓
+sv.Detections
+        ↓
+ByteTrack
+        ↓
+Persistent Person IDs
+        ↓
+        ├───────────────────────┐
+        ↓                       ↓
+   PolygonZone               LineZone
+        ↓                       ↓
+Current Occupancy         Crossing Events
+        ↓                       ↓
+        └───────────┬───────────┘
+                    ↓
+              BoxAnnotator
+                    ↓
+              LabelAnnotator
+                    ↓
+            Spatial Analytics
+                    ↓
+             Annotated Video
+```
+
+### Detection Configuration
+
+The final tested detector configuration is:
+
+```text
+Model: YOLOv8s
+Confidence Threshold: 0.15
+Inference Size: 1280
+Target Class: Person
+COCO Class ID: 0
+```
+
+The project initially tested YOLOv8n, but YOLOv8s was selected for the final pipeline because the real pedestrian scene contains many small and partially occluded people.
+
+### Tracking Configuration
+
+The final ByteTrack configuration uses:
+
+```text
+Track Activation Threshold: 0.15
+Lost Track Buffer: 90
+Minimum Matching Threshold: 0.70
+Frame Rate: Video FPS
+```
+
+The tracker configuration was adjusted to improve tracking continuity in the crowded pedestrian scene.
+
+### PolygonZone
+
+The final PolygonZone coordinates are:
+
+```text
+[520, 470]
+[1320, 470]
+[1460, 900]
+[420, 900]
+```
+
+The PolygonZone represents the primary pedestrian-crossing area and allows the application to calculate:
+
+```text
+People in Zone
+```
+
+for every processed frame.
+
+### LineZone
+
+Multiple line orientations were tested during development:
+
+```text
+Horizontal
+Vertical
+Diagonal 1
+Diagonal 2
+```
+
+The final implementation uses a vertical LineZone:
+
+```text
+Start: (960, 400)
+End:   (960, 920)
+```
+
+The vertical orientation was the tested configuration that produced a confirmed pedestrian crossing event.
+
+### Test Input
+
+The final project uses:
+
+```text
+assets/input/people_walking.mp4
+```
+
+Video information:
+
+```text
+Resolution: 1920 × 1080
+FPS: 50
+Frames: 763
+Duration: approximately 15.26 seconds
+```
+
+The video contains a real crowded pedestrian intersection and provides a challenging test for detection, tracking, occupancy analysis, and line-crossing analytics.
+
+### Test Result
+
+Project 05 was successfully tested in **Google Colab**.
+
+The final run processed:
+
+```text
+Processing video: 100%
+763/763
+```
+
+Final analytics:
+
+```text
+Final people in PolygonZone: 6
+
+Crossings In: 0
+Crossings Out: 1
+Total Crossings: 1
+```
+
+Because the scene contains a dense crowd and significant occlusion, the LineZone result represents **confirmed crossings maintained by the tracking pipeline**, rather than the total number of physical pedestrians visible in the intersection.
+
+### Project Evidence
+
+Project 05 contains:
+
+```text
+05-Zones-and-Counting-Analytics/
+│
+├── assets/
+│   ├── input/
+│   │   ├── README.md
+│   │   └── people_walking.mp4
+│   │
+│   └── output/
+│       ├── README.md
+│       └── people_zones_counting_final.mp4
+│
+├── zones_counting_analytics.py
+├── requirements.txt
+└── README.md
+```
+
+The final output video is stored at:
+
+```text
+05-Zones-and-Counting-Analytics/assets/output/people_zones_counting_final.mp4
+```
+
+The generated output demonstrates:
+
+```text
+YOLOv8s Person Detection
+        ↓
+Bounding Boxes
+        ↓
+Persistent Person IDs
+        ↓
+PolygonZone
+        ↓
+Current Occupancy
+        ↓
+LineZone
+        ↓
+Directional Crossing Analytics
+        ↓
+Final Annotated Video
+```
+
+**Status:** Completed, successfully tested in Google Colab, documented, and supported with real input/output video evidence.
+
+---
+
 ## Project Organization
 
 Each project is designed to be self-contained.
@@ -534,8 +762,12 @@ Projects in this directory currently use:
 - Ultralytics YOLO
 - Supervision
 - ByteTrack
+- PolygonZone
+- LineZone
 - JSON
+- Image processing
 - Video processing
+- FFmpeg
 - Google Colab
 - Git
 - GitHub
@@ -565,6 +797,17 @@ The projects currently cover concepts including:
 - Unique tracker IDs
 - Object trajectories
 - Tracking analytics
+- Polygon regions
+- Polygon occupancy
+- `PolygonZone`
+- `PolygonZoneAnnotator`
+- Virtual counting lines
+- `LineZone`
+- `LineZoneAnnotator`
+- Directional crossing analytics
+- Spatial video analytics
+- Crowded-scene tracking
+- Detector and tracker tuning
 
 Future projects will expand this stack as the course progresses toward more advanced computer vision and **SAM3** workflows.
 
@@ -578,8 +821,9 @@ Future projects will expand this stack as the course progresses toward more adva
 | 02 | [Multi-Annotator Visualization Pipeline](./02-Multi-Annotator-Visualization-Pipeline/) | Google Colab | Complete + Assets | Completed |
 | 03 | [Detection Filtering and NMS Pipeline](./03-Detection-Filtering-and-NMS-Pipeline/) | Google Colab | Complete + Assets | Completed |
 | 04 | [Object Tracking](./04-Object-Tracking/) | Google Colab | Complete + Input/Output Video | Completed |
+| 05 | [Zones and Counting Analytics](./05-Zones-and-Counting-Analytics/) | Google Colab | Complete + Input/Output Video | Completed |
 
-**Total completed projects: 4**
+**Total completed projects: 5**
 
 ---
 
@@ -659,6 +903,10 @@ Each project provides practical experience with:
 - Tracking objects across video frames
 - Maintaining persistent tracker IDs
 - Creating tracking analytics
+- Defining spatial analysis regions
+- Measuring zone occupancy
+- Creating virtual counting lines
+- Detecting directional crossing events
 - Processing and generating video
 - Organizing reusable Python applications
 - Managing project dependencies
