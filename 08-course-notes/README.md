@@ -15,6 +15,7 @@ The purpose of this section is to document each course session in a structured w
 | 02 | [Annotation and Visualization](./02-Annotation-and-Visualization/) | Completed |
 | 03 | [Filtering and Manipulating Detections](./03-Filtering-and-Manipulating-Detections/) | Completed |
 | 04 | [Object Tracking](./04-Object-Tracking/) | Completed |
+| 05 | [Zones and Counting](./05-Zones-and-Counting/) | Completed |
 
 ---
 
@@ -384,7 +385,7 @@ Previous Positions
         ↓
 ● → ● → ● → ●
             ↑
-     Current Position
+      Current Position
 ```
 
 Object trajectories can support applications such as:
@@ -540,6 +541,690 @@ The final H.264 video was displayed and visually inspected directly inside Googl
 
 ---
 
+# Session 05 — Zones and Counting
+
+[`05-Zones-and-Counting/`](./05-Zones-and-Counting/)
+
+This session extends object tracking into **spatial video analytics** by defining regions inside a video frame and analyzing how tracked objects interact with those regions.
+
+The session introduces two different types of spatial analysis:
+
+- **PolygonZone** — measures how many objects are currently inside an area.
+- **LineZone** — measures how many tracked objects have crossed a virtual line.
+
+The fundamental distinction is:
+
+```text
+PolygonZone:
+How many objects are inside this area RIGHT NOW?
+
+LineZone:
+How many objects have CROSSED this line IN TOTAL?
+```
+
+This transforms object tracking into a system capable of measuring both **occupancy** and **flow**.
+
+Topics include:
+
+- Spatial video analytics
+- Polygon coordinates
+- NumPy polygon definitions
+- `sv.PolygonZone`
+- `sv.PolygonZoneAnnotator`
+- Polygon occupancy
+- `zone.trigger()`
+- Boolean zone masks
+- `zone.current_count`
+- Spatial detection filtering
+- Tracking with PolygonZone
+- Virtual counting lines
+- `sv.Point`
+- `sv.LineZone`
+- `sv.LineZoneAnnotator`
+- Line crossing detection
+- Directional crossings
+- `line_zone.trigger()`
+- `line_zone.in_count`
+- `line_zone.out_count`
+- Accumulated crossing counts
+- Tracking with LineZone
+- PolygonZone and LineZone composition
+- Occupancy analysis
+- Flow analysis
+- YOLOv8
+- ByteTrack
+- Persistent tracker IDs
+- Video processing
+- Spatial event detection
+
+---
+
+## From Tracking to Spatial Analytics
+
+Object tracking provides persistent identities.
+
+For example:
+
+```text
+Frame 100 → ID 4
+Frame 101 → ID 4
+Frame 102 → ID 4
+Frame 103 → ID 4
+```
+
+Once the same object can be followed through multiple frames, the system can begin asking spatial questions.
+
+```text
+Where is ID 4?
+        ↓
+Is ID 4 inside this region?
+        ↓
+Did ID 4 cross this boundary?
+```
+
+The progression becomes:
+
+```text
+Object Detection
+       ↓
+Object Tracking
+       ↓
+Persistent Identity
+       ↓
+Movement
+       ↓
+Spatial Interaction
+       ↓
+Occupancy + Crossing Events
+       ↓
+Spatial Video Analytics
+```
+
+---
+
+## PolygonZone
+
+`PolygonZone` defines an area of interest inside the image.
+
+A polygon is represented by a collection of `(x, y)` pixel coordinates.
+
+Example:
+
+```python
+POLYGON_LEFT = np.array([
+    [0, video_info.height // 2],
+    [video_info.width // 2, video_info.height // 2],
+    [video_info.width // 2, video_info.height],
+    [0, video_info.height],
+])
+```
+
+The polygon can represent:
+
+- A traffic lane
+- A parking area
+- A restricted region
+- A store section
+- A waiting area
+- A work zone
+- Any custom spatial region
+
+Conceptually:
+
+```text
+Video Frame
+     ↓
+Polygon Coordinates
+     ↓
+PolygonZone
+     ↓
+Region of Interest
+```
+
+---
+
+## PolygonZone Trigger
+
+The zone evaluates detections using:
+
+```python
+zone.trigger(
+    detections=detections
+)
+```
+
+The result is a Boolean mask.
+
+Conceptually:
+
+```text
+Detection 1 → True
+Detection 2 → False
+Detection 3 → True
+Detection 4 → False
+```
+
+where:
+
+```text
+True  = object is inside the polygon
+False = object is outside the polygon
+```
+
+The mask can then filter the detection collection:
+
+```python
+zone_mask = zone.trigger(
+    detections=detections
+)
+
+detections_inside_zone = detections[
+    zone_mask
+]
+```
+
+This creates a spatial filtering workflow:
+
+```text
+All Detections
+      ↓
+PolygonZone
+      ↓
+Boolean Mask
+      ↓
+Spatial Filtering
+      ↓
+Objects Inside Zone
+```
+
+---
+
+## PolygonZone Current Count
+
+`PolygonZone` maintains:
+
+```python
+zone.current_count
+```
+
+This represents the number of objects currently inside the polygon.
+
+Conceptually:
+
+```text
+Frame 1 → 2 objects inside
+Frame 2 → 3 objects inside
+Frame 3 → 3 objects inside
+Frame 4 → 1 object inside
+```
+
+The value is therefore **instantaneous**.
+
+It answers:
+
+```text
+How many objects are inside this area right now?
+```
+
+This makes `PolygonZone` useful for **occupancy analysis**.
+
+---
+
+## Tracking with PolygonZone
+
+Tracking can be performed before triggering the zone.
+
+The workflow is:
+
+```text
+Video Frame
+     ↓
+YOLOv8
+     ↓
+Detections
+     ↓
+ByteTrack
+     ↓
+Persistent Tracker IDs
+     ↓
+PolygonZone
+     ↓
+Current Occupancy
+```
+
+This allows spatial information to be connected with persistent object identities.
+
+Instead of only knowing:
+
+```text
+3 objects are inside the zone
+```
+
+the system can understand which tracked objects are inside:
+
+```text
+ID 3
+ID 7
+ID 11
+```
+
+---
+
+## LineZone
+
+`LineZone` represents a virtual boundary rather than an area.
+
+A line is defined using two points:
+
+```python
+line_start = sv.Point(
+    x=0,
+    y=video_info.height // 2
+)
+
+line_end = sv.Point(
+    x=video_info.width,
+    y=video_info.height // 2
+)
+```
+
+The line is then created with:
+
+```python
+line_zone = sv.LineZone(
+    start=line_start,
+    end=line_end
+)
+```
+
+Conceptually:
+
+```text
+Start Point
+     +
+End Point
+     ↓
+Virtual Boundary
+     ↓
+LineZone
+```
+
+---
+
+## LineZone Crossing Detection
+
+`LineZone` uses:
+
+```python
+line_zone.trigger(
+    detections=detections
+)
+```
+
+to analyze tracked objects crossing the virtual boundary.
+
+Unlike `PolygonZone`, it does not primarily measure how many objects are currently located somewhere.
+
+Instead, it records **crossing events**.
+
+Conceptually:
+
+```text
+Tracked Object
+      ↓
+Approaches Line
+      ↓
+Crosses Boundary
+      ↓
+LineZone Event
+      ↓
+Directional Counter Updated
+```
+
+---
+
+## Directional Crossing Counts
+
+`LineZone` maintains two counters:
+
+```python
+line_zone.in_count
+line_zone.out_count
+```
+
+These represent accumulated crossings in opposite directions.
+
+For example:
+
+```text
+Crossings Down: 3
+Crossings Up:   3
+```
+
+The total number of crossing events can be calculated as:
+
+```python
+total_crossings = (
+    line_zone.in_count
+    +
+    line_zone.out_count
+)
+```
+
+Unlike `PolygonZone.current_count`, these values accumulate as the video is processed.
+
+---
+
+## PolygonZone vs. LineZone
+
+The fundamental difference between the two systems is:
+
+| Feature | PolygonZone | LineZone |
+|---|---|---|
+| Represents | Area | Boundary |
+| Measures | Presence | Crossing |
+| Count type | Instantaneous | Accumulated |
+| Main value | `current_count` | `in_count`, `out_count` |
+| Analytics type | Occupancy | Flow |
+| Example | Cars currently in an area | Cars crossing an entrance |
+
+The easiest way to remember the distinction is:
+
+```text
+PolygonZone = WHERE objects are
+
+LineZone = WHERE objects PASS
+```
+
+Or:
+
+```text
+PolygonZone:
+How many are HERE NOW?
+
+LineZone:
+How many PASSED HERE?
+```
+
+---
+
+## Why Tracking Matters
+
+Line crossing requires information about movement over time.
+
+A single object detection only tells us:
+
+```text
+An object exists at position X.
+```
+
+Tracking provides:
+
+```text
+Frame 1 → ID 7 at position A
+Frame 2 → ID 7 at position B
+Frame 3 → ID 7 at position C
+Frame 4 → ID 7 crosses the line
+```
+
+Therefore:
+
+```text
+Detection
+    ↓
+Object Exists
+```
+
+becomes:
+
+```text
+Detection
+    ↓
+Tracking
+    ↓
+Persistent Identity
+    ↓
+Movement
+    ↓
+Spatial Event
+```
+
+This is why the processing order is important:
+
+```text
+YOLO
+  ↓
+Detections
+  ↓
+ByteTrack
+  ↓
+Tracked Detections
+  ↓
+PolygonZone / LineZone
+```
+
+---
+
+## Combining PolygonZone and LineZone
+
+Both spatial systems can operate on the same tracked detections.
+
+```python
+polygon_zone.trigger(
+    detections=detections
+)
+
+line_zone.trigger(
+    detections=detections
+)
+```
+
+Conceptually:
+
+```text
+               Tracked Objects
+                     ↓
+            ┌────────┴────────┐
+            ↓                 ↓
+      PolygonZone          LineZone
+            ↓                 ↓
+        Occupancy             Flow
+            │                 │
+            └────────┬────────┘
+                     ↓
+                Visualization
+```
+
+This allows one video analytics pipeline to measure both:
+
+```text
+Occupancy
++
+Traffic Flow
+```
+
+at the same time.
+
+---
+
+## Complete Zones and Counting Workflow
+
+The complete workflow developed during this session is:
+
+```text
+Input Video
+     ↓
+Read Frame
+     ↓
+YOLOv8
+     ↓
+Object Detections
+     ↓
+sv.Detections
+     ↓
+ByteTrack
+     ↓
+Persistent Tracker IDs
+     ↓
+┌─────────────────────────┐
+│                         │
+↓                         ↓
+PolygonZone            LineZone
+↓                         ↓
+Occupancy                Flow
+│                         │
+└────────────┬────────────┘
+             ↓
+     Supervision Annotators
+             ↓
+        Output Video
+```
+
+This represents an important progression from simple detection toward real-world video analytics.
+
+---
+
+## Zones and Counting Practical
+
+The practical implementation uses a traffic video containing multiple moving vehicles.
+
+The source video is processed frame by frame using:
+
+```text
+Traffic Video
+     ↓
+YOLOv8
+     ↓
+sv.Detections
+     ↓
+ByteTrackTracker
+     ↓
+Tracked Vehicles
+     ↓
+PolygonZone + LineZone
+     ↓
+Bounding Boxes + Tracker IDs
+     ↓
+Occupancy + Crossing Counters
+     ↓
+Processed Video
+```
+
+---
+
+## Practical Video Information
+
+The traffic video used during the practical has:
+
+```text
+Resolution: 3840 × 2160
+FPS: 25
+Total Frames: 538
+```
+
+---
+
+## Practical Results
+
+The combined zones and counting pipeline produced:
+
+```text
+Final polygon occupancy: 1
+Crossings Down: 3
+Crossings Up: 3
+Total Crossings: 6
+```
+
+These results demonstrate the difference between the two types of measurements.
+
+The polygon value represents the occupancy at the end of processing:
+
+```text
+Final polygon occupancy: 1
+```
+
+while the line counters represent accumulated events:
+
+```text
+3 crossings down
++
+3 crossings up
+=
+6 total crossings
+```
+
+---
+
+## Zones and Counting Code Examples
+
+The concepts from this session were also transformed into small reusable examples inside:
+
+```text
+04-examples/
+└── 05-Zones-and-Counting/
+```
+
+The examples progress through:
+
+```text
+01-basic-polygon-zone.py
+        ↓
+02-polygon-zone-current-count.py
+        ↓
+03-filter-detections-inside-zone.py
+        ↓
+04-tracking-with-polygon-zone.py
+        ↓
+05-basic-line-zone.py
+        ↓
+06-line-zone-crossing-count.py
+        ↓
+07-tracking-with-line-zone.py
+        ↓
+08-polygon-and-line-zone.py
+        ↓
+09-complete-zones-counting-pipeline.py
+```
+
+This creates a progression from basic spatial regions to a complete video analytics pipeline.
+
+---
+
+## Practical Applications
+
+Zones and counting can be used for:
+
+- Traffic monitoring
+- Vehicle counting
+- Parking management
+- Entrance and exit monitoring
+- Retail analytics
+- People counting
+- Crowd monitoring
+- Security systems
+- Restricted-area monitoring
+- Industrial safety
+- Warehouse analytics
+- Queue monitoring
+- Transportation analytics
+- Building occupancy
+- Pedestrian flow analysis
+
+---
+
+## Lesson Materials
+
+- [Main Lesson Documentation](./05-Zones-and-Counting/README.md)
+- [Concept Documentation](./05-Zones-and-Counting/concepts/)
+- [Practical Exercises](./05-Zones-and-Counting/practical/)
+- [Practical Documentation](./05-Zones-and-Counting/practical/README.md)
+- [Class Recording Documentation](./05-Zones-and-Counting/CLASS-RECORDING.md)
+- [Watch the Zones and Counting Class Recording on YouTube](https://youtu.be/43i0z9b81Z4)
+
+**Status:** Completed
+
+---
+
 # Organization
 
 Each course session may contain:
@@ -641,6 +1326,22 @@ Contains:
 
 Contains small, focused, runnable Python examples demonstrating individual concepts.
 
+The examples currently progress through:
+
+```text
+Agentic AI Programming
+        ↓
+Object Detection
+        ↓
+Annotation
+        ↓
+Detection Filtering
+        ↓
+Object Tracking
+        ↓
+Zones and Counting
+```
+
 ## Projects
 
 ```text
@@ -691,6 +1392,7 @@ The course notes currently cover technologies and concepts including:
 - Multi-object tracking
 - ByteTrack
 - `sv.ByteTrack`
+- `ByteTrackTracker`
 - `tracker_id`
 - Object association
 - Persistent tracking identities
@@ -714,6 +1416,8 @@ The course notes currently cover technologies and concepts including:
 - `BoxAnnotator`
 - `LabelAnnotator`
 - `TraceAnnotator`
+- `PolygonZoneAnnotator`
+- `LineZoneAnnotator`
 - Annotation customization
 - Annotation layers
 - Multi-Annotator pipelines
@@ -723,6 +1427,26 @@ The course notes currently cover technologies and concepts including:
 - Object trajectories
 - Tracking visualization
 - Tracking analytics
+- Spatial video analytics
+- Polygon coordinates
+- Spatial regions
+- `PolygonZone`
+- Polygon occupancy
+- `zone.trigger()`
+- `zone.current_count`
+- Boolean zone masks
+- Zone-based filtering
+- Virtual counting boundaries
+- `sv.Point`
+- `LineZone`
+- Line crossing detection
+- `line_zone.trigger()`
+- `line_zone.in_count`
+- `line_zone.out_count`
+- Directional counting
+- Accumulated crossing counts
+- Occupancy analysis
+- Flow analysis
 - Video export
 - H.264
 - FFmpeg
@@ -742,6 +1466,7 @@ As the course progresses, this list will expand toward more advanced computer vi
 | 02 | Annotation and Visualization | Completed | Completed | Completed | Completed |
 | 03 | Filtering and Manipulating Detections | Completed | Completed | Completed | Completed |
 | 04 | Object Tracking | Completed | Completed | Completed | Completed |
+| 05 | Zones and Counting | Completed | Completed | Completed | Completed |
 
 ---
 
@@ -753,10 +1478,11 @@ As the course progresses, this list will expand toward more advanced computer vi
 02 — Annotation and Visualization           Completed
 03 — Filtering and Manipulating Detections  Completed
 04 — Object Tracking                        Completed
-05 — Next Course Session                    Upcoming
+05 — Zones and Counting                     Completed
+06 — Next Course Session                    Upcoming
 ```
 
-**Completed course sessions: 5**
+**Completed course sessions: 6**
 
 ---
 
@@ -783,6 +1509,13 @@ The goal of these notes is not only to preserve the course material, but also to
 - Object trajectories
 - Tracking analytics
 - Video processing
+- Polygon regions
+- Zone-based filtering
+- Occupancy monitoring
+- Line crossing
+- Directional counting
+- Traffic flow analysis
+- Spatial video analytics
 - Practical AI development
 
 Each completed session expands the repository from basic concepts toward complete computer vision applications.
@@ -804,7 +1537,7 @@ Filtering and Manipulating Detections
         ↓
 Object Tracking
         ↓
-Real-World Detection + Tracking
+Zones and Counting
         ↓
 Advanced Computer Vision Concepts
         ↓
@@ -813,7 +1546,7 @@ SAM3 Workflows
 Complete AI Applications
 ```
 
-The first five sessions establish an increasingly complete computer vision pipeline:
+The first six sessions establish an increasingly complete computer vision pipeline:
 
 ```text
 AI-Assisted Development
@@ -826,23 +1559,115 @@ Detection Filtering
         ↓
 Object Tracking
         ↓
-Tracking Analytics
+Persistent Object Identity
         ↓
-Advanced Vision Pipelines
+Spatial Zones
+        ↓
+Occupancy + Flow
+        ↓
+Spatial Video Analytics
 ```
 
 ---
 
-# Next Learning Direction
+# From Detection to Spatial Video Analytics
 
-After completing Object Tracking, the next natural extension is to combine real-world YOLO detections with ByteTrack.
+The course progression now demonstrates how individual computer vision concepts can be connected into a complete system.
 
-The extended workflow becomes:
+It begins with detection:
+
+```text
+Image
+  ↓
+YOLO
+  ↓
+Detections
+```
+
+Then visualization is added:
+
+```text
+Detections
+    ↓
+Supervision Annotators
+    ↓
+Visual Output
+```
+
+Filtering makes detections application-specific:
+
+```text
+Raw Detections
+      ↓
+Confidence
+      ↓
+Class
+      ↓
+Size
+      ↓
+NMS
+      ↓
+Spatial Filtering
+      ↓
+Relevant Detections
+```
+
+Tracking introduces time:
+
+```text
+Relevant Detections
+        ↓
+ByteTrack
+        ↓
+Persistent tracker_id
+        ↓
+Movement Across Frames
+```
+
+Zones introduce spatial reasoning:
+
+```text
+Tracked Objects
+      ↓
+Spatial Zones
+      ↓
+┌───────────────┐
+↓               ↓
+PolygonZone   LineZone
+↓               ↓
+Occupancy       Flow
+```
+
+Together, these concepts form:
+
+```text
+Detection
+    +
+Visualization
+    +
+Filtering
+    +
+Tracking
+    +
+Spatial Analysis
+    =
+Spatial Video Analytics
+```
+
+---
+
+# Current Computer Vision Pipeline
+
+After completing Zones and Counting, the repository now documents the following end-to-end conceptual pipeline:
 
 ```text
 Real-World Video
         ↓
-YOLO
+Frame Extraction
+        ↓
+YOLOv8
+        ↓
+Raw Object Detections
         ↓
 sv.Detections
         ↓
@@ -850,18 +1675,74 @@ Detection Filtering
         ↓
 ByteTrack
         ↓
-tracker_id
+Persistent tracker_id
         ↓
-Tracking Annotations
+Tracked Objects
         ↓
-Object Trajectories
-        ↓
-Tracking Analytics
-        ↓
-Processed Video
+┌──────────────────────────────┐
+│                              │
+↓                              ↓
+PolygonZone                 LineZone
+│                              │
+↓                              ↓
+Current Occupancy          Crossing Events
+│                              │
+└──────────────┬───────────────┘
+               ↓
+       Spatial Analytics
+               ↓
+       Supervision Annotators
+               ↓
+        Processed Video
+               ↓
+     Application-Level Data
 ```
 
-This connects the detection, filtering, annotation, and tracking concepts developed throughout the course into a single video-based computer vision pipeline.
+This combines the major concepts studied throughout the course so far into a single video-based computer vision architecture.
+
+---
+
+# Next Learning Direction
+
+After completing **Zones and Counting**, the repository has progressed from simple object detection to spatial video analytics.
+
+The next course session can build on the current pipeline:
+
+```text
+Detection
+    ↓
+Filtering
+    ↓
+Tracking
+    ↓
+Persistent IDs
+    ↓
+Spatial Zones
+    ↓
+Occupancy + Crossing Events
+    ↓
+Advanced Computer Vision Analysis
+    ↓
+SAM3 Workflows
+```
+
+Future sessions can extend this foundation with additional computer vision concepts introduced by the course.
+
+The repository will continue to document each new lesson using the same progression:
+
+```text
+Course Material
+      ↓
+Concept Documentation
+      ↓
+Practical Implementation
+      ↓
+Reusable Code Examples
+      ↓
+Testing
+      ↓
+Complete Computer Vision Workflows
+```
 
 ---
 
