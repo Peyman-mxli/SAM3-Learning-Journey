@@ -3,3 +3,12 @@ supervision
 opencv-python
 numpy
 pandas
+torch
+torchvision
+huggingface-hub
+Pillow
+matplotlib
+
+# SAM 3
+# Install the official Meta SAM 3 repository separately:
+# pip install -e /content/sam3_repo
