@@ -12,12 +12,13 @@ The purpose of this directory is to preserve structured evidence about:
 - Class observations
 - Trajectory analysis
 - Image-space movement
+- Trajectory visualization
 - Segmentation
 - Processing performance
 - System limitations
 - Failure cases
 
-The project has progressed beyond visual output generation and now includes structured temporal analytics, SQLite persistence, tracker summaries, and trajectory reports generated from recorded-video processing.
+The project has progressed beyond visual output generation and now includes structured temporal analytics, SQLite persistence, tracker summaries, trajectory analysis, and visual trajectory evidence generated from recorded-video processing.
 
 ---
 
@@ -28,13 +29,15 @@ reports/
 │
 ├── README.md
 ├── tracker_summary.csv
-└── trajectory_summary.csv
+├── trajectory_summary.csv
+└── trajectory_visualization.png
 ```
 
-The current validated analytics reports are:
+The current validated analytics reports and visual evidence are:
 
 - [`tracker_summary.csv`](./tracker_summary.csv)
 - [`trajectory_summary.csv`](./trajectory_summary.csv)
+- [`trajectory_visualization.png`](./trajectory_visualization.png)
 
 ---
 
@@ -433,6 +436,71 @@ TRAJECTORY ANALYTICS: SUCCESS
 
 ---
 
+# 3. Trajectory Visualization
+
+## `trajectory_visualization.png`
+
+The tracker trajectories were visualized using the center coordinates collected by the `VideoAnalytics` module.
+
+[`trajectory_visualization.png`](./trajectory_visualization.png)
+
+![Tracker Trajectory Visualization](./trajectory_visualization.png)
+
+The visualization represents the movement paths of tracker IDs `#1–#6` across the complete 75-frame test sequence.
+
+Each trajectory is constructed from the center point of the tracked object's bounding box:
+
+```text
+Bounding Box
+     |
+     v
+Center Point
+     |
+     v
+Next Frame Center Point
+     |
+     v
+Trajectory
+```
+
+The graph uses image coordinates measured in pixels.
+
+The horizontal axis represents:
+
+```text
+Image X Coordinate
+```
+
+The vertical axis represents:
+
+```text
+Image Y Coordinate
+```
+
+The Y-axis is inverted in the visualization so that the graph corresponds more closely to standard image coordinates, where the origin is located near the upper-left corner.
+
+---
+
+# What the Visualization Shows
+
+The trajectory visualization provides visual evidence of:
+
+- persistent object tracking
+- different movement paths
+- long-lived tracker IDs
+- short-lived tracker IDs
+- relative movement between objects
+- image-space displacement
+- tracker trajectory length
+
+Trackers `#1` and `#2` contain trajectory points spanning the complete 75-frame sequence.
+
+Tracker `#3` contains a substantial trajectory covering 59 observations.
+
+Shorter tracks such as `#5` and `#6` contain fewer trajectory points because those tracker IDs were present for fewer frames.
+
+---
+
 # Trajectory Summary
 
 | Tracker ID | Duration | Movement Distance | Average Movement |
@@ -503,7 +571,7 @@ Tracker #2
 Movement distance: 203.37 px
 ```
 
-means that the center of Tracker #2's bounding box traveled approximately 203.37 pixels through the image.
+means that the center of Tracker #2's bounding box traveled approximately 203.37 pixels through the image during its recorded trajectory.
 
 ---
 
@@ -533,7 +601,7 @@ Image-Space Movement
 Movement values can be affected by:
 
 - actual object movement
-- controlled camera motion
+- camera movement
 - bounding-box size changes
 - detector localization variation
 - confidence changes
@@ -580,7 +648,7 @@ tracker_id,first_frame,last_frame,frames_observed,duration_seconds,movement_dist
 
 # Analytics Architecture
 
-The analytics layer now supports both presence and movement analysis.
+The analytics layer now supports temporal presence, confidence analysis, and trajectory analysis.
 
 ```text
 Computer Vision
@@ -622,6 +690,9 @@ Class Counts              Average Movement
                    |                     |
                    v                     v
           tracker_summary.csv   trajectory_summary.csv
+                                      |
+                                      v
+                          trajectory_visualization.png
 ```
 
 ---
@@ -632,7 +703,7 @@ Temporal and movement analytics are implemented in:
 
 [`../src/analytics.py`](../src/analytics.py)
 
-Each stored observation can now contain:
+Each stored observation can contain:
 
 ```text
 frame_number
@@ -665,11 +736,13 @@ The current analytics module supports:
 - last observed frame
 - frames observed
 - tracker duration
+- average confidence analysis
 - center-point extraction
 - tracker trajectories
 - total image-space movement
 - average movement between observations
 - tracker summaries
+- trajectory visualization
 - complete analytics summaries
 
 ---
@@ -723,6 +796,8 @@ How far did each tracker move in image space?
 Which tracker had the largest accumulated trajectory?
 
 Which tracker had the highest average movement?
+
+What path did each tracker follow through the image?
 ```
 
 This transforms the project from a visualization pipeline into a more complete visual analytics system.
@@ -826,9 +901,12 @@ Confidence                Average Movement
         |               |
         v               v
 tracker_summary.csv  trajectory_summary.csv
-        |
-        v
-SUCCESS
+                            |
+                            v
+                trajectory_visualization.png
+                            |
+                            v
+                         SUCCESS
 ```
 
 ---
@@ -898,10 +976,32 @@ Examples include:
 - small-object detection problems
 - motion blur
 - unusual camera perspectives
-- artificial movement caused by camera motion
+- apparent movement caused by camera motion
 - noisy center-point trajectories
 
 Failures should be documented rather than removed from the evaluation.
+
+---
+
+# Current Completed Report Assets
+
+The reporting layer currently contains:
+
+```text
+tracker_summary.csv
+trajectory_summary.csv
+trajectory_visualization.png
+```
+
+These provide three complementary forms of evidence:
+
+```text
+Tracker Statistics
+        +
+Movement Statistics
+        +
+Visual Trajectories
+```
 
 ---
 
@@ -919,16 +1019,17 @@ performance_report.csv
 failure_analysis.md
 ```
 
-Possible visual reports include:
+Possible future visual reports include:
 
 ```text
-trajectory_visualization.png
 tracker_duration_chart.png
 class_observation_chart.png
 confidence_chart.png
 movement_distance_chart.png
 segmentation_evaluation.png
 ```
+
+`trajectory_visualization.png` is no longer a future asset because it has already been successfully generated and added to the project.
 
 ---
 
@@ -937,7 +1038,6 @@ segmentation_evaluation.png
 The next analytics phase may introduce:
 
 - full frame-observation CSV export
-- trajectory visualization
 - movement-distance charts
 - tracker-duration charts
 - class-distribution charts
@@ -948,6 +1048,8 @@ The next analytics phase may introduce:
 - SQLite query utilities
 - automated report generation
 - longer-video evaluation
+
+Trajectory calculation and trajectory visualization are now completed milestones.
 
 ---
 
