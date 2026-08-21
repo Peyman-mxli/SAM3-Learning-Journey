@@ -1,0 +1,21 @@
+metric,value
+Total Processed Frames,75
+Total Observations,246
+Unique Tracker IDs,6
+Average Observations per Frame,3.28
+Average Observations per Tracker,41.0
+Minimum Tracker Observations,3
+Maximum Tracker Observations,75
+Average Confidence,0.6815
+Minimum Average Confidence,0.5124
+Maximum Average Confidence,0.8587
+Average Tracker Duration (seconds),2.7333
+Minimum Tracker Duration (seconds),0.2
+Maximum Tracker Duration (seconds),5.0
+Total Movement Distance (pixels),693.18
+Average Movement Distance per Tracker (pixels),115.53
+Maximum Movement Distance (pixels),203.37
+Average Step Movement (pixels),2.9883
+Total Processing Time (seconds),N/A
+Average Processing Time per Frame (seconds),N/A
+Effective Processing FPS,N/A
