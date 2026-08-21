@@ -1,6 +1,6 @@
 # Visual Tracking and Analysis System
 
-An integrated computer vision project combining object detection, multi-object tracking, SAM 3 segmentation, persistent tracker identities, structured data storage, trajectory analysis, visual analytics, and system-level performance evaluation.
+An integrated computer vision project combining object detection, multi-object tracking, SAM 3 segmentation, persistent tracker identities, structured data storage, trajectory analysis, visual analytics, system-level performance evaluation, and interactive results exploration.
 
 This project was developed as part of my **SAM3 Computer Vision Learning Journey** and demonstrates how multiple computer vision components can be combined into a modular end-to-end analysis pipeline.
 
@@ -24,16 +24,20 @@ The current system integrates:
 - Performance evaluation
 - CSV report generation
 - Analytical visualizations
+- Interactive Streamlit dashboard
+- Dashboard CSV downloads
 - Google Colab GPU execution
 - H.264 video export
 
 The complete pipeline has been successfully tested in **Google Colab using an NVIDIA Tesla T4 GPU** on both images and recorded video.
 
+The interactive dashboard has also been successfully launched in Google Colab and verified through a browser-accessible Cloudflare Tunnel.
+
 ---
 
 ## Project Status
 
-**Status: Complete End-to-End Visual Tracking and Analysis Pipeline**
+**Status: Complete End-to-End Visual Tracking and Analysis Pipeline with Interactive Dashboard**
 
 The project has successfully completed the major technical milestones required for an integrated visual tracking and analysis system.
 
@@ -84,6 +88,10 @@ COMPLETED
 Milestone 11
 Results and Limitations Documentation
 COMPLETED
+
+Milestone 12
+Interactive Streamlit Dashboard
+COMPLETED
 ```
 
 ---
@@ -117,6 +125,9 @@ COMPLETED
 | Analytical Visualizations | Completed |
 | Results Documentation | Completed |
 | Limitations Documentation | Completed |
+| Interactive Streamlit Dashboard | Completed |
+| Dashboard CSV Downloads | Completed |
+| Browser-Based Results Exploration | Completed |
 
 ---
 
@@ -155,18 +166,22 @@ CSV Reports
         ↓
 Visual Analytics
         ↓
+Interactive Streamlit Dashboard
+        ↓
 Documented Results
 ```
 
-This architecture separates computer-vision inference from analytics and reporting.
+This architecture separates computer-vision inference from analytics, reporting, and interactive exploration.
 
 The inference pipeline produces structured observations, while the analytics layer transforms those observations into reusable evidence.
+
+The Streamlit application then provides an interactive interface for exploring the preserved analytical evidence without requiring the computer-vision inference pipeline to run again.
 
 ---
 
 # Core Technologies
 
-The project combines several computer-vision and data-analysis technologies.
+The project combines several computer-vision, data-analysis, persistence, visualization, and application technologies.
 
 ## YOLO
 
@@ -264,6 +279,7 @@ Pandas is used for:
 - Aggregating tracking information
 - Calculating system-level metrics
 - Creating structured CSV outputs
+- Loading report data into the interactive dashboard
 
 ---
 
@@ -277,6 +293,36 @@ Matplotlib is used to generate visual analytics including:
 - Confidence
 - Trajectories
 - Performance summaries
+
+---
+
+## Streamlit
+
+Streamlit provides the interactive application layer for exploring the preserved Project 06 results.
+
+The dashboard is implemented in:
+
+[`app.py`](./app.py)
+
+It provides seven verified sections:
+
+- Overview
+- Tracker Explorer
+- Trajectory Analysis
+- Visual Analytics
+- Performance
+- Results
+- Limitations
+
+The dashboard reads the preserved CSV reports, analytical visualizations, and Markdown documentation directly from the project repository.
+
+It also provides CSV download controls for:
+
+- Tracker summary
+- Trajectory summary
+- Performance summary
+
+The application was successfully tested in Google Colab and exposed for browser access through a temporary Cloudflare Tunnel during verification.
 
 ---
 
@@ -419,7 +465,7 @@ The current verified video-processing run produced:
 | Recorded observations | 246 |
 | Unique tracker IDs | 6 |
 
-These values form the reference dataset used by the current analytical reports.
+These values form the reference dataset used by the current analytical reports and interactive dashboard.
 
 ---
 
@@ -441,6 +487,8 @@ The verified tracker results are:
 | 6 | person | 53 | 61 | 9 | 0.60 s | 0.5124 |
 
 The tracker summary converts frame-level observations into object-level temporal information.
+
+These records can also be explored interactively through the dashboard's **Tracker Explorer**.
 
 ---
 
@@ -471,6 +519,8 @@ Tracker 6
 The confidence results are visualized in:
 
 [`reports/confidence_chart.png`](./reports/confidence_chart.png)
+
+The same visualization is available through the Streamlit dashboard.
 
 ---
 
@@ -508,6 +558,8 @@ The verified trajectory results are:
 | 4 | 25 | 1.67 s | 139.34 px | 5.81 px |
 | 5 | 3 | 0.20 s | 7.91 px | 3.96 px |
 | 6 | 9 | 0.60 s | 0.94 px | 0.12 px |
+
+The trajectory records are also available through the dashboard's **Trajectory Analysis** section.
 
 ---
 
@@ -561,6 +613,8 @@ The reconstructed object trajectories are available at:
 ![Trajectory Visualization](./reports/trajectory_visualization.png)
 
 This visualization provides a spatial representation of object movement across the processed video.
+
+It is also displayed directly inside the Streamlit **Trajectory Analysis** and **Visual Analytics** sections.
 
 ---
 
@@ -679,6 +733,8 @@ The performance chart provides a compact visual comparison of:
 6 tracker IDs
 ```
 
+The chart and its underlying metrics are also available through the dashboard's **Performance** section.
+
 ---
 
 # Processing-Time Metrics
@@ -752,6 +808,264 @@ The analytics layer is designed to separate computationally expensive computer-v
 
 ---
 
+# Interactive Streamlit Dashboard
+
+Project 06 includes an interactive Streamlit dashboard implemented in:
+
+[`app.py`](./app.py)
+
+The application provides a browser-based interface for exploring the preserved tracking, trajectory, performance, visualization, results, and limitations data.
+
+The dashboard was successfully launched from Google Colab and verified through a temporary browser-accessible Cloudflare Tunnel.
+
+## Dashboard Architecture
+
+```text
+tracker_summary.csv
+        +
+trajectory_summary.csv
+        +
+performance_summary.csv
+        +
+Analytical PNG Reports
+        +
+RESULTS.md
+        +
+LIMITATIONS.md
+        ↓
+      app.py
+        ↓
+Streamlit Dashboard
+        ↓
+Interactive Results Exploration
+```
+
+The dashboard does not require YOLO, ByteTrack, or SAM 3 inference to run again.
+
+Instead, it reuses the preserved evidence generated during the verified processing run.
+
+---
+
+## Dashboard Sections
+
+Seven dashboard sections were implemented and individually verified.
+
+| Dashboard Section | Purpose | Status |
+|---|---|---|
+| Overview | Project summary and key metrics | Verified |
+| Tracker Explorer | Individual tracker history and confidence | Verified |
+| Trajectory Analysis | Movement and trajectory inspection | Verified |
+| Visual Analytics | Generated analytical charts | Verified |
+| Performance | System-level metrics and report | Verified |
+| Results | Rendered project results documentation | Verified |
+| Limitations | Rendered limitations and failure cases | Verified |
+
+---
+
+## Dashboard Overview
+
+The **Overview** page displays the primary verified processing metrics:
+
+| Metric | Result |
+|---|---:|
+| Processed Frames | 75 |
+| Observations | 246 |
+| Unique Tracker IDs | 6 |
+| Average Confidence | 0.6815 |
+| Average Tracker Duration | 2.7333 s |
+| Total Movement | 693.18 px |
+
+It also displays the complete system pipeline and verified H.264 output information.
+
+---
+
+## Tracker Explorer
+
+The **Tracker Explorer** allows a tracker ID to be selected interactively.
+
+For each tracker, the dashboard can display:
+
+- Class
+- Observation count
+- Average confidence
+- First frame
+- Last frame
+- Duration
+
+The page also displays:
+
+- Complete tracker summary table
+- Tracker duration chart
+- Confidence chart
+- Tracker summary CSV download
+
+For example, the verified Tracker 1 contains:
+
+```text
+Class: person
+Observations: 75
+Average Confidence: 0.8385
+First Frame: 1
+Last Frame: 75
+Duration: 5.00 seconds
+```
+
+---
+
+## Trajectory Analysis Dashboard
+
+The **Trajectory Analysis** section provides interactive movement inspection.
+
+For a selected tracker, it displays:
+
+- Movement distance
+- Average movement
+- Frames observed
+- First frame
+- Last frame
+- Duration
+
+For example, Tracker 1 contains:
+
+```text
+Movement Distance: 159.26 px
+Average Movement: 2.15 px
+Frames Observed: 75
+First Frame: 1
+Last Frame: 75
+Duration: 5.00 seconds
+```
+
+The page also displays:
+
+- Complete trajectory summary
+- Trajectory visualization
+- Movement-distance chart
+- Trajectory summary CSV download
+
+---
+
+## Visual Analytics Dashboard
+
+The **Visual Analytics** section displays the project's generated analytical visualizations directly inside the application.
+
+These include:
+
+```text
+trajectory_visualization.png
+tracker_duration_chart.png
+class_observation_chart.png
+movement_distance_chart.png
+confidence_chart.png
+performance_chart.png
+```
+
+This provides a centralized visual interface for inspecting the analytical outputs.
+
+---
+
+## Performance Dashboard
+
+The **Performance** section displays system-level evaluation metrics.
+
+It includes:
+
+- Processed frames
+- Total observations
+- Tracker IDs
+- Average observations per frame
+- Average confidence
+- Total movement
+- Complete performance summary table
+- Performance visualization
+- Performance CSV download
+
+It also explicitly displays the current processing-time values:
+
+```text
+Total Processing Time: N/A
+Average Processing Time per Frame: N/A
+Effective Processing FPS: N/A
+```
+
+These remain `N/A` because the original complete pipeline runtime was not recorded.
+
+No benchmark values are invented.
+
+---
+
+## Results Dashboard
+
+The **Results** section loads:
+
+[`docs/RESULTS.md`](./docs/RESULTS.md)
+
+and renders the verified project results directly inside the Streamlit application.
+
+This connects the formal project documentation with the interactive results explorer.
+
+---
+
+## Limitations Dashboard
+
+The **Limitations** section loads:
+
+[`docs/LIMITATIONS.md`](./docs/LIMITATIONS.md)
+
+and renders the documented system limitations and failure cases directly inside the application.
+
+This allows users to inspect both successful results and known system constraints from the same interface.
+
+---
+
+## Dashboard CSV Downloads
+
+The Streamlit application provides direct download controls for:
+
+```text
+tracker_summary.csv
+trajectory_summary.csv
+performance_summary.csv
+```
+
+This allows analytical results to be exported directly from the browser interface.
+
+---
+
+## Dashboard Verification
+
+All seven dashboard sections were manually opened and verified during the Google Colab test session.
+
+```text
+Overview                VERIFIED
+Tracker Explorer        VERIFIED
+Trajectory Analysis     VERIFIED
+Visual Analytics        VERIFIED
+Performance             VERIFIED
+Results                 VERIFIED
+Limitations             VERIFIED
+```
+
+The verification confirmed that the dashboard can successfully load the preserved Project 06 reports and documentation.
+
+---
+
+## Running the Dashboard
+
+From the Project 06 directory:
+
+```bash
+streamlit run app.py
+```
+
+The application uses port `8501` by default.
+
+During Google Colab verification, Streamlit was launched in the background and a temporary Cloudflare Tunnel was used to provide browser access.
+
+The temporary Cloudflare URL is not stored as a permanent project link because quick tunnel addresses are temporary and exist only while the corresponding tunnel process remains active.
+
+---
+
 # SQLite Persistence
 
 The project successfully implemented SQLite persistence during the original video-analytics workflow.
@@ -815,6 +1129,9 @@ Colab was used for:
 - Analytics
 - Report generation
 - Visualization generation
+- Streamlit dashboard execution
+- Dashboard verification
+- Temporary Cloudflare Tunnel testing
 
 Because `/content/` storage is temporary, important outputs were downloaded and committed to GitHub.
 
@@ -837,6 +1154,8 @@ This document includes:
 - Generated reports
 - Visual analytics
 - Current project completion state
+
+The document is also rendered directly through the Streamlit **Results** page.
 
 ---
 
@@ -868,6 +1187,8 @@ Documented limitations include:
 
 Documenting limitations is important because computer-vision outputs should be interpreted in the context of model and tracking uncertainty.
 
+The complete limitations document is also accessible through the Streamlit **Limitations** page.
+
 ---
 
 # Project Proposal
@@ -886,6 +1207,12 @@ The implemented system now extends the original concept with:
 - System-level performance reporting
 - Formal results documentation
 - Formal limitations documentation
+- Interactive Streamlit dashboard
+- Browser-based results exploration
+- Tracker exploration
+- Trajectory exploration
+- Performance exploration
+- CSV downloads from the dashboard
 
 ---
 
@@ -949,13 +1276,15 @@ Average Step Movement
 2.9883 pixels
 ```
 
+These results are preserved in CSV reports and exposed through the interactive dashboard.
+
 ---
 
 # What This Project Demonstrates
 
 Project 06 demonstrates how multiple computer-vision components can be integrated into a larger analytical system.
 
-The completed project demonstrates:
+The completed implementation demonstrates:
 
 - Object detection
 - Multi-object tracking
@@ -975,8 +1304,15 @@ The completed project demonstrates:
 - Reusable analytics
 - Results documentation
 - Limitations documentation
+- Interactive Streamlit application development
+- Browser-based tracker exploration
+- Browser-based trajectory exploration
+- Browser-based visual analytics
+- Browser-based performance exploration
+- Dashboard CSV exports
+- Separation of inference and interactive analytics
 
-The project therefore extends beyond a basic object detector or tracker and implements a complete **Visual Tracking and Analysis System**.
+The project therefore extends beyond a basic object detector or tracker and implements a complete **Visual Tracking and Analysis System** with an interactive analytical interface.
 
 ---
 
@@ -1010,7 +1346,25 @@ performance_summary.csv
 performance_chart.png
 ```
 
-This reduces unnecessary computation and makes the reporting workflow more reproducible.
+The dashboard extends this design:
+
+```text
+tracker_summary.csv
+        +
+trajectory_summary.csv
+        +
+performance_summary.csv
+        +
+Generated Charts
+        +
+Project Documentation
+        ↓
+app.py
+        ↓
+Interactive Dashboard
+```
+
+This reduces unnecessary computation and makes the reporting and exploration workflow more reproducible.
 
 ---
 
@@ -1039,15 +1393,25 @@ Performance Chart                  COMPLETE
 Reports Documentation              COMPLETE
 Results Documentation              COMPLETE
 Limitations Documentation          COMPLETE
+Interactive Streamlit Dashboard    COMPLETE
+Overview Dashboard                 COMPLETE
+Tracker Explorer                   COMPLETE
+Trajectory Dashboard               COMPLETE
+Visual Analytics Dashboard         COMPLETE
+Performance Dashboard              COMPLETE
+Results Dashboard                  COMPLETE
+Limitations Dashboard              COMPLETE
+Dashboard CSV Downloads            COMPLETE
+Browser Verification               COMPLETE
 ```
 
 ---
 
 # Final Outcome
 
-Project 06 successfully evolved from an image-processing prototype into an integrated recorded-video computer-vision analytics system.
+Project 06 successfully evolved from an image-processing prototype into an integrated recorded-video computer-vision analytics system with an interactive browser-based exploration interface.
 
-The final workflow combines:
+The current workflow combines:
 
 ```text
 Detection
@@ -1064,10 +1428,14 @@ Performance Analysis
     ↓
 Visualization
     ↓
+Interactive Dashboard
+    ↓
 Documentation
 ```
 
 The system produces both visual and structured evidence, allowing tracking behavior to be inspected quantitatively rather than only through annotated video.
+
+The Streamlit application adds an interactive exploration layer on top of the preserved analytical evidence, allowing tracker histories, trajectories, visualizations, performance metrics, results, and limitations to be reviewed from a single interface.
 
 ---
 
@@ -1081,6 +1449,7 @@ The system produces both visual and structured evidence, allowing tracking behav
 - [Tracker Summary](./reports/tracker_summary.csv)
 - [Trajectory Summary](./reports/trajectory_summary.csv)
 - [Performance Summary](./reports/performance_summary.csv)
+- [Streamlit Dashboard](./app.py)
 
 ---
 
