@@ -4,28 +4,33 @@ Performance Analysis
 
 Visual Tracking and Analysis System
 
-This module analyzes persisted tracking observations and generates:
+This module analyzes the existing completed Project 06 reports and generates:
 
     reports/performance_summary.csv
     reports/performance_chart.png
 
-The script automatically searches the project for a SQLite database,
-detects the tracking-observation table, calculates system-level analytics,
-and generates a performance summary.
+The script intentionally uses the already-generated CSV reports instead of
+requiring the original SQLite database or rerunning YOLO, ByteTrack, or SAM 3.
+
+Required existing reports:
+
+    reports/tracker_summary.csv
+    reports/trajectory_summary.csv
 
 Optional:
-    You can provide the actual total video-processing time with:
+    You can provide the actual total processing duration with:
 
         python analytics/performance_analysis.py --processing-seconds 42.5
 
-This allows the script to calculate actual processing FPS and average
-processing time per frame without rerunning YOLO, ByteTrack, or SAM 3.
+When processing time is provided, the script also calculates:
+
+    - Effective processing FPS
+    - Average processing time per frame
 """
 
 from __future__ import annotations
 
 import argparse
-import sqlite3
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -37,259 +42,143 @@ import pandas as pd
 # ============================================================
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 REPORTS_DIR = PROJECT_ROOT / "reports"
+
+TRACKER_SUMMARY_CSV = REPORTS_DIR / "tracker_summary.csv"
+TRAJECTORY_SUMMARY_CSV = REPORTS_DIR / "trajectory_summary.csv"
 
 PERFORMANCE_CSV = REPORTS_DIR / "performance_summary.csv"
 PERFORMANCE_CHART = REPORTS_DIR / "performance_chart.png"
 
 
 # ============================================================
-# COLUMN NAME CANDIDATES
+# DATA VALIDATION
 # ============================================================
 
-FRAME_COLUMNS = [
-    "frame_number",
-    "frame_id",
-    "frame",
-    "frame_index",
-]
-
-TRACKER_COLUMNS = [
-    "tracker_id",
-    "track_id",
-    "tracking_id",
-]
-
-CONFIDENCE_COLUMNS = [
-    "confidence",
-    "conf",
-    "score",
-]
-
-CLASS_NAME_COLUMNS = [
-    "class_name",
-    "label",
-    "class",
-]
-
-CLASS_ID_COLUMNS = [
-    "class_id",
-    "category_id",
-]
-
-
-# ============================================================
-# DATABASE DISCOVERY
-# ============================================================
-
-def find_sqlite_database() -> Path:
+def validate_required_files() -> None:
     """
-    Search the project directory for an existing SQLite database.
+    Confirm that the completed analytics CSV reports exist.
     """
 
-    patterns = [
-        "*.db",
-        "*.sqlite",
-        "*.sqlite3",
+    required_files = [
+        TRACKER_SUMMARY_CSV,
+        TRAJECTORY_SUMMARY_CSV,
     ]
 
-    databases = []
-
-    for pattern in patterns:
-        databases.extend(PROJECT_ROOT.rglob(pattern))
-
-    databases = [
+    missing_files = [
         path
-        for path in databases
-        if path.is_file()
+        for path in required_files
+        if not path.exists()
     ]
 
-    if not databases:
+    if missing_files:
+
+        missing_names = "\n".join(
+            f"- {path.relative_to(PROJECT_ROOT)}"
+            for path in missing_files
+        )
+
         raise FileNotFoundError(
-            "\nNo SQLite database was found inside the project.\n"
-            "Expected a .db, .sqlite, or .sqlite3 file."
+            "\nRequired analytics files were not found:\n"
+            f"{missing_names}\n"
         )
-
-    databases.sort()
-
-    database = databases[0]
-
-    print(f"[INFO] SQLite database found: {database.relative_to(PROJECT_ROOT)}")
-
-    return database
-
-
-# ============================================================
-# DATABASE INSPECTION
-# ============================================================
-
-def get_tables(connection: sqlite3.Connection) -> list[str]:
-    """
-    Return all user-created SQLite tables.
-    """
-
-    query = """
-    SELECT name
-    FROM sqlite_master
-    WHERE type = 'table'
-      AND name NOT LIKE 'sqlite_%'
-    ORDER BY name;
-    """
-
-    rows = connection.execute(query).fetchall()
-
-    return [row[0] for row in rows]
-
-
-def get_columns(
-    connection: sqlite3.Connection,
-    table_name: str,
-) -> list[str]:
-    """
-    Return column names for a SQLite table.
-    """
-
-    safe_table = table_name.replace('"', '""')
-
-    rows = connection.execute(
-        f'PRAGMA table_info("{safe_table}")'
-    ).fetchall()
-
-    return [row[1] for row in rows]
-
-
-def find_matching_column(
-    columns: list[str],
-    candidates: list[str],
-) -> str | None:
-    """
-    Find the first matching column from a list of candidates.
-    """
-
-    lowercase_map = {
-        column.lower(): column
-        for column in columns
-    }
-
-    for candidate in candidates:
-        if candidate.lower() in lowercase_map:
-            return lowercase_map[candidate.lower()]
-
-    return None
-
-
-def find_tracking_table(
-    connection: sqlite3.Connection,
-) -> tuple[str, dict[str, str | None]]:
-    """
-    Detect the table containing tracking observations.
-
-    The table must contain at least:
-        - a frame column
-        - a tracker-ID column
-    """
-
-    tables = get_tables(connection)
-
-    if not tables:
-        raise RuntimeError(
-            "The SQLite database contains no user tables."
-        )
-
-    for table in tables:
-
-        columns = get_columns(connection, table)
-
-        frame_column = find_matching_column(
-            columns,
-            FRAME_COLUMNS,
-        )
-
-        tracker_column = find_matching_column(
-            columns,
-            TRACKER_COLUMNS,
-        )
-
-        confidence_column = find_matching_column(
-            columns,
-            CONFIDENCE_COLUMNS,
-        )
-
-        class_name_column = find_matching_column(
-            columns,
-            CLASS_NAME_COLUMNS,
-        )
-
-        class_id_column = find_matching_column(
-            columns,
-            CLASS_ID_COLUMNS,
-        )
-
-        if frame_column and tracker_column:
-
-            detected_columns = {
-                "frame": frame_column,
-                "tracker": tracker_column,
-                "confidence": confidence_column,
-                "class_name": class_name_column,
-                "class_id": class_id_column,
-            }
-
-            print(f"[INFO] Tracking table detected: {table}")
-            print(f"[INFO] Frame column: {frame_column}")
-            print(f"[INFO] Tracker column: {tracker_column}")
-
-            if confidence_column:
-                print(
-                    f"[INFO] Confidence column: "
-                    f"{confidence_column}"
-                )
-
-            if class_name_column:
-                print(
-                    f"[INFO] Class-name column: "
-                    f"{class_name_column}"
-                )
-
-            return table, detected_columns
-
-    raise RuntimeError(
-        "\nCould not automatically identify the tracking table.\n"
-        "A tracking table must contain frame and tracker-ID columns."
-    )
 
 
 # ============================================================
 # DATA LOADING
 # ============================================================
 
-def load_tracking_data(
-    connection: sqlite3.Connection,
-    table_name: str,
-) -> pd.DataFrame:
+def load_reports() -> tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Load the complete tracking-observation table into Pandas.
+    Load the existing tracker and trajectory reports.
     """
 
-    safe_table = table_name.replace('"', '""')
-
-    query = f'SELECT * FROM "{safe_table}"'
-
-    dataframe = pd.read_sql_query(
-        query,
-        connection,
+    tracker_df = pd.read_csv(
+        TRACKER_SUMMARY_CSV
     )
 
-    if dataframe.empty:
+    trajectory_df = pd.read_csv(
+        TRAJECTORY_SUMMARY_CSV
+    )
+
+    if tracker_df.empty:
         raise RuntimeError(
-            "The tracking table exists but contains no observations."
+            "tracker_summary.csv is empty."
+        )
+
+    if trajectory_df.empty:
+        raise RuntimeError(
+            "trajectory_summary.csv is empty."
         )
 
     print(
-        f"[INFO] Loaded {len(dataframe)} tracking observations."
+        f"[INFO] Loaded tracker report: "
+        f"{len(tracker_df)} tracker records"
     )
 
-    return dataframe
+    print(
+        f"[INFO] Loaded trajectory report: "
+        f"{len(trajectory_df)} trajectory records"
+    )
+
+    return tracker_df, trajectory_df
+
+
+# ============================================================
+# COLUMN VALIDATION
+# ============================================================
+
+def validate_columns(
+    tracker_df: pd.DataFrame,
+    trajectory_df: pd.DataFrame,
+) -> None:
+    """
+    Validate the columns required for performance analysis.
+    """
+
+    required_tracker_columns = {
+        "tracker_id",
+        "first_frame",
+        "last_frame",
+        "observations",
+        "duration_seconds",
+        "average_confidence",
+    }
+
+    required_trajectory_columns = {
+        "tracker_id",
+        "movement_distance_pixels",
+        "average_movement_pixels",
+    }
+
+    missing_tracker_columns = (
+        required_tracker_columns
+        - set(tracker_df.columns)
+    )
+
+    missing_trajectory_columns = (
+        required_trajectory_columns
+        - set(trajectory_df.columns)
+    )
+
+    if missing_tracker_columns:
+
+        raise RuntimeError(
+            "tracker_summary.csv is missing columns: "
+            + ", ".join(
+                sorted(missing_tracker_columns)
+            )
+        )
+
+    if missing_trajectory_columns:
+
+        raise RuntimeError(
+            "trajectory_summary.csv is missing columns: "
+            + ", ".join(
+                sorted(missing_trajectory_columns)
+            )
+        )
 
 
 # ============================================================
@@ -297,34 +186,28 @@ def load_tracking_data(
 # ============================================================
 
 def calculate_metrics(
-    dataframe: pd.DataFrame,
-    columns: dict[str, str | None],
+    tracker_df: pd.DataFrame,
+    trajectory_df: pd.DataFrame,
     processing_seconds: float | None = None,
 ) -> dict[str, float | int | str]:
     """
-    Calculate system-level analytics from tracking observations.
+    Calculate system-level metrics from the completed reports.
     """
 
-    frame_column = columns["frame"]
-    tracker_column = columns["tracker"]
-    confidence_column = columns["confidence"]
-
     # --------------------------------------------------------
-    # Core tracking statistics
+    # Core tracking metrics
     # --------------------------------------------------------
-
-    total_observations = int(len(dataframe))
 
     total_frames = int(
-        dataframe[frame_column].nunique()
+        tracker_df["last_frame"].max()
     )
 
-    valid_trackers = dataframe[
-        dataframe[tracker_column].notna()
-    ]
+    total_observations = int(
+        tracker_df["observations"].sum()
+    )
 
-    unique_trackers = int(
-        valid_trackers[tracker_column].nunique()
+    unique_tracker_ids = int(
+        tracker_df["tracker_id"].nunique()
     )
 
     average_observations_per_frame = (
@@ -333,71 +216,85 @@ def calculate_metrics(
         else 0
     )
 
-    # --------------------------------------------------------
-    # Confidence statistics
-    # --------------------------------------------------------
-
-    average_confidence = None
-    minimum_confidence = None
-    maximum_confidence = None
-
-    if confidence_column:
-
-        confidence_values = pd.to_numeric(
-            dataframe[confidence_column],
-            errors="coerce",
-        ).dropna()
-
-        if not confidence_values.empty:
-
-            average_confidence = float(
-                confidence_values.mean()
-            )
-
-            minimum_confidence = float(
-                confidence_values.min()
-            )
-
-            maximum_confidence = float(
-                confidence_values.max()
-            )
-
-    # --------------------------------------------------------
-    # Tracker persistence
-    # --------------------------------------------------------
-
-    tracker_observation_counts = (
-        valid_trackers
-        .groupby(tracker_column)
-        .size()
+    average_observations_per_tracker = float(
+        tracker_df["observations"].mean()
     )
 
-    if not tracker_observation_counts.empty:
+    minimum_tracker_observations = int(
+        tracker_df["observations"].min()
+    )
 
-        average_observations_per_tracker = float(
-            tracker_observation_counts.mean()
-        )
-
-        maximum_tracker_observations = int(
-            tracker_observation_counts.max()
-        )
-
-        minimum_tracker_observations = int(
-            tracker_observation_counts.min()
-        )
-
-    else:
-
-        average_observations_per_tracker = 0
-        maximum_tracker_observations = 0
-        minimum_tracker_observations = 0
+    maximum_tracker_observations = int(
+        tracker_df["observations"].max()
+    )
 
     # --------------------------------------------------------
-    # Actual processing-performance statistics
+    # Confidence metrics
     # --------------------------------------------------------
 
-    processing_fps = None
-    average_processing_time = None
+    average_confidence = float(
+        tracker_df["average_confidence"].mean()
+    )
+
+    minimum_average_confidence = float(
+        tracker_df["average_confidence"].min()
+    )
+
+    maximum_average_confidence = float(
+        tracker_df["average_confidence"].max()
+    )
+
+    # --------------------------------------------------------
+    # Tracker duration metrics
+    # --------------------------------------------------------
+
+    average_tracker_duration = float(
+        tracker_df["duration_seconds"].mean()
+    )
+
+    minimum_tracker_duration = float(
+        tracker_df["duration_seconds"].min()
+    )
+
+    maximum_tracker_duration = float(
+        tracker_df["duration_seconds"].max()
+    )
+
+    # --------------------------------------------------------
+    # Movement metrics
+    # --------------------------------------------------------
+
+    total_movement_distance = float(
+        trajectory_df[
+            "movement_distance_pixels"
+        ].sum()
+    )
+
+    average_movement_distance = float(
+        trajectory_df[
+            "movement_distance_pixels"
+        ].mean()
+    )
+
+    maximum_movement_distance = float(
+        trajectory_df[
+            "movement_distance_pixels"
+        ].max()
+    )
+
+    average_step_movement = float(
+        trajectory_df[
+            "average_movement_pixels"
+        ].mean()
+    )
+
+    # --------------------------------------------------------
+    # Processing-performance metrics
+    # --------------------------------------------------------
+
+    total_processing_time: float | str = "N/A"
+    average_processing_time: float | str = "N/A"
+    effective_processing_fps: float | str = "N/A"
 
     if processing_seconds is not None:
 
@@ -406,8 +303,8 @@ def calculate_metrics(
                 "Processing time must be greater than zero."
             )
 
-        processing_fps = (
-            total_frames / processing_seconds
+        total_processing_time = float(
+            processing_seconds
         )
 
         average_processing_time = (
@@ -416,14 +313,25 @@ def calculate_metrics(
             else 0
         )
 
+        effective_processing_fps = (
+            total_frames / processing_seconds
+            if processing_seconds > 0
+            else 0
+        )
+
     # --------------------------------------------------------
     # Final metrics
     # --------------------------------------------------------
 
     metrics = {
-        "Total Processed Frames": total_frames,
-        "Total Observations": total_observations,
-        "Unique Tracker IDs": unique_trackers,
+        "Total Processed Frames":
+            total_frames,
+
+        "Total Observations":
+            total_observations,
+
+        "Unique Tracker IDs":
+            unique_tracker_ids,
 
         "Average Observations per Frame":
             average_observations_per_frame,
@@ -438,48 +346,57 @@ def calculate_metrics(
             maximum_tracker_observations,
 
         "Average Confidence":
-            average_confidence
-            if average_confidence is not None
-            else "N/A",
+            average_confidence,
 
-        "Minimum Confidence":
-            minimum_confidence
-            if minimum_confidence is not None
-            else "N/A",
+        "Minimum Average Confidence":
+            minimum_average_confidence,
 
-        "Maximum Confidence":
-            maximum_confidence
-            if maximum_confidence is not None
-            else "N/A",
+        "Maximum Average Confidence":
+            maximum_average_confidence,
+
+        "Average Tracker Duration (seconds)":
+            average_tracker_duration,
+
+        "Minimum Tracker Duration (seconds)":
+            minimum_tracker_duration,
+
+        "Maximum Tracker Duration (seconds)":
+            maximum_tracker_duration,
+
+        "Total Movement Distance (pixels)":
+            total_movement_distance,
+
+        "Average Movement Distance per Tracker (pixels)":
+            average_movement_distance,
+
+        "Maximum Movement Distance (pixels)":
+            maximum_movement_distance,
+
+        "Average Step Movement (pixels)":
+            average_step_movement,
 
         "Total Processing Time (seconds)":
-            processing_seconds
-            if processing_seconds is not None
-            else "N/A",
+            total_processing_time,
 
         "Average Processing Time per Frame (seconds)":
-            average_processing_time
-            if average_processing_time is not None
-            else "N/A",
+            average_processing_time,
 
         "Effective Processing FPS":
-            processing_fps
-            if processing_fps is not None
-            else "N/A",
+            effective_processing_fps,
     }
 
     return metrics
 
 
 # ============================================================
-# CSV REPORT
+# CSV OUTPUT
 # ============================================================
 
 def save_performance_csv(
     metrics: dict[str, float | int | str],
 ) -> None:
     """
-    Save metrics to reports/performance_summary.csv.
+    Save system-level metrics to performance_summary.csv.
     """
 
     REPORTS_DIR.mkdir(
@@ -492,7 +409,10 @@ def save_performance_csv(
     for metric_name, value in metrics.items():
 
         if isinstance(value, float):
-            value = round(value, 4)
+            value = round(
+                value,
+                4,
+            )
 
         rows.append(
             {
@@ -501,15 +421,17 @@ def save_performance_csv(
             }
         )
 
-    dataframe = pd.DataFrame(rows)
+    performance_df = pd.DataFrame(
+        rows
+    )
 
-    dataframe.to_csv(
+    performance_df.to_csv(
         PERFORMANCE_CSV,
         index=False,
     )
 
     print(
-        f"[SUCCESS] Performance summary saved: "
+        f"[SUCCESS] Saved: "
         f"{PERFORMANCE_CSV.relative_to(PROJECT_ROOT)}"
     )
 
@@ -522,37 +444,41 @@ def save_performance_chart(
     metrics: dict[str, float | int | str],
 ) -> None:
     """
-    Generate a compact visual summary of the primary system metrics.
+    Generate a visual summary of key system metrics.
     """
 
-    chart_metrics = {
-        "Frames": metrics["Total Processed Frames"],
-        "Observations": metrics["Total Observations"],
-        "Tracker IDs": metrics["Unique Tracker IDs"],
-    }
+    chart_labels = [
+        "Frames",
+        "Observations",
+        "Tracker IDs",
+    ]
 
-    labels = list(chart_metrics.keys())
-    values = list(chart_metrics.values())
+    chart_values = [
+        metrics["Total Processed Frames"],
+        metrics["Total Observations"],
+        metrics["Unique Tracker IDs"],
+    ]
 
     plt.figure(
         figsize=(9, 6)
     )
 
     bars = plt.bar(
-        labels,
-        values,
+        chart_labels,
+        chart_values,
     )
 
     plt.title(
-        "Visual Tracking System - Performance Summary"
-    )
-
-    plt.ylabel(
-        "Count"
+        "Visual Tracking and Analysis System\n"
+        "Performance Summary"
     )
 
     plt.xlabel(
         "Metric"
+    )
+
+    plt.ylabel(
+        "Count"
     )
 
     plt.grid(
@@ -561,10 +487,14 @@ def save_performance_chart(
         alpha=0.35,
     )
 
-    for bar, value in zip(bars, values):
+    for bar, value in zip(
+        bars,
+        chart_values,
+    ):
 
         plt.text(
-            bar.get_x() + bar.get_width() / 2,
+            bar.get_x()
+            + bar.get_width() / 2,
             bar.get_height(),
             str(value),
             ha="center",
@@ -583,56 +513,66 @@ def save_performance_chart(
     plt.close()
 
     print(
-        f"[SUCCESS] Performance chart saved: "
+        f"[SUCCESS] Saved: "
         f"{PERFORMANCE_CHART.relative_to(PROJECT_ROOT)}"
     )
 
 
 # ============================================================
-# TERMINAL SUMMARY
+# TERMINAL OUTPUT
 # ============================================================
 
 def print_metrics(
     metrics: dict[str, float | int | str],
 ) -> None:
     """
-    Print the calculated metrics to the terminal.
+    Print calculated performance metrics.
     """
 
     print()
-    print("=" * 64)
-    print("VISUAL TRACKING AND ANALYSIS SYSTEM")
-    print("PERFORMANCE SUMMARY")
-    print("=" * 64)
+    print("=" * 72)
+    print(
+        "VISUAL TRACKING AND ANALYSIS SYSTEM"
+    )
+    print(
+        "PERFORMANCE SUMMARY"
+    )
+    print("=" * 72)
 
-    for name, value in metrics.items():
+    for metric_name, value in metrics.items():
 
         if isinstance(value, float):
-            formatted_value = f"{value:.4f}"
+
+            formatted_value = (
+                f"{value:.4f}"
+            )
+
         else:
+
             formatted_value = value
 
         print(
-            f"{name:<48} {formatted_value}"
+            f"{metric_name:<56} "
+            f"{formatted_value}"
         )
 
-    print("=" * 64)
+    print("=" * 72)
     print()
 
 
 # ============================================================
-# COMMAND LINE ARGUMENTS
+# COMMAND-LINE ARGUMENTS
 # ============================================================
 
 def parse_arguments() -> argparse.Namespace:
     """
-    Read optional command-line arguments.
+    Parse optional command-line arguments.
     """
 
     parser = argparse.ArgumentParser(
         description=(
-            "Generate performance analytics for the "
-            "Visual Tracking and Analysis System."
+            "Generate system-level performance analytics "
+            "from the completed Project 06 reports."
         )
     )
 
@@ -642,8 +582,8 @@ def parse_arguments() -> argparse.Namespace:
         default=None,
         help=(
             "Actual total processing duration in seconds. "
-            "When provided, processing FPS and average "
-            "processing time per frame are calculated."
+            "If provided, effective FPS and average "
+            "processing time per frame will be calculated."
         ),
     )
 
@@ -656,7 +596,7 @@ def parse_arguments() -> argparse.Namespace:
 
 def main() -> None:
     """
-    Execute the performance-analysis pipeline.
+    Execute the complete performance-analysis pipeline.
     """
 
     args = parse_arguments()
@@ -666,30 +606,34 @@ def main() -> None:
         "[INFO] Starting performance analysis..."
     )
 
-    database_path = find_sqlite_database()
+    validate_required_files()
 
-    with sqlite3.connect(database_path) as connection:
+    tracker_df, trajectory_df = (
+        load_reports()
+    )
 
-        table_name, detected_columns = (
-            find_tracking_table(connection)
-        )
-
-        tracking_data = load_tracking_data(
-            connection,
-            table_name,
-        )
+    validate_columns(
+        tracker_df,
+        trajectory_df,
+    )
 
     metrics = calculate_metrics(
-        dataframe=tracking_data,
-        columns=detected_columns,
+        tracker_df=tracker_df,
+        trajectory_df=trajectory_df,
         processing_seconds=args.processing_seconds,
     )
 
-    print_metrics(metrics)
+    print_metrics(
+        metrics
+    )
 
-    save_performance_csv(metrics)
+    save_performance_csv(
+        metrics
+    )
 
-    save_performance_chart(metrics)
+    save_performance_chart(
+        metrics
+    )
 
     print()
     print(
