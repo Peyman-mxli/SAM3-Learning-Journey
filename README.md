@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="07-assets/banners/Main-Banner.png" alt="SAM3 Learning Journey Banner" width="100%">
+  <img src="07-assets/Banners/Main-Banner.png" alt="SAM3 Learning Journey Banner" width="100%">
 </p>
 
 <p align="center">
@@ -36,6 +36,8 @@ A comprehensive learning repository documenting my journey through the SAM3 Comp
 | 🛠️ [Technologies Used](#️-technologies-used) | Tools and software used. |
 | 🗺️ [Learning Roadmap](#️-learning-roadmap) | Course learning path. |
 | 📅 [Course Progress](#-course-progress) | Progress across all sessions. |
+| 🚀 [Practical Development](#-practical-development) | Practical Computer Vision development. |
+| 🖼️ [Visual Assets](#️-visual-assets) | Repository banners and screenshots. |
 | 📚 [Resources](#-resources) | External references and documentation. |
 | ⚠️ [Professional Impact](#️-professional-impact) | Professional and portfolio value of the repository. |
 | 👤 [Author](#-author) | Repository author information. |
@@ -154,7 +156,7 @@ SAM3-Learning-Journey/
 │
 ├── 📁 07-assets/
 │   │
-│   ├── 📁 banners/
+│   ├── 📁 Banners/
 │   │   └── Repository and technology banners
 │   │
 │   ├── 📁 screenshots/
@@ -177,7 +179,7 @@ SAM3-Learning-Journey/
 | **05-projects** | Complete AI and Computer Vision projects |
 | **06-resources** | External documentation, datasets, papers, and references |
 | **07-assets** | Central location for repository visual resources |
-| **07-assets/banners** | Main repository and technology banners |
+| **07-assets/Banners** | Main repository and technology banners |
 | **07-assets/screenshots** | Screenshots documenting setup, experiments, and results |
 | **08-course-notes** | Notes, concepts, recordings, and practical work from course sessions |
 
@@ -282,7 +284,7 @@ Visual resources are organized inside:
 Reusable banners are stored in:
 
 ```text
-07-assets/banners/
+07-assets/Banners/
 ```
 
 Development evidence and screenshots are stored in:
