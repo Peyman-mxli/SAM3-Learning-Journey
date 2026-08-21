@@ -1,14 +1,27 @@
+# Core Computer Vision
 ultralytics
 supervision
 opencv-python
 numpy
-pandas
-torch
-torchvision
-huggingface-hub
 Pillow
+
+# Data Analysis and Reporting
+pandas
 matplotlib
 
+# PyTorch
+torch
+torchvision
+
+# Hugging Face
+huggingface-hub
+
 # SAM 3
-# Install the official Meta SAM 3 repository separately:
+# SAM 3 is installed separately from the official Meta repository.
+# Example for Google Colab:
+# git clone https://github.com/facebookresearch/sam3.git /content/sam3_repo
 # pip install -e /content/sam3_repo
+
+# SQLite
+# SQLite support is provided by Python's built-in sqlite3 module.
+# No additional pip package is required.
