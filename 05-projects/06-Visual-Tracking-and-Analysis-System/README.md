@@ -1,511 +1,689 @@
 # Visual Tracking and Analysis System
 
-A complete computer vision project for detecting, segmenting, tracking, analyzing, and storing information about objects or people across images and recorded video.
+An integrated computer vision project combining object detection, multi-object tracking, segmentation, visualization, evaluation, and structured data storage.
 
-This project was proposed through the **Computer Vision Laboratory** of the **SAM3: Computer Vision with Segment Anything Model 3** learning program.
+This project was developed as part of my **SAM3 Computer Vision Learning Journey** and demonstrates how multiple computer vision components can be combined into a modular analysis pipeline.
 
-It combines concepts developed throughout my SAM3 Learning Journey into a larger portfolio-oriented application.
+The current image-based MVP integrates:
 
----
+- Ultralytics YOLO object detection
+- Supervision detections
+- ByteTrack multi-object tracking
+- Meta SAM 3 text-prompt segmentation
+- SAM 3 segmentation masks
+- Bounding-box visualization
+- Persistent tracker IDs
+- Confidence labels
+- Object trajectories
+- SQLite-based structured storage
+- Evaluation metrics
+- Google Colab GPU execution
 
-## Project Overview
-
-The goal of this project is to build a computer vision system capable of:
-
-- Detecting objects or people
-- Segmenting visual entities
-- Tracking objects across video frames
-- Maintaining persistent tracking identities
-- Analyzing position and movement
-- Storing historical observations
-- Calculating evaluation metrics
-- Comparing processing sessions
-- Visualizing results through an application or dashboard
-- Exporting structured results for further analysis
-
-The project focuses initially on **recorded images and videos** rather than real-time processing.
-
-This allows the detection, segmentation, tracking, storage, and evaluation pipeline to be developed and validated before introducing the additional complexity of live video.
+The integrated image pipeline has been successfully tested in **Google Colab using an NVIDIA Tesla T4 GPU**.
 
 ---
 
-## Project Proposal
+## Project Status
 
-**Project:** Visual Tracking and Analysis System
+**Status: Image-Based Integrated MVP Completed**
 
-**Original proposal:** Sistema de Seguimiento y Análisis Visual
+The core image-processing pipeline is operational and has been tested end-to-end.
 
-**Project type:** Computer Vision Analysis and Evaluation Tool
+Current verified capabilities:
 
-**Primary technologies:**
+| Component | Status |
+|---|---|
+| YOLO Object Detection | Completed |
+| Supervision Integration | Completed |
+| ByteTrack Object Tracking | Completed |
+| Persistent Tracker IDs | Completed |
+| SAM 3 Integration | Completed |
+| SAM 3 Text-Prompt Segmentation | Completed |
+| SAM 3 Mask Generation | Completed |
+| Combined Visualization | Completed |
+| SQLite Database Module | Completed |
+| Evaluation Metrics Module | Completed |
+| Google Colab Workflow | Completed |
+| Final Integrated Image Test | Completed |
+| Recorded Video Pipeline | Planned |
+| Full Tracking Analytics | Planned |
+
+---
+
+## System Architecture
+
+The project follows a modular architecture in which each major computer vision task is implemented independently.
+
+```text
+Input Image / Video
+        |
+        v
++-----------------------+
+|   YOLO Detection      |
+|   ObjectDetector      |
++-----------------------+
+        |
+        v
++-----------------------+
+|   ByteTrack           |
+|   ObjectTracker       |
++-----------------------+
+        |
+        v
++-----------------------+
+|   Meta SAM 3          |
+|   ObjectSegmenter     |
++-----------------------+
+        |
+        v
++-----------------------+
+| Combined Visualization|
+| TrackingVisualizer    |
++-----------------------+
+        |
+        +----------------------+
+        |                      |
+        v                      v
++----------------+     +----------------+
+| Evaluation     |     | SQLite Storage |
+| Metrics        |     | Database       |
++----------------+     +----------------+
+        |
+        v
+Final Analysis Output
+```
+
+---
+
+## Integrated Image Pipeline
+
+The current working image pipeline follows this sequence:
+
+```text
+Input Image
+    |
+    v
+YOLO Object Detection
+    |
+    v
+Supervision Detections
+    |
+    v
+ByteTrack Object Tracking
+    |
+    v
+SAM 3 Text-Prompt Segmentation
+    |
+    v
+SAM 3 Segmentation Masks
+    |
+    v
+Combined Visualization
+    |
+    v
+Final Annotated Image
+```
+
+The final visualization can contain:
+
+- YOLO bounding boxes
+- detected object classes
+- confidence scores
+- ByteTrack tracker IDs
+- SAM 3 segmentation masks
+- tracking visualization information
+
+---
+
+## Technologies
+
+### Computer Vision
 
 - Python
 - OpenCV
+- Ultralytics YOLO
 - Supervision
-- YOLO
-- Ultralytics
-- SAM3
-- Object Tracking
-- Data Analysis
-- Database Storage
-- Visualization
-
----
-
-## Problem
-
-Computer vision systems can detect objects in individual images, but many practical applications require more than a single prediction.
-
-A useful system may need to answer questions such as:
-
-- What objects were detected?
-- Where were they located?
-- Which detections correspond to the same object over time?
-- How did an object move?
-- How confident was the model?
-- What happened during previous processing sessions?
-- Under which conditions did the system fail?
-- How does performance change between different videos?
-
-This project addresses these questions by creating an integrated visual analysis pipeline.
-
----
-
-## Objective
-
-Build an application capable of detecting, segmenting, tracking, and analyzing entities in recorded images and videos while storing structured historical results.
-
-The system should provide evidence that can later be inspected, compared, evaluated, and visualized.
-
----
-
-## System Pipeline
-
-The planned workflow is:
-
-```text
-Image / Recorded Video
-        |
-        v
-Object Detection
-        |
-        v
-Detection Filtering
-        |
-        v
-Segmentation
-        |
-        v
-Object Tracking
-        |
-        v
-Position & Movement Analysis
-        |
-        v
-Metrics and Events
-        |
-        v
-Database / Historical Storage
-        |
-        v
-Visualization Dashboard
-        |
-        v
-Reports / Exported Results
-```
-
----
-
-## Relationship to Previous Projects
-
-This project builds upon the practical work developed in earlier projects of the SAM3 Learning Journey.
-
-### 01 — YOLO + Supervision Object Detector
-
-Introduced:
-
-- YOLO inference
-- `sv.Detections`
-- Confidence scores
-- Bounding boxes
-- JSON prediction export
-
-### 02 — Multi-Annotator Visualization Pipeline
-
-Introduced:
-
-- Bounding-box visualization
-- Labels
-- Multiple Supervision annotators
-- Visual presentation of model results
-
-### 03 — Detection Filtering and NMS Pipeline
-
-Introduced:
-
-- Confidence filtering
-- Class filtering
-- Area filtering
-- Spatial filtering
-- Non-Maximum Suppression
-- Top-N detection selection
-
-### 04 — Object Tracking
-
-Introduced:
-
-- Video processing
 - ByteTrack
-- Persistent tracker IDs
-- Object trajectories
-- Frame-by-frame tracking
+- Meta SAM 3
 
-### 05 — Zones and Counting Analytics
+### Machine Learning
 
-Introduced:
+- PyTorch
+- TorchVision
+- Hugging Face Hub
 
-- Spatial zones
-- Object counting
-- Zone-based analytics
-- Movement interpretation
+### Data and Analysis
 
-### 06 — Visual Tracking and Analysis System
+- NumPy
+- Pandas
+- SQLite
+- Matplotlib
 
-This project integrates and extends those concepts into a larger system.
+### Development Environment
 
----
-
-## MVP Scope
-
-The first version of the project will focus on a reproducible end-to-end pipeline.
-
-### Included
-
-The MVP should be able to:
-
-- Load an image or recorded video
-- Preserve information about the source
-- Detect entities
-- Segment supported entities
-- Track entities through video
-- Assign persistent identifiers
-- Record timestamps
-- Store confidence values
-- Store observations and results
-- Query previous processing sessions
-- Compare results between sessions
-- Generate visual evidence
-- Calculate relevant metrics
-- Export structured results
-- Document failure cases
+- Google Colab
+- NVIDIA Tesla T4 GPU
+- Git
+- GitHub
 
 ---
 
-## Not Included in the Initial MVP
-
-The first version will not require:
-
-- Real-time camera processing
-- Mobile deployment
-- Edge-device deployment
-- Embedded systems
-- Automated alerts
-- Safety-critical decisions
-
-These features may be explored after the MVP has been validated.
-
----
-
-## Data to Store
-
-Each observation may contain information such as:
-
-```text
-session_id
-source
-frame_number
-timestamp
-tracker_id
-class_id
-class_name
-confidence
-bounding_box
-segmentation
-position
-zone
-notes
-```
-
-The exact database schema will be defined during implementation.
-
----
-
-## Evaluation
-
-The project should evaluate both model quality and system behavior.
-
-Potential evaluation metrics include:
-
-- Precision
-- Recall
-- Intersection over Union (IoU)
-- Dice coefficient
-- False positives
-- False negatives
-- Tracking consistency
-- Identity stability
-- Processing time
-
-Not every metric will necessarily apply to every experiment.
-
----
-
-## Testing Strategy
-
-### Initial Technical Test
-
-Use:
-
-- 20–50 images
-
-or
-
-- 2–5 short videos
-
-The goal is to verify that:
-
-- Input loading works
-- Inference works
-- Tracking works
-- Results can be stored
-- Output can be generated
-
-### MVP Validation
-
-Expand testing to approximately:
-
-- 100–200 observations
-
-Test under different conditions such as:
-
-- Lighting changes
-- Object scale
-- Movement
-- Partial occlusion
-- Different backgrounds
-- Out-of-sample data
-
----
-
-## Failure Analysis
-
-An important part of the project is documenting where the system fails.
-
-Examples include:
-
-- Missed detections
-- Incorrect classifications
-- Tracking ID changes
-- Segmentation errors
-- Occlusion problems
-- Low-light performance
-- Small-object detection problems
-- Motion blur
-- False positives
-
-Failure cases will be documented rather than hidden.
-
----
-
-## Responsible Use
-
-Because visual tracking technology can potentially be used to observe people, this project should be developed with responsible-use considerations.
-
-The project is intended for:
-
-- Learning
-- Computer vision experimentation
-- Model evaluation
-- Research
-- Portfolio demonstration
-
-Testing should avoid unnecessary collection of personally identifiable information or private-space recordings.
-
-Human tracking experiments should use appropriate public, synthetic, licensed, or voluntarily provided material.
-
----
-
-## Expected Deliverables
-
-The completed project should provide:
-
-1. Python source code for the processing pipeline
-2. Detection and segmentation functionality
-3. Object tracking functionality
-4. Historical data storage
-5. Analysis and visualization tools
-6. Exportable results
-7. Documented test cases
-8. Performance metrics
-9. Failure analysis
-10. A reproducible portfolio demonstration
-
----
-
-## Portfolio Value
-
-This project is designed to demonstrate the ability to move beyond isolated computer vision examples and build a larger integrated system.
-
-The final project can demonstrate experience with:
-
-- Computer vision pipelines
-- Object detection
-- Image segmentation
-- Multi-object tracking
-- Data persistence
-- Data analysis
-- Model evaluation
-- Visualization
-- Application development
-- Reproducible experimentation
-- Technical documentation
-
----
-
-## Planned Project Structure
+## Project Structure
 
 ```text
 06-Visual-Tracking-and-Analysis-System/
 │
 ├── README.md
 ├── requirements.txt
-├── app.py
-│
-├── src/
-│   ├── detector.py
-│   ├── segmenter.py
-│   ├── tracker.py
-│   ├── database.py
-│   ├── metrics.py
-│   └── visualization.py
 │
 ├── assets/
+│   ├── README.md
+│   │
 │   ├── input/
-│   │   └── README.md
+│   │   ├── README.md
+│   │   └── yolo_bus_test.jpg
+│   │
 │   └── output/
-│       └── README.md
+│       ├── README.md
+│       └── final_integrated_pipeline.jpg
 │
-├── data/
-│   └── README.md
+├── notebooks/
+│   ├── README.md
+│   └── COLAB-WORKFLOW.md
 │
-├── reports/
-│   └── README.md
-│
-└── docs/
-    └── PROJECT-PROPOSAL.md
+└── src/
+    ├── database.py
+    ├── detector.py
+    ├── metrics.py
+    ├── pipeline.py
+    ├── segmenter.py
+    ├── tracker.py
+    └── visualization.py
 ```
 
-The structure may evolve as the implementation progresses.
+---
+
+## Core Modules
+
+### `detector.py`
+
+Implements object detection using Ultralytics YOLO.
+
+Responsibilities include:
+
+- loading the YOLO model
+- processing input images
+- applying confidence thresholds
+- converting YOLO predictions into `supervision.Detections`
+- providing class-name information to other modules
 
 ---
 
-## Development Roadmap
+### `tracker.py`
 
-### Phase 1 — Prepare
+Implements multi-object tracking using ByteTrack.
 
-- Define the first test case
-- Select sample images and videos
-- Configure the Python environment
-- Verify required libraries
-- Define the initial data structure
+The tracker receives detections from YOLO and assigns persistent tracker IDs to detected objects.
 
-### Phase 2 — Detection
-
-- Load the detection model
-- Process images and video frames
-- Convert predictions to Supervision detections
-- Apply confidence and class filtering
-
-### Phase 3 — Segmentation
-
-- Integrate segmentation into the pipeline
-- Associate segmentation masks with detected entities
-- Store or export segmentation results
-
-### Phase 4 — Tracking
-
-- Integrate multi-object tracking
-- Assign persistent tracker IDs
-- Record trajectories
-- Analyze movement between frames
-
-### Phase 5 — Data Storage
-
-- Create a database schema
-- Store processing sessions
-- Store observations
-- Store confidence values and tracking IDs
-- Query historical sessions
-
-### Phase 6 — Metrics
-
-- Calculate relevant evaluation metrics
-- Record false positives and missed detections
-- Evaluate tracking consistency
-- Document failure cases
-
-### Phase 7 — Visualization
-
-- Build an interface or dashboard
-- Display processed videos or images
-- Show tracking information
-- Display historical sessions
-- Display metrics and analysis results
-
-### Phase 8 — Validation
-
-- Test under different lighting conditions
-- Test different object scales
-- Test movement
-- Test partial occlusion
-- Test different environments
-- Record and analyze failures
-
-### Phase 9 — Portfolio Demo
-
-- Prepare reproducible examples
-- Export reports
-- Document results
-- Add screenshots and visual evidence
-- Prepare the final GitHub documentation
+This makes it possible to maintain object identity across sequential frames when the project is extended to video processing.
 
 ---
 
-## Future Improvements
+### `segmenter.py`
 
-After validating the MVP, possible extensions include:
+Provides the integration layer between the project and the official Meta SAM 3 implementation.
 
-- Real-time camera processing
-- Live object tracking
-- Automated alerts
-- Custom-trained detection models
-- Advanced SAM3 segmentation workflows
-- API integration
-- Cloud deployment
-- Multi-camera analysis
-- Advanced trajectory analytics
-- Zone-based behavioral analysis
-- Mobile or edge deployment
+The module:
+
+- loads the SAM 3 image model
+- loads the SAM 3 checkpoint
+- creates a `Sam3Processor`
+- accepts PIL images
+- performs text-prompt segmentation
+- returns SAM 3 segmentation results
+
+Example text prompt:
+
+```python
+prompt="person"
+```
+
+SAM 3 can then identify and segment matching objects in the image.
 
 ---
 
-## Status
+### `visualization.py`
 
-**Current status:** Planning and initial implementation.
+Handles the visual representation of detection, tracking, and segmentation results.
 
-The project proposal and MVP scope have been defined.
+The visualizer supports:
 
-Implementation will proceed incrementally, with each component tested before integration into the complete system.
+- bounding boxes
+- class labels
+- confidence scores
+- tracker IDs
+- object traces
+- SAM 3 segmentation-mask overlays
+
+The segmentation masks are applied before the tracking annotations so that bounding boxes and labels remain visible in the final output.
+
+---
+
+### `pipeline.py`
+
+Acts as the central integration layer.
+
+The `VisualAnalysisPipeline` coordinates:
+
+1. YOLO detection
+2. ByteTrack tracking
+3. SAM 3 segmentation
+4. combined visualization
+
+Example:
+
+```python
+final_result = pipeline.process_image(
+    image_bgr=image,
+    segmentation_prompt="person"
+)
+```
+
+The returned result contains:
+
+```python
+{
+    "detections": detections,
+    "tracked_detections": tracked_detections,
+    "segmentation": segmentation_output,
+    "annotated_image": annotated_image
+}
+```
+
+This provides both machine-readable results and the final visualization.
+
+---
+
+### `database.py`
+
+Provides structured storage capabilities for analysis results.
+
+SQLite is used as a lightweight local database that can later store information such as:
+
+- tracker IDs
+- object classes
+- confidence scores
+- timestamps
+- frame numbers
+- detection information
+- tracking statistics
+
+This module prepares the project for more advanced video analytics.
+
+---
+
+### `metrics.py`
+
+Provides evaluation utilities for measuring system performance.
+
+The metrics layer is designed to support evaluation of:
+
+- detections
+- tracking results
+- segmentation results
+- object counts
+- future video-processing performance
+
+---
+
+## SAM 3 Integration
+
+Meta SAM 3 is used as the segmentation component of the system.
+
+SAM 3 provides promptable segmentation capabilities and can identify objects using text prompts.
+
+For example:
+
+```text
+person
+```
+
+can be used to request segmentation of people in an image.
+
+The system converts the OpenCV BGR image into RGB format and then creates a PIL image before sending it to SAM 3.
+
+```python
+image_rgb = image_bgr[:, :, ::-1]
+
+pil_image = Image.fromarray(
+    image_rgb
+)
+```
+
+The segmentation result is then passed into the visualization module.
+
+---
+
+## Hugging Face Authentication
+
+The official SAM 3 checkpoint is distributed through a gated Hugging Face repository.
+
+Access therefore requires:
+
+1. a Hugging Face account
+2. approved access to the SAM 3 repository
+3. a Hugging Face access token
+4. authentication inside the execution environment
+
+For Google Colab, the token can be stored securely using **Colab Secrets**.
+
+The project uses:
+
+```text
+HF_TOKEN
+```
+
+as the secret name.
+
+Tokens should never be committed directly to GitHub.
+
+---
+
+## SAM 3 Checkpoint
+
+The SAM 3 checkpoint is downloaded from the official gated model repository and cached by Hugging Face.
+
+The checkpoint file used during development was approximately:
+
+```text
+3.21 GB
+```
+
+Because model checkpoints are large and access-controlled, they are **not stored in this GitHub repository**.
+
+The checkpoint must be downloaded separately by an authorized user.
+
+---
+
+## GPU Environment
+
+The integrated pipeline was tested in Google Colab with:
+
+```text
+GPU: NVIDIA Tesla T4
+CUDA: Available
+```
+
+SAM 3 successfully loaded onto the GPU.
+
+Observed SAM 3 GPU memory usage after model loading was approximately:
+
+```text
+Allocated: ~3.33 GB
+Reserved:  ~3.43 GB
+```
+
+The Tesla T4 does not support the Ampere Flash Attention path used by newer NVIDIA architectures.
+
+The SAM 3 implementation therefore reports a warning indicating that Flash Attention is disabled.
+
+This warning does not prevent the model from running successfully.
+
+---
+
+## Dependency Compatibility
+
+During development, a binary compatibility issue occurred between NumPy and compiled Python packages.
+
+The environment was stabilized using:
+
+```text
+NumPy 1.26.4
+```
+
+After restarting the Colab runtime, the environment successfully loaded:
+
+- NumPy
+- PyTorch
+- Ultralytics
+- Supervision
+- SAM 3
+
+This highlights an important machine-learning engineering lesson:
+
+> Installing model repositories can modify shared dependencies, so dependency compatibility should always be verified after installation.
+
+---
+
+## Verified Integrated Test
+
+The final image-based pipeline was tested using a street image containing a bus and several people.
+
+The integrated test produced:
+
+```text
+YOLO detections: 4
+Tracked objects: 4
+SAM 3 masks: 4
+
+UPDATED PIPELINE END-TO-END: SUCCESS
+```
+
+This confirms that the complete pipeline can execute:
+
+```text
+YOLO
+  +
+ByteTrack
+  +
+SAM 3
+  +
+Supervision
+```
+
+inside one integrated workflow.
+
+---
+
+## Final Integrated Output
+
+The final evidence image is stored at:
+
+```text
+assets/output/final_integrated_pipeline.jpg
+```
+
+It demonstrates the combined output of the system, including:
+
+- YOLO object detection
+- object bounding boxes
+- detected classes
+- confidence scores
+- ByteTrack tracker IDs
+- SAM 3 segmentation masks
+- combined visualization
+
+![Final Integrated Pipeline](./assets/output/final_integrated_pipeline.jpg)
+
+---
+
+## Google Colab Workflow
+
+The complete development and testing process is documented in:
+
+[`notebooks/COLAB-WORKFLOW.md`](./notebooks/COLAB-WORKFLOW.md)
+
+The workflow covers:
+
+- GPU verification
+- repository setup
+- dependency installation
+- Hugging Face authentication
+- gated SAM 3 access
+- checkpoint download
+- SAM 3 model loading
+- dependency troubleshooting
+- YOLO integration
+- ByteTrack integration
+- segmentation testing
+- combined visualization testing
+- final pipeline validation
+
+---
+
+## Installation
+
+Install the standard Python dependencies with:
+
+```bash
+pip install -r requirements.txt
+```
+
+The official Meta SAM 3 repository must be installed separately.
+
+Example development workflow:
+
+```bash
+git clone https://github.com/facebookresearch/sam3.git /content/sam3_repo
+
+pip install -e /content/sam3_repo
+```
+
+The SAM 3 checkpoint must also be downloaded separately using an authorized Hugging Face account.
+
+---
+
+## Current Limitations
+
+The current implementation represents the first integrated MVP.
+
+Current limitations include:
+
+- primary validation is image-based
+- ByteTrack has been integrated but long-duration tracking still requires video testing
+- SAM 3 segmentation currently runs independently from YOLO class selection
+- segmentation masks and YOLO detections are not yet geometrically matched object-by-object
+- database integration is modular but full frame-by-frame persistence is still planned
+- advanced tracking analytics are not yet implemented
+- real-time processing performance has not yet been benchmarked
+
+These limitations define the next development phase.
+
+---
+
+## Next Development Phase
+
+The next major milestone is **recorded-video processing**.
+
+The planned pipeline is:
+
+```text
+Video
+  |
+  v
+Frame Extraction
+  |
+  v
+YOLO Detection
+  |
+  v
+ByteTrack Tracking
+  |
+  v
+SAM 3 Segmentation
+  |
+  v
+Combined Visualization
+  |
+  v
+Tracking Metrics
+  |
+  v
+SQLite Storage
+  |
+  v
+Annotated Output Video
+```
+
+Future improvements include:
+
+- full recorded-video processing
+- persistent tracking across hundreds of frames
+- SAM 3 segmentation during video analysis
+- trajectory visualization
+- per-object statistics
+- object appearance duration
+- object counting
+- class-based analytics
+- database persistence
+- tracking performance evaluation
+- segmentation evaluation
+- annotated video export
+- performance benchmarking
+
+---
+
+## Learning Outcomes
+
+This project demonstrates several important computer vision engineering concepts.
+
+### Modular Architecture
+
+Detection, tracking, segmentation, visualization, metrics, and storage are implemented as separate modules.
+
+### Model Integration
+
+YOLO and SAM 3 perform different tasks but can operate together inside one pipeline.
+
+### Detection vs. Segmentation
+
+YOLO identifies objects primarily using bounding boxes.
+
+SAM 3 provides pixel-level object masks.
+
+Combining them provides richer visual information.
+
+### Tracking
+
+ByteTrack introduces persistent object identities, creating the foundation for temporal video analysis.
+
+### Environment Management
+
+Large machine-learning systems frequently introduce dependency conflicts.
+
+Managing package versions and runtime state is an important part of practical AI development.
+
+### GPU Computing
+
+Large vision foundation models such as SAM 3 benefit significantly from GPU acceleration.
+
+### Reproducibility
+
+Documenting the Colab workflow, dependencies, model access process, and test outputs makes the project easier to reproduce and extend.
+
+---
+
+## Project Goal
+
+The long-term goal of this project is to create a reusable visual-analysis system capable of:
+
+```text
+Detecting
+    +
+Tracking
+    +
+Segmenting
+    +
+Visualizing
+    +
+Measuring
+    +
+Storing
+```
+
+objects across images and videos.
+
+The current image-based MVP establishes the foundation for that larger system.
 
 ---
 
@@ -513,10 +691,8 @@ Implementation will proceed incrementally, with each component tested before int
 
 **Peyman Miyandashti**
 
-GitHub: [Peyman-mxli](https://github.com/Peyman-mxli)
+Computer Vision, Artificial Intelligence, and Software Development
 
-LinkedIn: [Peyman Miyandashti](https://www.linkedin.com/in/peyman-mxli/)
+[GitHub](https://github.com/Peyman-mxli)
 
----
-
-This project is part of my [SAM3 Learning Journey](https://github.com/Peyman-mxli/SAM3-Learning-Journey).
+[LinkedIn](https://www.linkedin.com/in/peyman-mxli/)
