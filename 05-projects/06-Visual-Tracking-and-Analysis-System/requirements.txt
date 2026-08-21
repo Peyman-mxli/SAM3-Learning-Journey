@@ -9,6 +9,9 @@ Pillow
 pandas
 matplotlib
 
+# Application Dashboard
+streamlit
+
 # PyTorch
 torch
 torchvision
