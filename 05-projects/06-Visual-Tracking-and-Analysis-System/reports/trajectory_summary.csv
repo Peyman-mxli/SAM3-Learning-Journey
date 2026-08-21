@@ -1,0 +1,7 @@
+tracker_id,first_frame,last_frame,frames_observed,duration_seconds,movement_distance_pixels,average_movement_pixels
+1,1,75,75,5.0,159.26,2.15
+2,1,75,75,5.0,203.37,2.75
+3,3,75,59,3.93,182.36,3.14
+4,8,32,25,1.67,139.34,5.81
+5,29,31,3,0.2,7.91,3.96
+6,53,61,9,0.6,0.94,0.12
