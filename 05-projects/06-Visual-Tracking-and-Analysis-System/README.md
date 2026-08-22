@@ -1242,43 +1242,90 @@ This behavior is documented in greater detail in:
 
 # Key Results
 
-The current verified Project 06 results can be summarized as:
+Project 06 currently contains two real verified recorded-video processing sessions.
+
+## Session 001 — Baseline Verified Run
 
 ```text
-Processed Frames
-75
-
-Recorded Observations
-246
-
-Unique Tracker IDs
-6
-
-Average Observations per Frame
-3.2800
-
-Average Observations per Tracker
-41.0000
-
-Average Confidence
-0.6815
-
-Average Tracker Duration
-2.7333 seconds
-
-Total Movement Distance
-693.18 pixels
-
-Maximum Movement Distance
-203.37 pixels
-
-Average Step Movement
-2.9883 pixels
+Session ID: session_001
+Session Name: SAM3 Verified Video Run
+Processed Frames: 75
+Recorded Observations: 246
+Unique Tracker IDs: 6
+Observations per Frame: 3.2800
+Observations per Tracker: 41.0000
+Average Confidence: 0.6815
+Average Tracker Duration: 2.7333 seconds
+Total Movement Distance: 693.18 pixels
 ```
 
-These results are preserved in CSV reports and exposed through the interactive dashboard.
+Session 001 serves as the historical comparison baseline.
 
 ---
+
+## Session 002 — Busy Street Video Run
+
+A second independent recorded-video experiment was processed through the same Project 06 pipeline using a busy street scene.
+
+```text
+Session ID: session_002
+Session Name: Busy Street Video Run
+Source Media: tracking_test_02.mp4
+Processed Date: 2026-08-22
+Processed Frames: 75
+Recorded Observations: 720
+Unique Tracker IDs: 52
+Observations per Frame: 9.6000
+Observations per Tracker: 13.8462
+Average Confidence: 0.6392
+Average Tracker Duration: 0.4617 seconds
+Total Movement Distance: 6946.85 pixels
+```
+
+The verified H.264 output is preserved as:
+
+[`assets/output/sam3_tracking_output_02.mp4`](./assets/output/sam3_tracking_output_02.mp4)
+
+---
+
+## Verified Session Comparison
+
+The historical comparison pipeline now operates on two real verified processing sessions.
+
+| Metric | Session 001 | Session 002 | Change |
+|---|---:|---:|---:|
+| Processed Frames | 75 | 75 | 0 |
+| Total Observations | 246 | 720 | +474 |
+| Unique Tracker IDs | 6 | 52 | +46 |
+| Observations per Frame | 3.2800 | 9.6000 | +6.3200 |
+| Observations per Tracker | 41.0000 | 13.8462 | -27.1538 |
+| Average Confidence | 0.6815 | 0.6392 | -0.0423 |
+| Average Tracker Duration | 2.7333 s | 0.4617 s | -2.2716 s |
+| Total Movement Distance | 693.18 px | 6946.85 px | +6253.67 px |
+
+Across the same 75-frame processing window, Session 002 produced **474 additional observations** and **46 additional tracker IDs**.
+
+Average confidence decreased slightly by **0.0423**, while total measured image-space movement increased by **6253.67 pixels**.
+
+The substantially larger observation count, tracker population, and movement distance in Session 002 demonstrate how the system behaves when processing a more visually active scene.
+
+These differences also validate the historical analytics architecture: independently processed sessions can now be preserved and compared without rerunning previous inference workloads.
+
+### Comparison Evidence
+
+The verified comparison artifacts are preserved in:
+
+- [`data/session_history.csv`](./data/session_history.csv)
+- [`data/session_002_observations.csv`](./data/session_002_observations.csv)
+- [`reports/session_comparison_summary.csv`](./reports/session_comparison_summary.csv)
+- [`reports/session_comparison_chart.png`](./reports/session_comparison_chart.png)
+- [`reports/tracker_summary_session_002.csv`](./reports/tracker_summary_session_002.csv)
+- [`reports/trajectory_summary_session_002.csv`](./reports/trajectory_summary_session_002.csv)
+
+Both verified sessions are also available through the Streamlit **Session History** interface, where `session_001` and `session_002` can be selected and explored interactively.
+
+---
+
 
 # What This Project Demonstrates
 
