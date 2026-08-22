@@ -14,7 +14,8 @@ The current development milestones include:
 ```text
 Image-Based Integration       Completed
 Recorded-Video Tracking       Completed
-SAM 3 Video Integration       Next Phase
+SAM 3 Video Integration       Completed
+Multi-Session Video Analysis  Completed
 ```
 
 ---
@@ -26,15 +27,17 @@ assets/input/
 │
 ├── README.md
 ├── yolo_bus_test.jpg
-└── tracking_test_01.mp4
+├── tracking_test_01.mp4
+└── tracking_test_02.mp4
 ```
 
-The two current input assets serve different purposes.
+The current input assets serve different purposes.
 
 | Input | Purpose | Status |
 |---|---|---|
 | `yolo_bus_test.jpg` | YOLO + ByteTrack + SAM 3 image integration | Completed |
-| `tracking_test_01.mp4` | YOLO + ByteTrack temporal tracking | Completed |
+| `tracking_test_01.mp4` | Original recorded-video tracking test | Completed |
+| `tracking_test_02.mp4` | Busy-street source video for verified Session 002; used during Colab processing and not committed to the repository | Completed |
 
 ---
 
@@ -621,21 +624,50 @@ These conditions will help evaluate where the system performs well and where it 
 
 ---
 
-# Future Video Inputs
+# Additional Video Inputs
 
-Additional video tests may include:
+The project now contains a second verified recorded-video source:
 
 ```text
 tracking_test_02.mp4
+```
+
+This video was used for:
+
+- verified Session 002 processing
+- YOLO detection
+- ByteTrack multi-object tracking
+- SAM 3 segmentation
+- H.264 annotated video generation
+- tracker-level analytics
+- trajectory analysis
+- session-history registration
+- Session 001 vs Session 002 comparison
+
+The verified Session 002 processing window contains:
+
+```text
+Processed frames: 75
+Recorded observations: 720
+Unique tracker IDs: 52
+Average confidence: 0.6392
+Average tracker duration: 0.4617 seconds
+Total movement distance: 6946.85 pixels
+```
+
+Future video tests may include:
+
+```text
 pedestrian_sequence_01.mp4
 occlusion_test_01.mp4
 movement_test_01.mp4
 low_light_test_01.mp4
 ```
 
-These videos can be used to evaluate increasingly difficult tracking scenarios.
+These future inputs can be used to evaluate increasingly difficult tracking scenarios.
 
 ---
+
 
 # File Organization
 
