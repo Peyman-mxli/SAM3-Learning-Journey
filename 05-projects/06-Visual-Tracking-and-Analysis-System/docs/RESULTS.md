@@ -64,6 +64,70 @@ This video demonstrates the integration of detection, tracking, and SAM 3 segmen
 
 ---
 
+# Verified Session 002 — Busy Street Video Run
+
+A second independent recorded-video experiment was completed on **2026-08-22** using the same Project 06 detection, tracking, segmentation, and analytics architecture.
+
+The source media for this experiment was:
+
+`tracking_test_02.mp4`
+
+The verified browser-compatible H.264 output is:
+
+[`../assets/output/sam3_tracking_output_02.mp4`](../assets/output/sam3_tracking_output_02.mp4)
+
+## Session 002 Results
+
+| Metric | Result |
+|---|---:|
+| Processed frames | 75 |
+| Recorded observations | 720 |
+| Unique tracker IDs | 52 |
+| Observations per frame | 9.6000 |
+| Observations per tracker | 13.8462 |
+| Average confidence | 0.6392 |
+| Average tracker duration | 0.4617 s |
+| Total movement distance | 6946.85 px |
+
+The second session processed the same number of frames as the historical baseline while representing a substantially more active street scene.
+
+---
+
+# Verified Session Comparison
+
+Project 06 now contains **two real verified processing sessions**.
+
+| Metric | Session 001 | Session 002 | Change |
+|---|---:|---:|---:|
+| Processed frames | 75 | 75 | 0 |
+| Total observations | 246 | 720 | +474 |
+| Unique tracker IDs | 6 | 52 | +46 |
+| Observations per frame | 3.2800 | 9.6000 | +6.3200 |
+| Observations per tracker | 41.0000 | 13.8462 | -27.1538 |
+| Average confidence | 0.6815 | 0.6392 | -0.0423 |
+| Average tracker duration | 2.7333 s | 0.4617 s | -2.2716 s |
+| Total movement distance | 693.18 px | 6946.85 px | +6253.67 px |
+
+Compared with Session 001, Session 002 produced **474 additional observations** and **46 additional tracker IDs** across the same 75-frame processing window.
+
+Average confidence decreased from **0.6815** to **0.6392**, while total measured image-space movement increased from **693.18 pixels** to **6946.85 pixels**.
+
+These differences demonstrate how scene complexity and object activity affect the analytical outputs of the tracking system.
+
+## Comparison Evidence
+
+- [`../data/session_history.csv`](../data/session_history.csv)
+- [`../data/session_002_observations.csv`](../data/session_002_observations.csv)
+- [`../reports/session_comparison_summary.csv`](../reports/session_comparison_summary.csv)
+- [`../reports/session_comparison_chart.png`](../reports/session_comparison_chart.png)
+- [`../reports/tracker_summary_session_002.csv`](../reports/tracker_summary_session_002.csv)
+- [`../reports/trajectory_summary_session_002.csv`](../reports/trajectory_summary_session_002.csv)
+
+Both verified sessions can also be explored interactively through the Streamlit **Session History** page.
+
+---
+
+
 # Tracker Results
 
 The tracker-level results are stored in:
