@@ -1,2 +1,3 @@
 session_id,session_name,source_media,processed_date,processed_frames,total_observations,unique_tracker_ids,average_confidence,average_tracker_duration_seconds,total_movement_distance_pixels,status
 session_001,SAM3 Verified Video Run,sam3_tracking_output_01.mp4,2026-08-21,75,246,6,0.6815,2.7333,693.18,verified
+session_002,Busy Street Video Run,tracking_test_02.mp4,2026-08-22,75,720,52,0.6392,0.4617,6946.85,verified
