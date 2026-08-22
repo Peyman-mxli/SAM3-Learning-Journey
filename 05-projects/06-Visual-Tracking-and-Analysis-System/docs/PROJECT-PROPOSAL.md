@@ -2,127 +2,102 @@
 
 ## Origin
 
-This project proposal was generated through the **Computer Vision Laboratory** provided as part of the SAM3 computer vision learning program.
+This project proposal was generated through the **Computer Vision Laboratory** provided as part of the **SAM3 Computer Vision Learning Program**.
 
 The original generated project was titled:
 
 **Sistema de Seguimiento y Análisis Visual**
 
-This document preserves the main objectives, scope, expected results, validation strategy, and portfolio goals from that proposal.
+This document preserves the objectives, scope, expected results, learning goals, validation strategy, MVP requirements, and portfolio evidence defined in the original proposal.
 
 ---
 
-## Project
+# Project
 
-### Visual Tracking and Analysis System
+## Visual Tracking and Analysis System
 
 A computer vision tool designed to detect, segment, and track objects or people in images and recorded video while storing and analyzing historical results.
 
-The project will develop a Python-based processing pipeline integrating computer vision models, object tracking, structured data storage, evaluation, and visualization.
+The project consists of developing a Python-based video-processing pipeline integrating tracking models and databases for querying processing sessions.
 
 ---
 
-## Expected Result
+# Expected Result
 
-The expected result is a:
+The expected result is an:
 
-**Computer Vision Exploration and Evaluation Tool**
+**Exploration and Evaluation Tool**
 
-The final system is intended to combine:
+The proposal defines the expected result as a combination of:
 
 - Digital application
 - Analysis tool
 - Tracking dashboard
-- Historical result storage
-- Computer vision evaluation
 
 ---
 
-## Project Objective
+# Guiding Question
 
-Build an application capable of detecting, tracking, and analyzing the position and movement of entities in video sequences while exporting structured evidence.
-
-The system should support the study of:
-
-- Object detection
-- Segmentation
-- Temporal identity
-- Object tracking
-- Movement
-- Historical observations
-- Model performance
-- Failure cases
+The project is intended to explore how computer vision can be used to detect, track, and analyze entities over time while preserving structured evidence that can later be reviewed and compared.
 
 ---
 
-## Why This Project Fits the Learning Profile
+# Why This Project Fits the Learning Profile
 
-The proposal combines skills and learning areas including:
+The proposal aligns skills in:
 
 - Python
 - Computer vision
-- Artificial intelligence
-- Object detection
-- Object segmentation
-- Object tracking
-- Data analysis
 - Databases
 - Programming
-- Research
-- Cloud computing
-- Application development
 
-The project is designed to transform individual computer vision concepts into a complete reproducible system.
+with the objective of processing recorded videos and structuring the resulting evidence.
 
 ---
 
+# Project Objective
+
+Build an application to detect, track, and analyze the position and movement of entities in video sequences while exporting structured evidence.
+
+---
+
+# Learning and Evidence
+
 ## Learning Objectives
 
-The project provides opportunities to learn and demonstrate:
+The proposal identifies the following learning objectives:
 
 - Failure documentation
 - Model evaluation
 - Temporal identity
-- Intersection over Union
+- IoU
 - Dice coefficient
 - Post-processing with Supervision
 - Precision
 - Recall
-- Object tracking
+- Tracking
 - Data visualization
 
 ---
 
-## Evidence of Mastery
+# Evidence of Mastery
 
-The completed project should produce professional evidence including:
+The project should produce:
 
 - Python source code for the processing and tracking pipeline
-- Analysis tool
-- User interface for reviewing results
-- Historical processing records
-- Performance evaluation
-- Documented test cases
-- Failure analysis
-- Exportable metrics
-- Visual evidence
+- Analysis tool and interface for querying results
+- Performance evaluation report under uncontrolled environmental conditions
 
 ---
 
-## Portfolio Evidence
+# Portfolio Evidence
 
-The final portfolio evidence may include:
+The proposed portfolio evidence includes:
 
 - Documented test cases
 - Results explorer
 - Confusion matrix
-- Evaluation metrics
-- Annotated images
-- Tracking videos
-- Segmentation results
-- Failure examples
-- Technical reports
-- Reproducible source code
+- Metrics report
 
 ---
 
@@ -130,53 +105,40 @@ The final portfolio evidence may include:
 
 ## Included in the MVP
 
-The first version should:
+The MVP should:
 
-- Load an image or recorded video
-- Preserve its source information
-- Preserve relevant timestamps
-- Detect visual entities
-- Segment supported entities
-- Track entities across video frames
-- Assign persistent identifiers
-- Store confidence values
-- Store observations
-- Save processing results
+- Load an image or recorded video and preserve its date and source
+- Store identifier, timestamp, media, result, confidence, and notes
 - Query previous observations
-- Compare processing sessions
-- Visualize tracking results
-- Generate structured evidence
-- Document errors and limitations
+- Compare sessions of the same unit
+- Display evolution and evidence in a digital application
+- Provide an analysis tool
+- Provide a tracking dashboard
+- Document errors caused by lighting
+- Document errors caused by scale
+- Document errors caused by occlusion
+- Document errors involving out-of-sample data
 
 ---
 
-## Not Included Initially
+# Not Included Initially
 
-The initial MVP does not require:
+The initial MVP does not include:
 
-- Live camera processing
-- Real-time inference
-- Mobile deployment
-- Edge deployment
-- Embedded systems
-- Automated alerts
+- Threshold-based alerts before metrics and false positives have been validated
+- Live capture as part of the initial MVP
 
-Real-time capture may be evaluated later as an extension after the MVP has been validated.
+Live capture may be evaluated later as an extension.
 
 ---
 
-## Definition of Done
+# Definition of Done
 
-The MVP can be considered complete when it can:
+The project is considered complete when it demonstrates:
 
-1. Process recorded video.
-2. Detect and track entities.
-3. Maintain historical tracking information.
-4. Store observations in a database.
-5. Retrieve previous processing sessions.
-6. Generate visual evidence.
-7. Export relevant performance information.
-8. Produce documented evaluation results.
+- The ability to process recorded videos
+- The ability to register tracking history in the database
+- Generation of exportable reports containing performance metrics for tracked objects
 
 ---
 
@@ -186,67 +148,7 @@ The MVP can be considered complete when it can:
 
 ### Verify Project Feasibility
 
-Begin with a small technical test using:
-
-- 20–50 images
-
-or
-
-- 2–5 short videos
-
-The purpose is to confirm that:
-
-- Media loading works
-- Model inference works
-- Detection conversion works
-- Tracking works
-- Data can be stored
-- Results can be visualized
-
-### Expected Result
-
-A reproducible technical test.
-
----
-
-## 02 — Build
-
-Implement the complete processing workflow.
-
-The initial workflow should:
-
-1. Load an image or recorded video.
-2. Preserve its source information.
-3. Perform computer vision inference.
-4. Track detected entities.
-5. Record timestamps and identifiers.
-6. Store observations.
-7. Query historical results.
-8. Display visual evidence.
-9. Generate analysis information.
-10. Document failures.
-
-### Expected Result
-
-The MVP produces and preserves structured evidence.
-
----
-
-## 03 — Validate
-
-Evaluate where the system works and where it fails.
-
-### Technical Test
-
-Verify:
-
-- Input capture
-- Inference
-- Tracking
-- Storage
-- Visualization
-
-Recommended initial data:
+Begin with a technical test using:
 
 - 20–50 images
 
@@ -256,144 +158,144 @@ or
 
 ### MVP Validation
 
-Expand the evaluation to approximately:
+Use approximately:
 
-- 100–200 observations
+- 100–200 observations under varied conditions
+
+### Custom Training
+
+Custom training is:
+
+**Not required for the first technical test.**
+
+If the base model does not adequately cover the task, this limitation should be documented.
+
+### Expected Result
+
+A reproducible technical test.
+
+---
+
+# 02 — Build
+
+## Implement the End-to-End Workflow
+
+The system should:
+
+1. Load an image or recorded video and preserve its date and source.
+2. Store identifier, timestamp, media, result, confidence, and notes.
+3. Query previous observations.
+4. Compare sessions of the same unit.
+5. Display evolution and evidence in a digital application.
+6. Provide an analysis tool.
+7. Provide a tracking dashboard.
+8. Document errors involving lighting, scale, occlusion, and out-of-sample data.
+
+### Expected Result
+
+The MVP produces and preserves evidence.
+
+---
+
+# 03 — Validate
+
+## Demonstrate Where the System Works and Where It Fails
+
+### MVP Validation
 
 Evaluate:
 
 - False positives
-- Missed detections
-- Tracking stability
-- Identity consistency
-- Segmentation quality
-- Environmental variation
+- Omissions
+- Stability under varied conditions
+
+Recommended validation size:
+
+**100–200 observations under varied conditions.**
 
 ### Custom Training
 
-Custom model training is not required for the first technical test.
+Train or adjust categories and regions not adequately covered by the base model only if necessary.
 
-If the base model does not adequately cover the target objects or environment, custom training or fine-tuning can be considered later.
+Custom training is:
 
-### Expected Result
+**Not required for the first technical test.**
 
-Documented success criteria and failure cases.
+If the base model does not cover the task adequately, this limitation should be documented.
 
----
+### Technical Test
 
-## 04 — Present
+Verify that the following work correctly:
 
-Convert the completed work into professional evidence.
+- Capture
+- Inference
+- Storage
 
-The final presentation should include:
+Recommended technical test:
 
-- Python source code
-- Processing pipeline
-- Tracking implementation
-- Analysis interface
-- Historical result storage
-- Evaluation results
-- Documented experiments
-- Visual examples
-- Failure analysis
-- Reproducible instructions
+- 20–50 images
+
+or
+
+- 2–5 short videos
 
 ### Expected Result
 
-A clear and reproducible portfolio demonstration.
+Documented success criteria and documented errors.
 
 ---
 
-# Evaluation
+# 04 — Present
 
-Potential evaluation metrics include:
+## Convert the Work into Professional Evidence
 
-- Precision
-- Recall
-- Intersection over Union (IoU)
-- Dice coefficient
-- False positives
-- False negatives
-- Tracking consistency
-- Identity stability
-- Processing time
+The final project presentation should include:
 
-The appropriate metrics will depend on the experiment and available ground-truth data.
+- Python source code for the processing and tracking pipeline
+- Analysis tool and interface for querying results
+- Performance evaluation report under uncontrolled environmental conditions
+
+### Expected Result
+
+A clear, understandable, and reproducible demonstration.
 
 ---
 
-# Environmental Testing
+# Resources, Requirements, and Tools
 
-The system should eventually be evaluated under varying conditions including:
+The proposal identifies the following core technologies:
 
-- Lighting changes
-- Object scale
-- Movement
-- Partial occlusion
-- Motion blur
-- Different backgrounds
-- Different camera perspectives
-- Out-of-sample data
-
-The purpose is not only to demonstrate successful results but also to identify system limitations.
+- Supervision
+- YOLO
+- Ultralytics
+- SAM 3
 
 ---
 
 # Responsible Use
 
-The project may involve technologies capable of observing or tracking people.
-
-Development should therefore consider:
-
-- Privacy
-- Appropriate test data
-- Responsible collection of visual material
-- Avoidance of unnecessary personally identifiable information
-- Clear documentation of system limitations
-
-The project is intended primarily for:
-
-- Education
-- Research
-- Computer vision experimentation
-- Model evaluation
-- Portfolio demonstration
+The project should be developed within the limits and responsible-use considerations defined by the learning program, particularly when computer vision is used to observe or track people or other entities.
 
 ---
 
-# Future Development
+# Possible Future Development
 
-After completing and validating the MVP, possible extensions include:
+After completing and validating the MVP, future development may include:
 
-- Real-time video processing
-- Live camera input
-- Advanced SAM3 segmentation
-- Custom model training
-- Automated alerts
-- Cloud deployment
-- REST API integration
-- Multi-camera analysis
-- Advanced trajectory analytics
-- Zone-based analytics
-- Interactive dashboards
-- Mobile or edge deployment
+- Threshold-based alerts after validating metrics and false positives
+- Live capture as a later extension
+
+These capabilities are not part of the initial MVP.
 
 ---
 
-## Related Technologies
+# Program Context
 
-The project may use technologies including:
+This project proposal was generated as part of the **SAM3 Computer Vision Learning Program** involving:
 
-- Python
-- OpenCV
-- Ultralytics
-- YOLO
-- Supervision
-- ByteTrack
-- SAM3
-- NumPy
-- Pandas
-- SQLite
+- Meta
+- CENTRO
+- INFOTEC
 
 ---
 
