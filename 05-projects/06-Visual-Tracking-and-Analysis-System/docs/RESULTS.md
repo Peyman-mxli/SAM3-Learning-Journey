@@ -127,7 +127,6 @@ Both verified sessions can also be explored interactively through the Streamlit 
 
 ---
 
-
 # Tracker Results
 
 The tracker-level results are stored in:
@@ -430,6 +429,218 @@ This provides a compact visual summary of the verified processing run.
 
 ---
 
+# Ground-Truth Segmentation Evaluation
+
+A dedicated ground-truth evaluation was completed to measure SAM 3 `person` segmentation performance against manually annotated reference data.
+
+The evaluation dataset contains:
+
+| Dataset Metric | Result |
+|---|---:|
+| Evaluated images | 20 |
+| Ground-truth person instances | 424 |
+| SAM 3 predicted instances | 472 |
+
+The reference dataset was manually annotated in Roboflow using an **Instance Segmentation** project and exported using **COCO Segmentation** format.
+
+The evaluation runner is:
+
+[`../evaluation/evaluate_ground_truth.py`](../evaluation/evaluate_ground_truth.py)
+
+The verified evaluation outputs are:
+
+- [`../evaluation/evaluation_metrics.csv`](../evaluation/evaluation_metrics.csv)
+- [`../evaluation/evaluation_summary.json`](../evaluation/evaluation_summary.json)
+
+---
+
+## Segmentation Performance
+
+The completed evaluation produced:
+
+| Metric | Result |
+|---|---:|
+| True positives | 381 |
+| False positives | 91 |
+| False negatives / omissions | 43 |
+| Precision | 0.8072 |
+| Recall | 0.8986 |
+| Average IoU | 0.7969 |
+| Average Dice | 0.8829 |
+
+The evaluation achieved higher recall than precision.
+
+A recall of `0.8986` indicates that most manually annotated person instances were successfully matched by the segmentation system.
+
+The precision of `0.8072` reflects the presence of predicted person instances that did not satisfy the evaluation matching requirement.
+
+The average IoU of `0.7969` and average Dice coefficient of `0.8829` indicate substantial overlap between matched SAM 3 predictions and manually annotated reference masks.
+
+---
+
+## False Positives and Omissions
+
+Across the complete 20-image evaluation dataset:
+
+```text
+False positives: 91
+False negatives / omissions: 43
+```
+
+The evaluation therefore provides explicit measurements of both over-detection and missed ground-truth instances rather than relying only on qualitative inspection.
+
+---
+
+## Pixel-Level Confusion Matrix
+
+The evaluation produced the following binary pixel-level confusion-matrix values:
+
+| Pixel Classification | Count |
+|---|---:|
+| True-positive pixels | 1,604,567 |
+| False-positive pixels | 341,396 |
+| False-negative pixels | 229,371 |
+| True-negative pixels | 20,864,666 |
+
+These values compare the union of predicted `person` segmentation masks with the union of manually annotated `person` masks across the complete evaluation dataset.
+
+---
+
+## Evaluation Dataset
+
+The ground-truth dataset contains:
+
+```text
+20 manually annotated images
+424 person annotations
+```
+
+The dataset contains:
+
+```text
+10 frames from Session 001
+10 frames from Session 002
+```
+
+The two sessions represent different levels of visual complexity.
+
+Session 001 contains a relatively sparse street scene.
+
+Session 002 contains a more crowded urban environment with:
+
+- More visible people
+- Greater variation in person scale
+- Greater camera distance
+- Partial visibility
+- Occlusion
+- Crowded regions
+- Complex backgrounds
+
+This provides evaluation evidence under varied real-world visual conditions.
+
+---
+
+## Ground-Truth Data
+
+The manually annotated dataset is stored in:
+
+[`../evaluation/ground_truth/`](../evaluation/ground_truth/)
+
+The Roboflow COCO export is stored in:
+
+[`../evaluation/ground_truth/roboflow_export/`](../evaluation/ground_truth/roboflow_export/)
+
+The primary annotation file is:
+
+[`../evaluation/ground_truth/roboflow_export/_annotations.coco.json`](../evaluation/ground_truth/roboflow_export/_annotations.coco.json)
+
+The COCO export contains:
+
+```text
+Images: 20
+Annotations: 424
+Person annotations: 424
+```
+
+The exported COCO category metadata also contains an unused `object` category.
+
+All real annotations are assigned to:
+
+```text
+person
+```
+
+No annotations are assigned to the unused `object` category.
+
+---
+
+## Evaluation Method
+
+For each evaluation image:
+
+```text
+Ground-Truth Image
+        ↓
+Manual COCO Person Masks
+        ↓
+SAM 3 Person Prediction
+        ↓
+Predicted Segmentation Masks
+        ↓
+Ground Truth vs Prediction
+        ↓
+Instance Matching
+        ↓
+IoU / Dice
+        ↓
+Precision / Recall
+        ↓
+False Positives / Omissions
+        ↓
+Pixel Confusion Matrix
+```
+
+Predicted masks and ground-truth masks were matched using segmentation overlap.
+
+A prediction was considered a matched instance when the mask IoU satisfied the evaluation matching threshold.
+
+The evaluation results were generated through real SAM 3 inference using the existing Project 06 pipeline.
+
+No metric values were manually estimated or invented.
+
+---
+
+## Evaluation Evidence
+
+The evaluation stage produced:
+
+```text
+evaluation/
+│
+├── README.md
+├── evaluate_ground_truth.py
+├── evaluation_metrics.csv
+├── evaluation_summary.json
+│
+└── ground_truth/
+    ├── README.md
+    │
+    └── roboflow_export/
+        ├── README.md
+        ├── _annotations.coco.json
+        └── 20 evaluation images
+```
+
+The per-image results are stored in:
+
+[`../evaluation/evaluation_metrics.csv`](../evaluation/evaluation_metrics.csv)
+
+The overall evaluation summary is stored in:
+
+[`../evaluation/evaluation_summary.json`](../evaluation/evaluation_summary.json)
+
+---
+
 # Processing-Time Results
 
 The performance-analysis module supports:
@@ -466,7 +677,7 @@ using:
 
 # Generated Analytical Reports
 
-Project 06 currently contains the following verified reports:
+Project 06 currently contains the following verified analytical and evaluation outputs:
 
 ```text
 reports/
@@ -483,6 +694,20 @@ reports/
 ├── movement_distance_chart.png
 ├── confidence_chart.png
 └── performance_chart.png
+
+evaluation/
+│
+├── README.md
+├── evaluate_ground_truth.py
+├── evaluation_metrics.csv
+├── evaluation_summary.json
+│
+└── ground_truth/
+    ├── README.md
+    └── roboflow_export/
+        ├── README.md
+        ├── _annotations.coco.json
+        └── 20 evaluation images
 ```
 
 ---
@@ -565,6 +790,12 @@ The final verified tracking video was encoded in H.264 format:
 sam3_tracking_output_01.mp4
 ```
 
+A second verified H.264 output was also generated for Session 002:
+
+```text
+sam3_tracking_output_02.mp4
+```
+
 Using H.264 improves compatibility with:
 
 - GitHub
@@ -573,7 +804,7 @@ Using H.264 improves compatibility with:
 - Documentation platforms
 - Presentation software
 
-This output provides direct visual evidence of the integrated detection, tracking, and segmentation pipeline.
+These outputs provide direct visual evidence of the integrated detection, tracking, and segmentation pipeline.
 
 ---
 
@@ -604,6 +835,20 @@ Performance Summary
   ↓
 Visual Analytics
   ↓
+Historical Session Comparison
+  ↓
+Manual Ground Truth
+  ↓
+SAM 3 Evaluation
+  ↓
+IoU / Dice
+  ↓
+Precision / Recall
+  ↓
+False Positives / Omissions
+  ↓
+Confusion Matrix
+  ↓
 Documented Results
 ```
 
@@ -627,7 +872,18 @@ The verified outputs demonstrate that Project 06 can:
 - Generate reusable CSV reports
 - Produce analytical visualizations
 - Generate system-level performance reports
-- Reuse preserved analytics without rerunning inference
+- Reuse preserved analytics without rerunning previous inference
+- Preserve multiple verified processing sessions
+- Compare historical session results
+- Evaluate SAM 3 predictions against manually annotated ground truth
+- Measure false positives
+- Measure false negatives and omissions
+- Calculate Precision
+- Calculate Recall
+- Calculate IoU
+- Calculate Dice coefficient
+- Produce pixel-level confusion-matrix values
+- Export reproducible evaluation metrics
 
 ---
 
@@ -653,6 +909,18 @@ Confidence Chart                   COMPLETE
 Performance Analysis               COMPLETE
 Performance Summary                COMPLETE
 Performance Chart                  COMPLETE
+Historical Session Comparison      COMPLETE
+Ground-Truth Dataset               COMPLETE
+Manual Person Annotation           COMPLETE
+COCO Segmentation Export           COMPLETE
+SAM 3 Ground-Truth Evaluation      COMPLETE
+Precision Evaluation               COMPLETE
+Recall Evaluation                  COMPLETE
+IoU Evaluation                     COMPLETE
+Dice Evaluation                    COMPLETE
+False Positive Evaluation          COMPLETE
+Omission Evaluation                COMPLETE
+Confusion Matrix                   COMPLETE
 Limitations Documentation          COMPLETE
 Results Documentation              COMPLETE
 ```
@@ -662,12 +930,18 @@ Results Documentation              COMPLETE
 # Related Documentation
 
 - [Project README](../README.md)
+- [Project Proposal](./PROJECT-PROPOSAL.md)
 - [Reports Documentation](../reports/README.md)
 - [Analytics Documentation](../analytics/README.md)
+- [Evaluation Documentation](../evaluation/README.md)
+- [Ground-Truth Documentation](../evaluation/ground_truth/README.md)
 - [System Limitations](./LIMITATIONS.md)
 - [Tracker Summary](../reports/tracker_summary.csv)
 - [Trajectory Summary](../reports/trajectory_summary.csv)
 - [Performance Summary](../reports/performance_summary.csv)
+- [Evaluation Metrics](../evaluation/evaluation_metrics.csv)
+- [Evaluation Summary](../evaluation/evaluation_summary.json)
+- [COCO Ground Truth](../evaluation/ground_truth/roboflow_export/_annotations.coco.json)
 
 ---
 
