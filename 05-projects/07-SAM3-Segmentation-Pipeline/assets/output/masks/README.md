@@ -11,11 +11,29 @@ The selected masks correspond directly to the representative objects stored insi
 ## Selected Masks
 
 - `object_00_mask.png`
+  
+  <img width="1536" height="1024" alt="object_00_mask" src="https://github.com/user-attachments/assets/85598f64-94c4-460c-8117-0820f33ba3b2" />
+
 - `object_01_mask.png`
+
+  <img width="1536" height="1024" alt="object_01_mask" src="https://github.com/user-attachments/assets/65a868f6-c73d-4a51-b4ef-fa77a081ce16" />
+
 - `object_02_mask.png`
+
+<img width="1536" height="1024" alt="object_02_mask" src="https://github.com/user-attachments/assets/00ad36f5-4c50-4a41-94ea-9f55c5068d4d" />
+  
 - `object_04_mask.png`
+  
+<img width="1536" height="1024" alt="object_04_mask" src="https://github.com/user-attachments/assets/31a56d4e-9014-4621-83a3-5cbd2c9ff43b" />
+
 - `object_05_mask.png`
+
+<img width="1536" height="1024" alt="object_05_mask" src="https://github.com/user-attachments/assets/73410475-e37d-48d4-984f-9f382df59a20" />
+
 - `object_17_mask.png`
+  
+<img width="1536" height="1024" alt="object_17_mask" src="https://github.com/user-attachments/assets/8a325b9b-c662-4c82-a267-8c635466273a" />
+
 
 Each mask represents the pixels assigned to a detected object by SAM 3.
 
