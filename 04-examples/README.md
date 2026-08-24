@@ -4,7 +4,7 @@ This directory contains clean, runnable Python examples based on the practical c
 
 Unlike the detailed course notes, these files focus on small, reusable code examples that can be executed and studied independently.
 
-The examples progressively build from basic AI-assisted programming and object detection toward filtering, tracking, spatial analysis, occupancy monitoring, and object counting.
+The examples progressively build from basic AI-assisted programming and object detection toward filtering, tracking, spatial analysis, occupancy monitoring, object counting, and pixel-level segmentation with SAM 3.
 
 ---
 
@@ -221,9 +221,72 @@ Occupancy                Flow
 │                         │
 └────────────┬────────────┘
              ↓
-        Visualization
+         Visualization
              ↓
-        Output Video
+         Output Video
+```
+
+---
+
+### 06 — Segmentation with SAM
+
+[`06-Segmentation-with-SAM/`](./06-Segmentation-with-SAM/)
+
+Examples covering:
+
+- YOLOv8 object detection
+- Bounding-box extraction
+- YOLO bounding boxes as SAM 3 prompts
+- SAM 3 segmentation
+- Pixel-level boolean masks
+- Supervision detections
+- Mask inspection
+- Object pixel counting
+- Image coverage calculations
+- Pixel-level object extraction
+- Mask area vs bounding-box area
+- Base64 mask serialization
+- JSON mask storage
+- Mask reconstruction and validation
+
+The examples demonstrate how object detection can be extended from rectangular bounding boxes to precise pixel-level representations.
+
+The basic segmentation workflow is:
+
+```text
+Input Image
+     ↓
+YOLOv8
+     ↓
+Object Detections
+     ↓
+Bounding Boxes
+     ↓
+SAM 3 Prompts
+     ↓
+Segmentation Masks
+     ↓
+Mask Analysis
+     ↓
+Object Extraction / Serialization
+```
+
+All six Session 06 examples were successfully tested in Google Colab using an NVIDIA T4 GPU.
+
+Validated results included:
+
+```text
+Input image: bus.jpg
+Image shape: (1080, 810, 3)
+
+YOLO detections: 6
+SAM masks generated: 6
+Mask array shape: (6, 1080, 810)
+
+First mask object pixels: 265686
+First mask image coverage: 30.37%
+
+Decoded mask matches original: True
 ```
 
 ---
@@ -351,6 +414,26 @@ Occupancy + Flow
 Annotated Video
 ```
 
+### Segmentation Workflow
+
+```text
+Input Image
+    ↓
+YOLOv8
+    ↓
+Detections
+    ↓
+Bounding Boxes
+    ↓
+SAM 3
+    ↓
+Pixel-Level Masks
+    ↓
+Mask Analysis
+    ↓
+Object Extraction / Serialization
+```
+
 ---
 
 ## Technologies
@@ -362,8 +445,10 @@ Examples in this directory may use:
 - NumPy
 - Matplotlib
 - Ultralytics YOLOv8
+- SAM 3
 - Supervision
 - ByteTrack
+- Base64
 - JSON
 - Google Colab
 
@@ -417,6 +502,16 @@ Examples in this directory may use:
 │   ├── 07-tracking-with-line-zone.py
 │   ├── 08-polygon-and-line-zone.py
 │   └── 09-complete-zones-counting-pipeline.py
+│
+├── 06-Segmentation-with-SAM/
+│   ├── README.md
+│   ├── bus.jpg
+│   ├── 01_yolo_detection.py
+│   ├── 02_sam_bbox_segmentation.py
+│   ├── 03_mask_inspection.py
+│   ├── 04_object_extraction.py
+│   ├── 05_mask_area_comparison.py
+│   └── 06_mask_serialization.py
 │
 └── README.md
 ```
@@ -950,7 +1045,7 @@ Frame 2 → ID 7
 Frame 3 → ID 7
 Frame 4 → ID 7 crosses line
                      ↓
-                 Count Event
+                  Count Event
 ```
 
 ---
@@ -966,15 +1061,15 @@ Uses the same tracked detections for both spatial systems:
 ```text
              Tracked Objects
                    ↓
-          ┌────────┴────────┐
-          ↓                 ↓
-    PolygonZone          LineZone
-          ↓                 ↓
-      Occupancy             Flow
-          │                 │
-          └────────┬────────┘
+           ┌────────┴────────┐
+           ↓                 ↓
+     PolygonZone          LineZone
+           ↓                 ↓
+       Occupancy             Flow
+           │                 │
+           └────────┬────────┘
                    ↓
-              Visualization
+               Visualization
 ```
 
 ---
@@ -1007,9 +1102,9 @@ Occupancy                Flow
 │                         │
 └────────────┬────────────┘
              ↓
-        Annotation
+         Annotation
              ↓
-        Output Video
+         Output Video
 ```
 
 The practical version of this pipeline was tested successfully on:
@@ -1055,6 +1150,300 @@ How many objects PASSED HERE?
 
 ---
 
+# 06 — Segmentation with SAM Examples
+
+The Segmentation with SAM examples extend object detection from bounding boxes into **pixel-level object understanding**.
+
+They progress through:
+
+```text
+01_yolo_detection.py
+        ↓
+02_sam_bbox_segmentation.py
+        ↓
+03_mask_inspection.py
+        ↓
+04_object_extraction.py
+        ↓
+05_mask_area_comparison.py
+        ↓
+06_mask_serialization.py
+```
+
+All six examples were successfully executed and validated in Google Colab.
+
+---
+
+## YOLO Detection
+
+```text
+01_yolo_detection.py
+```
+
+Introduces the detection stage used to generate prompts for SAM 3.
+
+```text
+Input Image
+     ↓
+YOLOv8
+     ↓
+Object Detections
+     ↓
+Bounding Boxes
+     ↓
+SAM 3 Prompts
+```
+
+The validated `bus.jpg` execution produced:
+
+```text
+Detected objects: 6
+
+1 bus
+4 persons
+1 stop sign
+```
+
+---
+
+## SAM Bounding-Box Segmentation
+
+```text
+02_sam_bbox_segmentation.py
+```
+
+Uses the YOLO bounding boxes as prompts for SAM 3.
+
+```text
+YOLO Bounding Boxes
+        ↓
+      SAM 3
+        ↓
+Segmentation Masks
+```
+
+Validated result:
+
+```text
+YOLO detections: 6
+SAM detections: 6
+SAM masks generated: 6
+Mask array shape: (6, 1080, 810)
+```
+
+Every YOLO bounding box successfully produced a SAM 3 segmentation mask.
+
+---
+
+## Mask Inspection
+
+```text
+03_mask_inspection.py
+```
+
+Demonstrates how segmentation masks are represented as boolean NumPy arrays.
+
+```text
+True  → Object Pixel
+False → Background Pixel
+```
+
+Validated first-mask statistics:
+
+```text
+Shape: (1080, 810)
+Data type: bool
+
+Object pixels: 265686
+Background pixels: 609114
+Total pixels: 874800
+
+Image coverage: 30.37%
+```
+
+The complete mask collection had the shape:
+
+```text
+(6, 1080, 810)
+```
+
+representing:
+
+```text
+(number_of_objects, image_height, image_width)
+```
+
+---
+
+## Object Extraction
+
+```text
+04_object_extraction.py
+```
+
+Uses a segmentation mask to isolate an object from the original image.
+
+The core operation is:
+
+```python
+object_image[~mask] = 0
+```
+
+Conceptually:
+
+```text
+Original Image
+      ↓
+SAM 3 Mask
+      ↓
+Remove Background Pixels
+      ↓
+Extracted Object
+```
+
+The validated execution generated:
+
+```text
+extracted_object.png
+```
+
+---
+
+## Mask Area Comparison
+
+```text
+05_mask_area_comparison.py
+```
+
+Compares pixel-level segmentation area with rectangular bounding-box area.
+
+The calculation is:
+
+```text
+Mask / Box Percentage
+        =
+Mask Area / Bounding Box Area × 100
+```
+
+Validated results:
+
+| Object | Class | Mask Area | Bounding Box Area | Mask / Box |
+|---|---|---:|---:|---:|
+| 0 | bus | 265,686 px | 411,059.31 px | 64.63% |
+| 1 | person | 46,648 px | 99,214.33 px | 47.02% |
+| 2 | person | 20,935 px | 67,998.79 px | 30.79% |
+| 3 | person | 32,911 px | 55,768.55 px | 59.01% |
+| 4 | person | 10,715 px | 20,346.07 px | 52.66% |
+| 5 | stop sign | 1,878 px | 2,288.43 px | 82.07% |
+
+This demonstrates how segmentation provides more precise geometric information than bounding boxes alone.
+
+---
+
+## Mask Serialization
+
+```text
+06_mask_serialization.py
+```
+
+Demonstrates how a boolean segmentation mask can be stored in JSON using NumPy packbits and Base64 encoding.
+
+```text
+Boolean Mask
+      ↓
+Flatten
+      ↓
+np.packbits
+      ↓
+Bytes
+      ↓
+Base64
+      ↓
+JSON
+```
+
+The example then reconstructs the mask:
+
+```text
+JSON
+  ↓
+Base64 Decode
+  ↓
+np.frombuffer
+  ↓
+np.unpackbits
+  ↓
+Reshape
+  ↓
+Boolean Mask
+```
+
+Validated serialization statistics:
+
+```text
+Boolean pixels: 874800
+Packed bytes: 109350
+Base64 characters: 145800
+```
+
+Final validation:
+
+```text
+Decoded mask matches original: True
+```
+
+This confirms that the original segmentation mask can be stored and reconstructed without losing mask information.
+
+---
+
+## SAM 3 Model
+
+The SAM 3 model checkpoint is not stored in the GitHub repository because of its large size.
+
+The validated Google Colab environment used:
+
+```text
+/content/drive/MyDrive/SAM3-Models/sam3.pt
+```
+
+Model size:
+
+```text
+3.21 GB
+```
+
+The model is required by examples `02` through `06`.
+
+Example `01_yolo_detection.py` only requires YOLOv8.
+
+---
+
+## Validated Session 06 Environment
+
+The Session 06 examples were tested with:
+
+```text
+Google Colab
+NVIDIA T4 GPU
+Ultralytics
+YOLOv8
+SAM 3
+Supervision
+NumPy
+OpenCV
+```
+
+During SAM 3 inference, Ultralytics automatically adjusted the requested image size:
+
+```text
+imgsz=[1024] must be multiple of max stride 14,
+updating to [1036]
+```
+
+Inference continued normally and all six masks were successfully generated.
+
+---
+
 ## From Examples to Practical Implementations
 
 The repository follows a progressive learning structure.
@@ -1085,6 +1474,24 @@ Tracking + Zones
 PolygonZone + LineZone
           ↓
 Complete Spatial Analytics Pipeline
+```
+
+### Segmentation
+
+```text
+YOLO Detection
+      ↓
+SAM 3 Prompting
+      ↓
+Mask Inspection
+      ↓
+Object Extraction
+      ↓
+Mask Analysis
+      ↓
+Mask Serialization
+      ↓
+Complete Segmentation Practical
 ```
 
 This creates a progression from isolated concepts to complete computer vision systems.
@@ -1125,14 +1532,15 @@ As new SAM3 sessions are completed, additional example directories will be added
 | 03 | Filtering and Manipulating Detections | 5 |
 | 04 | Object Tracking | 9 |
 | 05 | Zones and Counting | 9 |
+| 06 | Segmentation with SAM | 6 |
 
-**Total runnable examples: 38**
+**Total runnable examples: 44**
 
 ---
 
 ## Related Course Material
 
-### Session 06 — Zones and Counting
+### Session 05 — Zones and Counting
 
 Detailed course notes:
 
@@ -1145,6 +1553,26 @@ Practical implementation:
 Class recording:
 
 [Watch — SAM3: Zonas y Conteo | PolygonZone, LineZone y ByteTrack](https://youtu.be/43i0z9b81Z4)
+
+---
+
+### Session 06 — Segmentation with SAM
+
+Detailed course notes:
+
+[`../08-course-notes/06-Segmentation-with-SAM/`](../08-course-notes/06-Segmentation-with-SAM/)
+
+Practical implementation:
+
+[`../08-course-notes/06-Segmentation-with-SAM/practical/`](../08-course-notes/06-Segmentation-with-SAM/practical/)
+
+Code examples:
+
+[`06-Segmentation-with-SAM/`](./06-Segmentation-with-SAM/)
+
+Class recording:
+
+[Watch — SAM3: Segmentation with SAM 3](https://youtu.be/1EYfpSsmHO0)
 
 ---
 
@@ -1196,6 +1624,18 @@ Spatial Zones
 Occupancy + Flow
         ↓
 Spatial Video Analytics
+        ↓
+YOLO Bounding-Box Prompts
+        ↓
+SAM 3 Segmentation
+        ↓
+Pixel-Level Masks
+        ↓
+Mask Analysis
+        ↓
+Object Extraction
+        ↓
+Mask Serialization
 ```
 
 Each new session builds on concepts introduced in previous sessions.
