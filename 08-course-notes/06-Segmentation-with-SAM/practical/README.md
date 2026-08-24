@@ -129,3 +129,20 @@ practical/
 │   ├── input/
 │   └── output/
 └── segmentation_with_sam.py
+
+The input directory stores source media used by the practical.
+
+The output directory stores generated segmentation results.
+
+The Python implementation contains the reproducible version of the workflow demonstrated during the session.
+
+Learning Outcome
+
+After completing this practical, I understand how to connect an object detector with a segmentation model and work directly with pixel-level segmentation data.
+
+The key concept is that YOLO provides the approximate location of an object through a bounding box, while SAM 3 converts that spatial prompt into a much more precise representation of the object's actual shape.
+
+
+Create **only this file for now**.
+
+When it is uploaded to GitHub, send me **`done`** or a screenshot, and we continue to **Step 3**.
