@@ -44,7 +44,8 @@ OUTPUT_DIR = BASE_DIR / "assets" / "output"
 MASKS_DIR = OUTPUT_DIR / "masks"
 EXTRACTED_DIR = OUTPUT_DIR / "extracted_objects"
 
-INPUT_IMAGE = INPUT_DIR / "bus.jpg"
+# Custom Project 07 validation image
+INPUT_IMAGE = INPUT_DIR / "mexicali_bus_scene.png"
 
 YOLO_MODEL = "yolov8n.pt"
 
@@ -82,7 +83,7 @@ EXTRACTED_DIR.mkdir(
 if not INPUT_IMAGE.exists():
     raise FileNotFoundError(
         f"Input image not found: {INPUT_IMAGE}\n"
-        "Place 'bus.jpg' inside assets/input/."
+        "Place 'mexicali_bus_scene.png' inside assets/input/."
     )
 
 
@@ -476,7 +477,7 @@ if not saved:
 
 
 print(
-    f"\nAnnotated segmentation saved to:"
+    "\nAnnotated segmentation saved to:"
 )
 
 print(
@@ -598,10 +599,15 @@ for index in range(
     )
 
 
-    cv2.imwrite(
+    mask_saved = cv2.imwrite(
         str(mask_path),
         mask_image
     )
+
+    if not mask_saved:
+        raise RuntimeError(
+            f"Could not save mask image: {mask_path}"
+        )
 
 
     # --------------------------------------------------------
@@ -627,10 +633,15 @@ for index in range(
     )
 
 
-    cv2.imwrite(
+    extracted_saved = cv2.imwrite(
         str(extracted_path),
         extracted_object
     )
+
+    if not extracted_saved:
+        raise RuntimeError(
+            f"Could not save extracted object: {extracted_path}"
+        )
 
 
     # --------------------------------------------------------
@@ -714,6 +725,16 @@ for index in range(
         f"{mask_to_box_percentage:.2f}%"
     )
 
+    print(
+        f"Mask file: "
+        f"{mask_filename}"
+    )
+
+    print(
+        f"Extracted object: "
+        f"{extracted_filename}"
+    )
+
 
 # ============================================================
 # PREPARE PROJECT SUMMARY
@@ -780,7 +801,7 @@ with open(
 
 
 print(
-    f"\nStructured results saved to:"
+    "\nStructured results saved to:"
 )
 
 print(
@@ -805,7 +826,12 @@ print(
 )
 
 print(
-    f"\nRaw YOLO detections: "
+    f"\nInput image: "
+    f"{INPUT_IMAGE.name}"
+)
+
+print(
+    f"Raw YOLO detections: "
     f"{len(detections)}"
 )
 
@@ -842,4 +868,12 @@ print(
 
 print(
     f"- {object_count} extracted object images"
+)
+
+print(
+    "\nOutput directory:"
+)
+
+print(
+    OUTPUT_DIR
 )
