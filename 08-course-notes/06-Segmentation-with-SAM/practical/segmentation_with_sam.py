@@ -36,7 +36,7 @@ BASE_DIR = Path(__file__).resolve().parent
 INPUT_DIR = BASE_DIR / "assets" / "input"
 OUTPUT_DIR = BASE_DIR / "assets" / "output"
 
-INPUT_IMAGE = INPUT_DIR / "input.jpg"
+INPUT_IMAGE = INPUT_DIR / "bus.jpg"
 
 YOLO_MODEL = "yolov8n.pt"
 SAM_MODEL = "sam3.pt"
@@ -53,7 +53,7 @@ image = cv2.imread(str(INPUT_IMAGE))
 if image is None:
     raise FileNotFoundError(
         f"Input image not found: {INPUT_IMAGE}\n"
-        "Place an image named 'input.jpg' inside assets/input/."
+        "Place an image named 'bus.jpg' inside assets/input/."
     )
 
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
