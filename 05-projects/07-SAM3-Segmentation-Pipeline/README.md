@@ -1,30 +1,31 @@
 # Project 07 — SAM 3 Segmentation Pipeline
 
-This project implements a complete **object detection and pixel-level segmentation pipeline** using **YOLOv8**, **Segment Anything Model 3 (SAM 3)**, **Supervision**, **OpenCV**, and **NumPy**.
+This project implements a complete **multi-object detection and pixel-level segmentation pipeline** using **YOLOv8**, **Segment Anything Model 3 (SAM 3)**, **Supervision**, **OpenCV**, and **NumPy**.
 
 The project builds on the concepts studied in **Session 06 — Segmentation with SAM** and combines them into a reusable Computer Vision application.
 
-Unlike the smaller examples in `04-examples/06-Segmentation-with-SAM/`, this project integrates detection, segmentation, analysis, visualization, object extraction, and structured result export into a single pipeline.
+Unlike the smaller examples in `04-examples/06-Segmentation-with-SAM/`, this project integrates detection, confidence filtering, segmentation, mask analysis, visualization, object extraction, and structured result export into a single validated pipeline.
 
 ---
 
-## Project Objective
+# Project Objective
 
 The objective is to build a reusable system capable of:
 
-1. Loading an input image.
+1. Loading a custom input image.
 2. Detecting multiple objects using YOLOv8.
 3. Converting YOLO predictions into Supervision detections.
 4. Filtering detections using a confidence threshold.
-5. Extracting bounding boxes from the detected objects.
-6. Using those bounding boxes as prompts for SAM 3.
+5. Extracting bounding boxes from accepted detections.
+6. Using YOLO bounding boxes as prompts for SAM 3.
 7. Generating pixel-level segmentation masks.
 8. Analyzing each segmentation mask.
 9. Comparing mask area with bounding-box area.
 10. Extracting individual segmented objects.
-11. Creating a complete annotated segmentation visualization.
-12. Saving structured detection and segmentation information to JSON.
-13. Preserving generated results inside a dedicated output directory.
+11. Exporting individual segmentation masks.
+12. Creating a complete annotated segmentation visualization.
+13. Saving structured detection and segmentation information to JSON.
+14. Preserving representative visual evidence inside the repository.
 
 ---
 
@@ -33,32 +34,37 @@ The objective is to build a reusable system capable of:
 The complete project follows this workflow:
 
 ```text
-Input Image
-     ↓
-YOLOv8
-     ↓
-Object Detection
-     ↓
+Custom Input Image
+        ↓
+      YOLOv8
+        ↓
+ Object Detection
+        ↓
 Confidence Filtering
-     ↓
-Bounding Boxes
-     ↓
-SAM 3 Prompts
-     ↓
-Pixel-Level Segmentation Masks
-     ↓
+        ↓
+ Accepted Objects
+        ↓
+ Bounding Boxes
+        ↓
+ SAM 3 Prompts
+        ↓
+Pixel-Level Masks
+        ↓
 Supervision Detections
-     ↓
+        ↓
 ┌───────────────────────────────┐
 │                               │
 ↓                               ↓
-Mask Analysis             Visualization
+Mask Analysis              Visualization
 │                               │
 ↓                               ↓
 Area Measurements         Annotated Image
 │
 ↓
 Object Extraction
+│
+↓
+Mask Export
 │
 ↓
 Structured Results
@@ -113,6 +119,8 @@ True  → pixel belongs to the object
 False → pixel belongs to the background
 ```
 
+This makes it possible to move from approximate object localization to precise pixel-level segmentation.
+
 ---
 
 # Project Structure
@@ -129,79 +137,87 @@ False → pixel belongs to the background
     ├── README.md
     │
     ├── input/
-    │   └── README.md
+    │   ├── README.md
+    │   └── mexicali_bus_scene.png
     │
     └── output/
-        └── README.md
+        │
+        ├── README.md
+        ├── annotated_segmentation.png
+        ├── segmentation_results.json
+        │
+        ├── extracted_objects/
+        │   ├── README.md
+        │   ├── object_00.png
+        │   ├── object_01.png
+        │   ├── object_02.png
+        │   ├── object_04.png
+        │   ├── object_05.png
+        │   └── object_17.png
+        │
+        └── masks/
+            ├── README.md
+            ├── object_00_mask.png
+            ├── object_01_mask.png
+            ├── object_02_mask.png
+            ├── object_04_mask.png
+            ├── object_05_mask.png
+            └── object_17_mask.png
 ```
 
-After execution, the output directory will also contain generated project results.
+The complete execution generated 25 masks and 25 extracted objects.
 
-Example:
-
-```text
-assets/output/
-│
-├── annotated_segmentation.png
-├── segmentation_results.json
-├── masks/
-│   ├── object_00_mask.png
-│   ├── object_01_mask.png
-│   └── ...
-│
-└── extracted_objects/
-    ├── object_00.png
-    ├── object_01.png
-    └── ...
-```
-
-Generated output files are created by the pipeline and should not replace the original input media.
+A representative subset is preserved in the repository to provide visual evidence without unnecessarily storing every generated image.
 
 ---
 
 # Input
 
-The project accepts an image stored inside:
+The project uses a custom validation scene stored at:
 
 ```text
-assets/input/
+assets/input/mexicali_bus_scene.png
 ```
 
-The initial validation image can be:
+The image contains multiple objects at different positions and scales, including pedestrians, vehicles, and smaller objects.
+
+Validated image resolution:
 
 ```text
-bus.jpg
+1536 × 1024
 ```
 
-This image is useful because it contains multiple detectable objects and allows the complete multi-object segmentation pipeline to be evaluated.
+This provides a more demanding test than the original `bus.jpg` image used during the smaller Session 06 exercises.
+
+The custom scene allows the complete Project 07 pipeline to be evaluated independently.
 
 ---
 
 # Stage 1 — Image Loading
 
-OpenCV loads the source image from the input directory.
+OpenCV loads the custom source image from the input directory.
 
 ```python
 image = cv2.imread(str(INPUT_IMAGE))
 ```
 
-The pipeline verifies that the image exists before continuing.
+The pipeline verifies that the image exists and can be read before continuing.
 
 Conceptually:
 
 ```text
-Input File
-    ↓
-OpenCV
-    ↓
-Image Array
+mexicali_bus_scene.png
+        ↓
+      OpenCV
+        ↓
+   Image Array
 ```
 
 ---
 
 # Stage 2 — YOLOv8 Detection
 
-YOLOv8 performs the initial object detection.
+YOLOv8 performs the initial multi-object detection.
 
 ```text
 Image
@@ -223,7 +239,13 @@ sv.Detections
 
 using Supervision.
 
-This provides a consistent representation for later processing.
+This provides a consistent representation for later filtering, segmentation, annotation, and analysis.
+
+During the validated Project 07 run:
+
+```text
+Raw YOLO detections: 25
+```
 
 ---
 
@@ -231,21 +253,30 @@ This provides a consistent representation for later processing.
 
 Not every model prediction should automatically become a SAM 3 prompt.
 
-The project therefore applies a configurable confidence threshold.
+The project therefore applies a configurable confidence threshold:
+
+```text
+0.25
+```
 
 Conceptually:
 
 ```text
 All YOLO Detections
         ↓
-Confidence Threshold
+Confidence ≥ 0.25
         ↓
 Accepted Detections
 ```
 
-This reduces low-confidence detections before segmentation.
+Validated result:
 
-The threshold is configured inside the project rather than being hard-coded throughout the pipeline.
+```text
+Raw YOLO detections: 25
+Accepted detections: 25
+```
+
+All 25 detections passed the configured threshold during the validated run.
 
 ---
 
@@ -257,42 +288,62 @@ The accepted YOLO bounding boxes are extracted from:
 detections.xyxy
 ```
 
-Each bounding box becomes a SAM 3 prompt.
+Each bounding box becomes a spatial prompt for SAM 3.
 
-Example:
+Conceptually:
 
 ```text
-Object 0
+Accepted YOLO Detection
+          ↓
 [x1, y1, x2, y2]
-
-Object 1
-[x1, y1, x2, y2]
-
-Object 2
-[x1, y1, x2, y2]
+          ↓
+    SAM 3 Prompt
 ```
 
-These prompts connect the object detector with the segmentation model.
+This stage connects object detection with pixel-level segmentation.
+
+During validation:
+
+```text
+25 accepted detections
+        ↓
+25 bounding-box prompts
+```
 
 ---
 
 # Stage 5 — SAM 3 Segmentation
 
-SAM 3 processes the input image using the YOLO bounding boxes.
+SAM 3 processes the same input image using the accepted YOLO bounding boxes.
 
 ```text
 Image
   +
-Bounding Boxes
-      ↓
-    SAM 3
-      ↓
+YOLO Bounding Boxes
+        ↓
+      SAM 3
+        ↓
 Segmentation Masks
 ```
 
-Ideally, each accepted YOLO detection produces a corresponding SAM 3 mask.
+Validated result:
 
-The project verifies that masks are returned before continuing with analysis.
+```text
+SAM masks generated: 25
+Mask array shape: (25, 1024, 1536)
+```
+
+The mask dimensions correspond to the original image dimensions.
+
+Most importantly:
+
+```text
+25 accepted YOLO detections
+            ↓
+25 SAM 3 segmentation masks
+```
+
+Every accepted detection produced a corresponding segmentation mask during the validated run.
 
 ---
 
@@ -302,12 +353,11 @@ Each segmentation mask is analyzed independently.
 
 Measurements include:
 
-- Mask dimensions
 - Object pixel count
 - Total image pixels
 - Image coverage
 - Bounding-box area
-- Mask area
+- Segmentation-mask area
 - Mask-to-box percentage
 
 For a boolean mask:
@@ -316,11 +366,21 @@ For a boolean mask:
 mask_area = int(mask.sum())
 ```
 
-because every `True` pixel represents one segmented object pixel.
+Every `True` pixel represents one pixel assigned to the segmented object.
+
+The total image size is:
+
+```text
+1024 × 1536
+=
+1,572,864 pixels
+```
+
+This makes it possible to calculate the percentage of the complete image occupied by each segmented object.
 
 ---
 
-# Mask Area vs Bounding-Box Area
+# Mask Area vs. Bounding-Box Area
 
 Bounding-box area is calculated as:
 
@@ -334,23 +394,25 @@ or:
 (x2 - x1) × (y2 - y1)
 ```
 
-Mask coverage inside the bounding box can then be calculated using:
+The relationship between segmentation area and bounding-box area is calculated as:
 
 ```text
-Mask Area
-────────────── × 100
+      Mask Area
+──────────────────── × 100
 Bounding Box Area
 ```
 
-This measurement helps demonstrate the difference between rectangular detection and pixel-level segmentation.
+This measurement demonstrates an important difference between detection and segmentation.
 
-A bounding box may contain substantial background, while the segmentation mask attempts to represent only the object itself.
+A bounding box represents a rectangular region and therefore usually includes background pixels.
+
+A segmentation mask attempts to preserve only pixels belonging to the actual object.
 
 ---
 
 # Stage 7 — Object Extraction
 
-The project extracts every segmented object from the original image.
+The project extracts each segmented object from the original image.
 
 The core operation is:
 
@@ -362,111 +424,440 @@ Conceptually:
 
 ```text
 Original Image
+      +
+SAM 3 Mask
       ↓
-Segmentation Mask
+Pixel Selection
       ↓
-Remove Background
+Background Removed
       ↓
 Extracted Object
 ```
 
-Each detected object is saved separately.
+Pixels outside the segmentation mask are set to black.
 
-This provides direct visual evidence of the segmentation result.
+Pixels belonging to the segmented object remain unchanged.
+
+The complete validated run generated:
+
+```text
+25 extracted objects
+```
 
 ---
 
 # Stage 8 — Mask Export
 
-Each segmentation mask is also exported as an image.
+Every segmentation mask generated during execution is exported as an individual image.
 
-This allows the masks to be inspected independently from the original image.
-
-Example:
+Conceptually:
 
 ```text
-object_00_mask.png
-object_01_mask.png
-object_02_mask.png
+Boolean Mask
+     ↓
+0 / 255 Image
+     ↓
+PNG Mask
 ```
 
-These images provide a simple visual representation of the pixel-level predictions generated by SAM 3.
+In the exported images:
+
+```text
+White pixels → segmented object
+Black pixels → background
+```
+
+The complete execution generated:
+
+```text
+25 mask images
+```
+
+A representative subset is stored in the repository.
 
 ---
 
 # Stage 9 — Complete Visualization
 
-The project creates a final visualization containing the detected and segmented objects.
+The project creates a final visualization combining:
 
-The visualization may include:
-
-- Segmentation masks
-- Bounding boxes
-- Class labels
+- SAM 3 segmentation masks
+- YOLO bounding boxes
+- Object classes
 - Confidence scores
 - Object indices
 
-The objective is to create a single output image that summarizes the complete inference result.
+The result is stored at:
 
 ```text
-Original Image
-      ↓
-Masks
-      ↓
-Bounding Boxes
-      ↓
-Labels
-      ↓
-Final Annotated Segmentation
+assets/output/annotated_segmentation.png
 ```
+
+<p align="center">
+  <img src="assets/output/annotated_segmentation.png"
+       alt="Project 07 SAM 3 annotated segmentation result"
+       width="900">
+</p>
+
+The visualization provides a single overview of the complete inference result.
 
 ---
 
 # Stage 10 — Structured JSON Export
 
-The project saves structured information about every processed object.
+The project saves structured information about every analyzed object.
 
-The JSON output contains information such as:
+The output file is:
 
-```json
-{
-    "input_image": "bus.jpg",
-    "objects": [
-        {
-            "object_index": 0,
-            "class_id": 5,
-            "class_name": "bus",
-            "confidence": 0.87,
-            "bounding_box": [
-                22.87,
-                231.27,
-                805.00,
-                756.84
-            ],
-            "mask_area_pixels": 265686,
-            "bounding_box_area_pixels": 411059.31,
-            "mask_to_box_percentage": 64.63
-        }
-    ]
-}
+```text
+assets/output/segmentation_results.json
 ```
 
-The exact values depend on the input image and model inference.
+The JSON stores information including:
+
+```text
+Project name
+Input image
+Image width
+Image height
+Confidence threshold
+Raw YOLO detection count
+Accepted detection count
+SAM mask count
+Analyzed object count
+Annotated output filename
+```
+
+For every object it also stores:
+
+```text
+Object index
+Class ID
+Class name
+Confidence
+Bounding-box coordinates
+Bounding-box area
+Mask area
+Image coverage percentage
+Mask-to-box percentage
+Mask filename
+Extracted-object filename
+```
+
+This makes the segmentation results machine-readable and allows later analysis without repeating model inference.
+
+---
+
+# Final Validation Results
+
+Project 07 was successfully executed and validated using the complete YOLOv8 + SAM 3 pipeline.
+
+## Validation Configuration
+
+```text
+Input image: mexicali_bus_scene.png
+Image resolution: 1536 × 1024
+YOLO model: YOLOv8n
+Confidence threshold: 0.25
+SAM model: SAM 3
+SAM checkpoint: sam3.pt
+```
+
+## Detection and Segmentation Results
+
+```text
+Raw YOLO detections:       25
+Accepted detections:       25
+SAM 3 masks generated:     25
+Objects analyzed:          25
+```
+
+The validated workflow therefore produced:
+
+```text
+25 YOLO detections
+        ↓
+25 accepted detections
+        ↓
+25 bounding-box prompts
+        ↓
+25 SAM 3 masks
+        ↓
+25 analyzed objects
+        ↓
+25 masks exported
+        ↓
+25 objects extracted
+```
+
+This confirms a complete one-to-one relationship between the accepted detections and generated segmentation masks during the validation run.
+
+---
+
+# Detected Object Classes
+
+The custom scene produced detections from multiple object categories, including:
+
+- Person
+- Bus
+- Car
+- Traffic light
+- Backpack
+- Handbag
+
+This makes the scene useful for evaluating segmentation across:
+
+- Different object classes
+- Large and small objects
+- Foreground and background objects
+- Different image positions
+- Different object shapes
+- Different object scales
+
+---
+
+# Bus Segmentation Result
+
+The bus produced one of the strongest and most visually useful results in the validation scene.
+
+```text
+Class: bus
+YOLO confidence: 0.9149
+Mask area: 395,899 pixels
+Image coverage: 25.17%
+Mask / bounding-box area: 75.64%
+```
+
+Conceptually:
+
+```text
+YOLO Detection
+      ↓
+Bus Bounding Box
+      ↓
+SAM 3 Prompt
+      ↓
+Pixel-Level Bus Mask
+      ↓
+Extracted Bus
+```
+
+The result demonstrates why segmentation provides more precise spatial information than object detection alone.
+
+A bounding box contains both object and background pixels, while the SAM 3 mask follows the actual visible object region much more closely.
+
+---
+
+# Representative Extracted Objects
+
+The complete execution generated 25 extracted objects.
+
+A representative subset is stored inside:
+
+```text
+assets/output/extracted_objects/
+```
+
+The selected outputs are:
+
+```text
+object_00.png
+object_01.png
+object_02.png
+object_04.png
+object_05.png
+object_17.png
+```
+
+These examples provide visual evidence across different object positions, classes, and scales.
+
+---
+
+## Object 00
+
+<p align="center">
+  <img src="assets/output/extracted_objects/object_00.png"
+       alt="Project 07 extracted object 00"
+       width="650">
+</p>
+
+---
+
+## Object 01
+
+<p align="center">
+  <img src="assets/output/extracted_objects/object_01.png"
+       alt="Project 07 extracted object 01"
+       width="650">
+</p>
+
+---
+
+## Object 02 — Bus
+
+<p align="center">
+  <img src="assets/output/extracted_objects/object_02.png"
+       alt="Project 07 extracted bus"
+       width="650">
+</p>
+
+---
+
+## Object 04
+
+<p align="center">
+  <img src="assets/output/extracted_objects/object_04.png"
+       alt="Project 07 extracted object 04"
+       width="650">
+</p>
+
+---
+
+## Object 05
+
+<p align="center">
+  <img src="assets/output/extracted_objects/object_05.png"
+       alt="Project 07 extracted object 05"
+       width="650">
+</p>
+
+---
+
+## Object 17
+
+<p align="center">
+  <img src="assets/output/extracted_objects/object_17.png"
+       alt="Project 07 extracted object 17"
+       width="650">
+</p>
+
+---
+
+# Representative SAM 3 Masks
+
+The corresponding segmentation masks are stored inside:
+
+```text
+assets/output/masks/
+```
+
+The selected masks are:
+
+```text
+object_00_mask.png
+object_01_mask.png
+object_02_mask.png
+object_04_mask.png
+object_05_mask.png
+object_17_mask.png
+```
+
+---
+
+## Object 00 Mask
+
+<p align="center">
+  <img src="assets/output/masks/object_00_mask.png"
+       alt="Project 07 SAM 3 mask object 00"
+       width="650">
+</p>
+
+---
+
+## Object 01 Mask
+
+<p align="center">
+  <img src="assets/output/masks/object_01_mask.png"
+       alt="Project 07 SAM 3 mask object 01"
+       width="650">
+</p>
+
+---
+
+## Object 02 Mask — Bus
+
+<p align="center">
+  <img src="assets/output/masks/object_02_mask.png"
+       alt="Project 07 SAM 3 bus segmentation mask"
+       width="650">
+</p>
+
+---
+
+## Object 04 Mask
+
+<p align="center">
+  <img src="assets/output/masks/object_04_mask.png"
+       alt="Project 07 SAM 3 mask object 04"
+       width="650">
+</p>
+
+---
+
+## Object 05 Mask
+
+<p align="center">
+  <img src="assets/output/masks/object_05_mask.png"
+       alt="Project 07 SAM 3 mask object 05"
+       width="650">
+</p>
+
+---
+
+## Object 17 Mask
+
+<p align="center">
+  <img src="assets/output/masks/object_17_mask.png"
+       alt="Project 07 SAM 3 mask object 17"
+       width="650">
+</p>
+
+---
+
+# Representative Mask-to-Object Relationship
+
+Each stored mask corresponds directly to an extracted object.
+
+```text
+object_00_mask.png → object_00.png
+object_01_mask.png → object_01.png
+object_02_mask.png → object_02.png
+object_04_mask.png → object_04.png
+object_05_mask.png → object_05.png
+object_17_mask.png → object_17.png
+```
+
+The relationship is:
+
+```text
+Original Image
+      +
+SAM 3 Mask
+      ↓
+Pixel Selection
+      ↓
+Extracted Object
+```
+
+This provides direct visual evidence that the exported segmentation masks are being used to isolate objects from the source image.
 
 ---
 
 # Output Organization
 
-Generated files are separated from source media.
+Generated files are separated from the source media.
 
 ```text
 assets/
 │
 ├── input/
-│   └── Original media
+│   └── mexicali_bus_scene.png
 │
 └── output/
-    └── Generated results
+    ├── annotated_segmentation.png
+    ├── segmentation_results.json
+    ├── extracted_objects/
+    └── masks/
 ```
 
 This prevents generated files from overwriting the original input.
@@ -477,6 +868,7 @@ It also improves:
 - Organization
 - Debugging
 - Documentation
+- Result inspection
 - Result comparison
 
 ---
@@ -485,7 +877,7 @@ It also improves:
 
 The SAM 3 checkpoint is intentionally **not stored inside this GitHub repository** because the model file is very large.
 
-The validated course environment stores the checkpoint externally in Google Drive:
+The validated Google Colab environment stores the checkpoint externally in Google Drive:
 
 ```text
 /content/drive/MyDrive/SAM3-Models/sam3.pt
@@ -497,7 +889,7 @@ Approximate model size:
 3.21 GB
 ```
 
-The project will allow the model path to be configured rather than requiring the checkpoint to exist inside the repository.
+The project verifies that the checkpoint exists before attempting segmentation.
 
 ---
 
@@ -519,95 +911,124 @@ The project uses:
 
 ---
 
-# Expected Outputs
+# Validation
 
-A successful project execution should demonstrate:
-
-- YOLOv8 object detection
-- Confidence filtering
-- Multiple detected objects
-- SAM 3 bounding-box prompting
-- Multiple segmentation masks
-- Boolean mask analysis
-- Mask-area calculations
-- Bounding-box-area calculations
-- Mask-to-box comparisons
-- Individual mask exports
-- Individual object extractions
-- Complete segmentation visualization
-- Structured JSON results
-
----
-
-# Validation Plan
-
-The project will be validated step by step.
+The project was validated end-to-end rather than only checking individual code sections.
 
 ## 1. Input Validation
 
-Verify:
+Validated:
 
 ```text
-Input image exists
-Image loads correctly
-Image dimensions are valid
+Input image exists                 ✅
+Image loads correctly              ✅
+Image dimensions are valid         ✅
 ```
+
+---
 
 ## 2. Detection Validation
 
-Verify:
+Validated:
 
 ```text
-YOLO model loads
-Detections are generated
-Confidence filtering works
-Bounding boxes are available
+YOLOv8 model loads                 ✅
+Detections are generated           ✅
+Confidence filtering works         ✅
+Bounding boxes are available       ✅
 ```
+
+Result:
+
+```text
+25 raw detections
+25 accepted detections
+```
+
+---
 
 ## 3. SAM 3 Validation
 
-Verify:
+Validated:
 
 ```text
-SAM 3 checkpoint exists
-SAM 3 loads successfully
-Bounding-box prompts are accepted
-Segmentation masks are generated
+SAM 3 checkpoint exists            ✅
+SAM 3 loads successfully           ✅
+Bounding-box prompts accepted      ✅
+Segmentation masks generated       ✅
 ```
+
+Result:
+
+```text
+25 prompts
+25 segmentation masks
+```
+
+---
 
 ## 4. Mask Validation
 
-Verify:
+Validated:
 
 ```text
-Masks are boolean arrays
-Mask dimensions match the input image
-Object pixels can be counted
-Mask areas can be calculated
+Masks are available                ✅
+Mask dimensions match image        ✅
+Object pixels can be counted       ✅
+Mask areas can be calculated       ✅
+Image coverage can be calculated   ✅
+Mask/box ratio can be calculated   ✅
 ```
+
+Mask array:
+
+```text
+(25, 1024, 1536)
+```
+
+---
 
 ## 5. Export Validation
 
-Verify:
+Validated:
 
 ```text
-Annotated image is generated
-Individual masks are generated
-Extracted objects are generated
-JSON output is generated
+Annotated image generated          ✅
+Individual masks generated         ✅
+Extracted objects generated        ✅
+JSON output generated              ✅
 ```
+
+Complete execution produced:
+
+```text
+1 annotated visualization
+1 structured JSON file
+25 mask images
+25 extracted object images
+```
+
+---
 
 ## 6. Result Validation
 
-Verify that:
+The key relationship was verified:
 
 ```text
-Number of accepted detections
-        ≈
-Number of generated masks
+Accepted YOLO detections
+          =
+Generated SAM 3 masks
+          =
+Analyzed objects
 ```
 
-and that the generated files correctly correspond to the detected objects.
+Validated values:
+
+```text
+25 = 25 = 25
+```
+
+This confirms that every accepted YOLO detection was successfully passed through the SAM 3 segmentation stage during this execution.
 
 ---
 
@@ -638,28 +1059,84 @@ Validated Practical
           ↓
 Project 07
           ↓
+Custom Multi-Object Scene
+          ↓
 Reusable Segmentation Pipeline
 ```
 
-The project therefore represents the integration stage of the Session 06 learning process.
+Project 07 therefore represents the integration stage of the Session 06 learning process.
+
+It is not simply a copy of the Session 06 practical.
+
+The project introduces:
+
+- A different custom input scene
+- A complete reusable pipeline
+- Confidence filtering
+- Multi-object analysis
+- Individual mask export
+- Individual object extraction
+- Structured result storage
+- Representative GitHub evidence
+- End-to-end validation
 
 ---
 
 # Learning Outcomes
 
-After completing this project, I will be able to:
+After completing this project, I can:
 
 - Connect an object detector with a segmentation model.
 - Use YOLO bounding boxes as SAM 3 prompts.
+- Filter detections before segmentation.
 - Generate multiple pixel-level segmentation masks.
 - Work directly with boolean NumPy masks.
 - Measure segmented object geometry.
+- Calculate image coverage.
 - Compare segmentation masks with bounding boxes.
 - Extract individual objects from images.
-- Generate reusable Computer Vision outputs.
+- Export segmentation masks as images.
+- Generate complete annotated visualizations.
 - Export structured segmentation metadata.
-- Organize a complete segmentation application.
+- Organize a reusable Computer Vision application.
 - Validate a multi-stage Computer Vision pipeline.
+- Preserve representative visual evidence for reproducibility and documentation.
+
+---
+
+# Final Outcome
+
+Project 07 successfully demonstrates an end-to-end multi-object segmentation system:
+
+```text
+mexicali_bus_scene.png
+        ↓
+      YOLOv8
+        ↓
+25 Raw Detections
+        ↓
+Confidence Filtering
+        ↓
+25 Accepted Detections
+        ↓
+25 Bounding-Box Prompts
+        ↓
+      SAM 3
+        ↓
+25 Pixel-Level Masks
+        ↓
+Mask Analysis
+        ↓
+25 Mask Exports
+        ↓
+25 Object Extractions
+        ↓
+Annotated Visualization
+        ↓
+Structured JSON Results
+```
+
+The project moves beyond the isolated Session 06 examples by integrating detection, filtering, segmentation, geometric analysis, visualization, object extraction, mask export, and structured result storage into one reproducible pipeline.
 
 ---
 
@@ -668,21 +1145,21 @@ After completing this project, I will be able to:
 ```text
 Project 07 — SAM 3 Segmentation Pipeline
 
-Project structure       🔄 In Progress
-Input handling          ⏳ Pending
-YOLO detection          ⏳ Pending
-Confidence filtering    ⏳ Pending
-SAM 3 integration       ⏳ Pending
-Mask analysis           ⏳ Pending
-Object extraction       ⏳ Pending
-Mask export             ⏳ Pending
-Visualization           ⏳ Pending
-JSON export             ⏳ Pending
-Final validation        ⏳ Pending
-Documentation           🔄 In Progress
+Project structure       ✅ Completed
+Input handling          ✅ Completed
+YOLO detection          ✅ Completed
+Confidence filtering    ✅ Completed
+SAM 3 integration       ✅ Completed
+Mask analysis           ✅ Completed
+Object extraction       ✅ Completed
+Mask export             ✅ Completed
+Visualization           ✅ Completed
+JSON export             ✅ Completed
+Final validation        ✅ Completed
+Documentation           ✅ Completed
 ```
 
-The status will be updated as each component is implemented and validated.
+**Project 07 — SAM 3 Segmentation Pipeline is complete and validated.** ✅
 
 ---
 
