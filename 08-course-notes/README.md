@@ -1,6 +1,6 @@
 # SAM3 Course Notes
 
-This directory contains my organized notes, concepts, practical exercises, notebooks, class recordings, and supporting material from the **SAM3 — Computer Vision with Segment Anything Model 3** course.
+This directory contains my organized notes, concepts, practical exercises, notebooks, class recordings, validated outputs, and supporting material from the **SAM3 — Computer Vision with Segment Anything Model 3** learning journey.
 
 The purpose of this section is to document each course session in a structured way, transforming the original class material into a reusable computer vision learning reference.
 
@@ -16,6 +16,8 @@ The purpose of this section is to document each course session in a structured w
 | 03 | [Filtering and Manipulating Detections](./03-Filtering-and-Manipulating-Detections/) | Completed |
 | 04 | [Object Tracking](./04-Object-Tracking/) | Completed |
 | 05 | [Zones and Counting](./05-Zones-and-Counting/) | Completed |
+| 06 | [Segmentation with SAM](./06-Segmentation-with-SAM/) | Completed |
+| 07 | [Advanced MaskAnnotator and SAM2](./07-Advanced-MaskAnnotator-and-SAM2/) | Completed |
 
 ---
 
@@ -385,7 +387,7 @@ Previous Positions
         ↓
 ● → ● → ● → ●
             ↑
-      Current Position
+       Current Position
 ```
 
 Object trajectories can support applications such as:
@@ -917,8 +919,6 @@ Unlike `PolygonZone.current_count`, these values accumulate as the video is proc
 
 ## PolygonZone vs. LineZone
 
-The fundamental difference between the two systems is:
-
 | Feature | PolygonZone | LineZone |
 |---|---|---|
 | Represents | Area | Boundary |
@@ -1024,15 +1024,15 @@ Conceptually:
 ```text
                Tracked Objects
                      ↓
-            ┌────────┴────────┐
-            ↓                 ↓
-      PolygonZone          LineZone
-            ↓                 ↓
-        Occupancy             Flow
-            │                 │
-            └────────┬────────┘
+             ┌───────┴───────┐
+             ↓               ↓
+       PolygonZone         LineZone
+             ↓               ↓
+         Occupancy           Flow
+             │               │
+             └───────┬───────┘
                      ↓
-                Visualization
+               Visualization
 ```
 
 This allows one video analytics pipeline to measure both:
@@ -1075,9 +1075,9 @@ Occupancy                Flow
 │                         │
 └────────────┬────────────┘
              ↓
-     Supervision Annotators
+      Supervision Annotators
              ↓
-        Output Video
+         Output Video
 ```
 
 This represents an important progression from simple detection toward real-world video analytics.
@@ -1225,532 +1225,1826 @@ Zones and counting can be used for:
 
 ---
 
-# Organization
+# Session 06 — Segmentation with SAM
 
-Each course session may contain:
+[`06-Segmentation-with-SAM/`](./06-Segmentation-with-SAM/)
 
-```text
-session-name/
-│
-├── concepts/
-│   └── Detailed theoretical explanations
-│
-├── practical/
-│   ├── README.md
-│   ├── Practical Python implementations
-│   │
-│   └── assets/
-│       ├── input/
-│       └── output/
-│
-├── course-notebook.ipynb
-│   └── Original Jupyter / Google Colab notebook
-│
-├── CLASS-RECORDING.md
-│   └── Class recording and related information
-│
-└── README.md
-    └── Main session documentation
-```
+This session introduces **pixel-level object segmentation with SAM 3** and extends the previous object-detection workflow from rectangular bounding boxes to precise segmentation masks.
 
-Some earlier sessions use:
+Instead of representing an object only with:
 
 ```text
-practical-exercises/
+Bounding Box
 ```
 
-instead of:
+the segmentation workflow identifies:
 
 ```text
-practical/
+Individual Pixels Belonging to the Object
 ```
 
-The exact structure may vary depending on the material covered during each class.
+The session combines **YOLOv8**, **SAM 3**, **Supervision**, **NumPy**, and **OpenCV** to create a complete detection-to-segmentation pipeline.
+
+Topics include:
+
+- Segment Anything Model
+- SAM 3
+- YOLOv8 + SAM integration
+- Bounding-box prompting
+- Segmentation masks
+- Boolean NumPy masks
+- `sv.Detections`
+- Mask inspection
+- Pixel-level segmentation
+- Mask area
+- Object extraction
+- Bounding-box area vs. mask area
+- Mask serialization
+- `np.packbits`
+- `np.unpackbits`
+- Base64 encoding
+- JSON-compatible mask storage
+- Segmentation visualization
+- Reusable segmentation workflows
 
 ---
 
-# Learning Workflow
+## From Detection to Segmentation
 
-The course material is organized into a progressive learning workflow:
+Previous sessions primarily represented objects using bounding boxes.
+
+For example:
 
 ```text
-Class Session
-      ↓
-Class Recording
-      ↓
-Original Notebook
-      ↓
-Course Notes
-      ↓
-Concept Documentation
-      ↓
-Code Examples
-      ↓
-Practical Exercises
-      ↓
-Testing and Validation
-      ↓
-Complete Projects
+Input Image
+     ↓
+YOLOv8
+     ↓
+Object Detection
+     ↓
+Bounding Box
 ```
 
-This allows the original course material to evolve into a structured and reusable learning resource.
+A bounding box identifies the approximate rectangular region containing an object.
+
+Session 06 extends this workflow:
+
+```text
+Input Image
+     ↓
+YOLOv8
+     ↓
+Bounding Boxes
+     ↓
+SAM 3
+     ↓
+Segmentation Masks
+```
+
+YOLO therefore answers:
+
+```text
+Where is the object approximately?
+```
+
+while SAM provides:
+
+```text
+Which pixels actually belong to the object?
+```
 
 ---
 
-# Course Notes vs. Examples vs. Projects
+## Bounding Boxes as SAM Prompts
 
-The repository separates different types of learning material.
+YOLOv8 first detects the objects in the image.
 
-## Course Notes
+The detection results are converted into:
 
-```text
-08-course-notes/
+```python
+sv.Detections
 ```
 
-Contains:
+The bounding boxes are available through:
 
-- Detailed explanations
-- Concepts
-- Class material
-- Practical exercises
-- Original notebooks
-- Class recordings
-- Practical assets
-- Tested outputs
+```python
+detections.xyxy
+```
 
-## Code Examples
+These boxes can then be used as prompts for SAM 3.
+
+Conceptually:
+
+```text
+YOLO Detection
+      ↓
+Bounding Box
+      ↓
+SAM Prompt
+      ↓
+Segmentation Mask
+```
+
+This creates a useful combination:
+
+```text
+YOLO
+ ↓
+Fast Object Localization
+
+SAM 3
+ ↓
+Precise Pixel Segmentation
+```
+
+---
+
+## Segmentation Masks
+
+A segmentation mask represents the object at pixel level.
+
+Conceptually:
+
+```text
+True  → pixel belongs to the object
+False → pixel belongs to the background
+```
+
+A SAM segmentation mask can therefore be represented as a Boolean NumPy array.
+
+For an image with dimensions:
+
+```text
+1080 × 810
+```
+
+the corresponding mask can have the shape:
+
+```text
+(1080, 810)
+```
+
+Each position in the mask corresponds to a pixel in the original image.
+
+---
+
+## Mask Inspection
+
+Once a segmentation mask has been generated, it can be analyzed as a NumPy data structure.
+
+Useful properties include:
+
+```text
+Mask type
+Mask shape
+Mask dtype
+Unique values
+Object pixels
+Total pixels
+Object coverage
+```
+
+For a Boolean mask:
+
+```python
+mask.sum()
+```
+
+counts the number of pixels belonging to the segmented object.
+
+Conceptually:
+
+```text
+Segmentation Mask
+       ↓
+Count True Pixels
+       ↓
+Object Area in Pixels
+```
+
+This allows segmentation to provide geometric information that cannot be obtained as precisely from a rectangular bounding box.
+
+---
+
+## Object Extraction
+
+A segmentation mask can also be used to isolate the detected object from the original image.
+
+The key operation demonstrated in the session is:
+
+```python
+object_image[~mask] = 0
+```
+
+The inverse mask:
+
+```python
+~mask
+```
+
+selects pixels outside the segmented object.
+
+Those pixels are then set to black.
+
+Conceptually:
+
+```text
+Original Image
+      +
+SAM Mask
+      ↓
+Keep Object Pixels
+      ↓
+Remove Background Pixels
+      ↓
+Extracted Object
+```
+
+This produces a pixel-level extraction rather than a rectangular crop.
+
+---
+
+## Mask Area vs. Bounding-Box Area
+
+The session compares:
+
+```text
+Segmentation Mask Area
+```
+
+with:
+
+```text
+Bounding-Box Area
+```
+
+The bounding-box area can be calculated from:
+
+```text
+width × height
+```
+
+while the mask area is calculated from the number of `True` pixels.
+
+The comparison percentage is:
+
+```python
+percentage = (
+    mask_area
+    / bounding_box_area
+) * 100
+```
+
+This answers:
+
+```text
+How much of the rectangular bounding box
+is actually occupied by the segmented object?
+```
+
+A lower percentage means the bounding box contains more background.
+
+A higher percentage means more of the rectangular region corresponds to the actual segmented object.
+
+---
+
+## Validated Mask Area Comparison
+
+The validated `bus.jpg` experiment produced six objects.
+
+```text
+Object 0
+Class: bus
+Mask area: 265686 px
+Bounding-box area: 411059.31 px
+Mask / box: 64.63%
+
+Object 1
+Class: person
+Mask area: 46648 px
+Bounding-box area: 99214.33 px
+Mask / box: 47.02%
+
+Object 2
+Class: person
+Mask area: 20935 px
+Bounding-box area: 67998.79 px
+Mask / box: 30.79%
+
+Object 3
+Class: person
+Mask area: 32911 px
+Bounding-box area: 55768.55 px
+Mask / box: 59.01%
+
+Object 4
+Class: person
+Mask area: 10715 px
+Bounding-box area: 20346.07 px
+Mask / box: 52.66%
+
+Object 5
+Class: stop sign
+Mask area: 1878 px
+Bounding-box area: 2288.43 px
+Mask / box: 82.07%
+```
+
+This demonstrates that bounding boxes can contain significantly more area than the actual segmented object.
+
+---
+
+## Mask Serialization
+
+Segmentation masks can contain hundreds of thousands or millions of Boolean values.
+
+Storing the complete Boolean array directly in JSON would be inefficient.
+
+The session therefore demonstrates a compact serialization workflow:
+
+```text
+Boolean Mask
+     ↓
+Flatten
+     ↓
+np.packbits()
+     ↓
+Packed Bytes
+     ↓
+Base64 Encoding
+     ↓
+JSON-Compatible String
+```
+
+The encoded data can later be reconstructed:
+
+```text
+Base64 String
+     ↓
+Base64 Decode
+     ↓
+np.frombuffer()
+     ↓
+np.unpackbits()
+     ↓
+Trim Extra Bits
+     ↓
+Reshape
+     ↓
+Original Boolean Mask
+```
+
+---
+
+## Validated Serialization Result
+
+The validated example used a mask with:
+
+```text
+Original mask shape: (1080, 810)
+Original mask dtype: bool
+Object pixels: 265686
+```
+
+The serialization process produced:
+
+```text
+Boolean pixels:     874800
+Packed bytes:       109350
+Base64 characters:  145800
+```
+
+The mask was then decoded.
+
+Validation returned:
+
+```text
+Decoded mask shape: (1080, 810)
+Decoded mask dtype: bool
+
+Decoded mask matches original: True
+```
+
+This confirms that the serialized representation could reconstruct the original segmentation mask correctly.
+
+---
+
+## SAM 3 Image-Size Adjustment
+
+During validated SAM 3 inference, Ultralytics displayed:
+
+```text
+WARNING ⚠️ imgsz=[1024] must be multiple of max stride 14,
+updating to [1036]
+```
+
+This warning did not stop execution.
+
+The requested size:
+
+```text
+1024
+```
+
+was automatically adjusted to:
+
+```text
+1036
+```
+
+and segmentation continued successfully.
+
+---
+
+## Session 06 Code Examples
+
+The lesson concepts were transformed into six focused examples inside:
 
 ```text
 04-examples/
+└── 06-Segmentation-with-SAM/
 ```
 
-Contains small, focused, runnable Python examples demonstrating individual concepts.
-
-The examples currently progress through:
+The examples are:
 
 ```text
-Agentic AI Programming
-        ↓
-Object Detection
-        ↓
-Annotation
-        ↓
-Detection Filtering
-        ↓
-Object Tracking
-        ↓
-Zones and Counting
+01_yolo_detection.py
+02_sam_bbox_segmentation.py
+03_mask_inspection.py
+04_object_extraction.py
+05_mask_area_comparison.py
+06_mask_serialization.py
 ```
 
-## Projects
+The progression is:
 
 ```text
-05-projects/
-```
-
-Contains larger applications that combine multiple concepts into complete computer vision workflows.
-
-The relationship is:
-
-```text
-Course Notes
-     ↓
-Understand the Concept
-     ↓
-Code Examples
-     ↓
-Practice the Concept
-     ↓
-Practical Exercises
-     ↓
-Experiment
-     ↓
-Test and Validate
-     ↓
-Projects
-     ↓
-Build Complete Applications
+YOLO Detection
+      ↓
+SAM Bounding-Box Segmentation
+      ↓
+Mask Inspection
+      ↓
+Object Extraction
+      ↓
+Mask Area Comparison
+      ↓
+Mask Serialization
 ```
 
 ---
 
-# Technologies and Concepts
+## Example 01 — YOLO Detection
 
-The course notes currently cover technologies and concepts including:
+The first example establishes the detection stage.
+
+It demonstrates:
+
+- Loading `bus.jpg`
+- Running YOLOv8
+- Converting predictions into `sv.Detections`
+- Inspecting bounding boxes
+- Inspecting class IDs
+- Inspecting confidence scores
+
+These bounding boxes become the prompts used by SAM 3.
+
+---
+
+## Example 02 — SAM Bounding-Box Segmentation
+
+The second example combines YOLO and SAM.
+
+```text
+bus.jpg
+   ↓
+YOLOv8
+   ↓
+6 Detections
+   ↓
+Bounding Boxes
+   ↓
+SAM 3
+   ↓
+6 Segmentation Masks
+```
+
+This demonstrates how object detection and segmentation can be combined inside the same workflow.
+
+---
+
+## Example 03 — Mask Inspection
+
+The third example focuses on the mask itself.
+
+It demonstrates how to inspect:
+
+- Shape
+- Data type
+- Unique values
+- Object pixels
+- Total pixels
+- Image coverage
+
+The mask is treated as a Boolean NumPy array rather than only as a visualization.
+
+---
+
+## Example 04 — Object Extraction
+
+The fourth example uses a SAM mask to extract an object.
+
+Validated result for the selected object:
+
+```text
+Selected mask shape: (1080, 810)
+Object pixels: 265686
+```
+
+The extraction uses:
+
+```python
+object_image[~mask] = 0
+```
+
+Pixels outside the mask become black while pixels inside the mask remain unchanged.
+
+---
+
+## Example 05 — Mask Area Comparison
+
+The fifth example compares the area of every generated mask with its corresponding YOLO bounding box.
+
+The experiment demonstrates that:
+
+```text
+Bounding Box
+     ↓
+Approximate Rectangular Area
+```
+
+while:
+
+```text
+Segmentation Mask
+     ↓
+Actual Pixel-Level Region
+```
+
+This provides a quantitative demonstration of the additional geometric precision available through segmentation.
+
+---
+
+## Example 06 — Mask Serialization
+
+The sixth example demonstrates storing segmentation masks in a JSON-compatible representation.
+
+The workflow uses:
+
+- `np.packbits`
+- Raw bytes
+- Base64
+- JSON
+- Base64 decoding
+- `np.frombuffer`
+- `np.unpackbits`
+- NumPy reshape
+- `np.array_equal`
+
+The final validation returned:
+
+```text
+Decoded mask matches original: True
+```
+
+---
+
+## SAM 3 Model
+
+The SAM 3 checkpoint is not stored inside the repository because the model file is very large.
+
+The validated Google Colab environment uses:
+
+```text
+/content/drive/MyDrive/SAM3-Models/sam3.pt
+```
+
+This keeps the repository lightweight while allowing the segmentation examples to use the external checkpoint.
+
+---
+
+## Technologies Used
+
+Session 06 uses:
 
 - Python
-- Computer Vision
-- OpenCV
-- NumPy
-- Matplotlib
+- Google Colab
 - Ultralytics
 - YOLOv8
+- SAM 3
 - Supervision
-- `sv.Detections`
-- Object detection
-- Object tracking
-- Multi-object tracking
-- ByteTrack
-- `sv.ByteTrack`
-- `ByteTrackTracker`
-- `tracker_id`
-- Object association
-- Persistent tracking identities
-- Bounding boxes
-- Confidence scores
-- Confidence thresholds
-- Detection labels
-- Tracking labels
-- Boolean masks
-- Detection filtering
-- Class filtering
-- Size filtering
-- Spatial filtering
-- Bounding-box area
-- Bounding-box center calculation
-- Detection merging
-- Non-Maximum Suppression (NMS)
-- Intersection over Union (IoU)
-- Top-N detection selection
-- Supervision Annotators
-- `BoxAnnotator`
-- `LabelAnnotator`
-- `TraceAnnotator`
-- `PolygonZoneAnnotator`
-- `LineZoneAnnotator`
-- Annotation customization
-- Annotation layers
-- Multi-Annotator pipelines
-- Detection post-processing
-- Video processing
-- Frame-by-frame processing
-- Object trajectories
-- Tracking visualization
-- Tracking analytics
-- Spatial video analytics
-- Polygon coordinates
-- Spatial regions
-- `PolygonZone`
-- Polygon occupancy
-- `zone.trigger()`
-- `zone.current_count`
-- Boolean zone masks
-- Zone-based filtering
-- Virtual counting boundaries
-- `sv.Point`
-- `LineZone`
-- Line crossing detection
-- `line_zone.trigger()`
-- `line_zone.in_count`
-- `line_zone.out_count`
-- Directional counting
-- Accumulated crossing counts
-- Occupancy analysis
-- Flow analysis
-- Video export
-- H.264
-- FFmpeg
-- Google Colab
-- AI-assisted programming
-
-As the course progresses, this list will expand toward more advanced computer vision and **Segment Anything Model 3 (SAM3)** workflows.
+- NumPy
+- OpenCV
+- Base64
+- JSON
 
 ---
 
-# Current Progress
+## Session 06 Learning Progression
 
-| # | Course Session | Notes | Concepts | Exercises | Status |
-|---|---|---|---|---|---|
-| 00 | Agentic AI Programming | Completed | Completed | Completed | Completed |
-| 01 | Introduction to Supervision | Completed | Completed | Completed | Completed |
-| 02 | Annotation and Visualization | Completed | Completed | Completed | Completed |
-| 03 | Filtering and Manipulating Detections | Completed | Completed | Completed | Completed |
-| 04 | Object Tracking | Completed | Completed | Completed | Completed |
-| 05 | Zones and Counting | Completed | Completed | Completed | Completed |
-
----
-
-# Progress Overview
+The complete conceptual progression is:
 
 ```text
-00 — Agentic AI Programming                 Completed
-01 — Introduction to Supervision            Completed
-02 — Annotation and Visualization           Completed
-03 — Filtering and Manipulating Detections  Completed
-04 — Object Tracking                        Completed
-05 — Zones and Counting                     Completed
-06 — Next Course Session                    Upcoming
-```
-
-**Completed course sessions: 6**
-
----
-
-# Purpose
-
-The goal of these notes is not only to preserve the course material, but also to document my learning process and build a reusable reference for:
-
-- Computer Vision
-- Supervision
-- YOLO
-- Segment Anything Model 3 (SAM3)
-- AI-assisted development
-- Model inference and evaluation
-- Computer vision pipelines
-- Detection visualization
-- Annotation systems
-- Detection filtering
-- Detection post-processing
-- Non-Maximum Suppression
-- Spatial analysis
-- Object tracking
-- Multi-object tracking
-- Persistent object identities
-- Object trajectories
-- Tracking analytics
-- Video processing
-- Polygon regions
-- Zone-based filtering
-- Occupancy monitoring
-- Line crossing
-- Directional counting
-- Traffic flow analysis
-- Spatial video analytics
-- Practical AI development
-
-Each completed session expands the repository from basic concepts toward complete computer vision applications.
-
----
-
-# Repository Learning Progression
-
-The overall learning progression can now be represented as:
-
-```text
-Agentic AI Programming
-        ↓
-Introduction to Supervision
-        ↓
-Annotation and Visualization
-        ↓
-Filtering and Manipulating Detections
-        ↓
-Object Tracking
-        ↓
-Zones and Counting
-        ↓
-Advanced Computer Vision Concepts
-        ↓
-SAM3 Workflows
-        ↓
-Complete AI Applications
-```
-
-The first six sessions establish an increasingly complete computer vision pipeline:
-
-```text
-AI-Assisted Development
-        ↓
 Object Detection
-        ↓
-Detection Visualization
-        ↓
-Detection Filtering
-        ↓
-Object Tracking
-        ↓
-Persistent Object Identity
-        ↓
-Spatial Zones
-        ↓
-Occupancy + Flow
-        ↓
-Spatial Video Analytics
+       ↓
+Bounding Boxes
+       ↓
+SAM 3 Prompts
+       ↓
+Segmentation Masks
+       ↓
+Boolean Mask Analysis
+       ↓
+Object Extraction
+       ↓
+Geometric Analysis
+       ↓
+Mask Serialization
+```
+
+This creates the foundation required for the advanced mask visualization concepts introduced in Session 07.
+
+---
+
+## Connection to Session 07
+
+Session 06 answers:
+
+```text
+How do I generate and analyze segmentation masks?
+```
+
+Session 07 continues with:
+
+```text
+How do I visualize those masks?
+How do I customize their appearance?
+How do I filter objects before segmentation?
+How do I reuse the segmentation pipeline?
+How can segmentation extend toward video?
+```
+
+Therefore:
+
+```text
+Session 06
+Segmentation with SAM
+       ↓
+Generate + Inspect Masks
+       ↓
+Session 07
+Advanced MaskAnnotator and SAM2
+       ↓
+Visualize + Customize + Reuse Masks
 ```
 
 ---
 
-# From Detection to Spatial Video Analytics
+## Lesson Materials
 
-The course progression now demonstrates how individual computer vision concepts can be connected into a complete system.
+- [Main Lesson Documentation](./06-Segmentation-with-SAM/README.md)
+- [Session 06 Folder](./06-Segmentation-with-SAM/)
+- [Segmentation Code Examples](../04-examples/06-Segmentation-with-SAM/)
+- [Code Examples Documentation](../04-examples/06-Segmentation-with-SAM/README.md)
 
-It begins with detection:
+**Status:** Completed
+
+---
+
+# Session 07 — Advanced MaskAnnotator and SAM2
+
+[`07-Advanced-MaskAnnotator-and-SAM2/`](./07-Advanced-MaskAnnotator-and-SAM2/)
+
+This session continues the segmentation workflow introduced in **Session 06 — Segmentation with SAM**.
+
+The focus moves beyond generating segmentation masks and explores how those masks can be **visualized, customized, filtered, compared, and reused** using Supervision.
+
+The session also introduces the conceptual transition from static image segmentation toward **temporal video segmentation with SAM2**.
+
+Topics include:
+
+- `sv.MaskAnnotator`
+- `sv.BoxAnnotator`
+- Advanced mask visualization
+- Mask opacity
+- Bounding-box and mask composition
+- YOLOv8 + SAM 3 integration
+- Bounding-box prompting
+- `sv.Detections`
+- Detection filtering before SAM
+- Person-only segmentation
+- Selective segmentation
+- Reusable segmentation functions
+- Multiple-image processing
+- Output visualization
+- SAM2 concepts
+- Temporal segmentation
+- Temporal memory
+- Video mask propagation
+
+---
+
+## From Session 06 to Session 07
+
+Session 06 established:
+
+```text
+Input Image
+     ↓
+YOLOv8
+     ↓
+Bounding Boxes
+     ↓
+SAM 3
+     ↓
+Segmentation Masks
+```
+
+Session 07 extends the workflow:
+
+```text
+YOLO Detection
+      ↓
+Bounding Boxes
+      ↓
+SAM 3
+      ↓
+Segmentation Masks
+      ↓
+MaskAnnotator
+      ↓
+Visualization
+      ↓
+Opacity Customization
+      ↓
+Detection Filtering
+      ↓
+Selective Segmentation
+      ↓
+Reusable Pipeline
+```
+
+The progression can be summarized as:
+
+```text
+Session 06
+Generate + Analyze Masks
+        ↓
+Session 07
+Visualize + Customize + Reuse Masks
+```
+
+---
+
+## MaskAnnotator
+
+The main Supervision component introduced in this session is:
+
+```python
+sv.MaskAnnotator()
+```
+
+`MaskAnnotator` overlays segmentation masks on the original image.
+
+Example:
+
+```python
+mask_annotator = sv.MaskAnnotator(
+    opacity=0.6
+)
+```
+
+The annotation operation follows:
+
+```python
+annotated_image = mask_annotator.annotate(
+    scene=image.copy(),
+    detections=sam_detections
+)
+```
+
+Conceptually:
+
+```text
+Original Image
+      +
+SAM Masks
+      ↓
+MaskAnnotator
+      ↓
+Visual Segmentation Result
+```
+
+---
+
+## Mask Opacity
+
+The lesson explores how the `opacity` parameter changes segmentation visualization.
+
+The practical compares:
+
+```text
+0.2
+0.5
+0.9
+```
+
+Conceptually:
+
+```text
+Opacity 0.2
+    ↓
+Transparent Mask
+    ↓
+Original Image Highly Visible
+```
+
+```text
+Opacity 0.5
+    ↓
+Balanced Visualization
+```
+
+```text
+Opacity 0.9
+    ↓
+Strong Mask
+    ↓
+Segmentation Region Highly Visible
+```
+
+The validated comparison is stored as:
+
+[`opacity_comparison.png`](./07-Advanced-MaskAnnotator-and-SAM2/practical/assets/output/opacity_comparison.png)
+
+---
+
+## Combining Masks and Bounding Boxes
+
+`MaskAnnotator` and `BoxAnnotator` can be combined.
+
+The workflow is:
+
+```text
+Original Image
+      ↓
+SAM Masks
+      ↓
+MaskAnnotator
+      ↓
+YOLO Bounding Boxes
+      ↓
+BoxAnnotator
+      ↓
+Combined Visualization
+```
+
+This allows direct comparison between:
+
+```text
+YOLO Bounding Box
+        ↓
+Approximate Rectangular Localization
+```
+
+and:
+
+```text
+SAM Mask
+        ↓
+Pixel-Level Object Region
+```
+
+Validated output:
+
+[`bbox_vs_mask.png`](./07-Advanced-MaskAnnotator-and-SAM2/practical/assets/output/bbox_vs_mask.png)
+
+---
+
+## Filtering Before SAM
+
+The session demonstrates that detections can be filtered **before** segmentation.
+
+For example:
+
+```python
+person_detections = yolo_detections[
+    yolo_detections.class_id == 0
+]
+```
+
+where:
+
+```text
+COCO class 0 = person
+```
+
+The pipeline becomes:
+
+```text
+Input Image
+     ↓
+YOLOv8
+     ↓
+All Detections
+     ↓
+Class Filter
+     ↓
+Person Detections
+     ↓
+SAM 3
+     ↓
+Person Masks
+```
+
+This avoids sending irrelevant detections through the segmentation stage.
+
+---
+
+## Why Selective Segmentation Matters
+
+Instead of:
+
+```text
+Detect Everything
+      ↓
+Segment Everything
+      ↓
+Discard Unwanted Objects
+```
+
+the workflow can use:
+
+```text
+Detect Everything
+      ↓
+Filter
+      ↓
+Segment Relevant Objects
+```
+
+This demonstrates how concepts from **Session 03 — Filtering and Manipulating Detections** can be reused inside a segmentation pipeline.
+
+---
+
+# Session 07 Practical
+
+The complete practical implementation is stored in:
+
+[`07-Advanced-MaskAnnotator-and-SAM2/practical/`](./07-Advanced-MaskAnnotator-and-SAM2/practical/)
+
+Main Python script:
+
+[`advanced_mask_annotator.py`](./07-Advanced-MaskAnnotator-and-SAM2/practical/advanced_mask_annotator.py)
+
+The practical uses two images:
+
+```text
+bus.jpg
+zidane.jpg
+```
+
+Input assets:
+
+[`practical/assets/input/`](./07-Advanced-MaskAnnotator-and-SAM2/practical/assets/input/)
+
+---
+
+## Practical Experiment — bus.jpg
+
+The first image was:
+
+```text
+bus.jpg
+```
+
+Validated image shape:
+
+```text
+(1080, 810, 3)
+```
+
+YOLOv8 detected:
+
+```text
+4 persons
+1 bus
+1 stop sign
+```
+
+Total:
+
+```text
+YOLO detections: 6
+```
+
+The six bounding boxes were supplied to SAM 3.
+
+Validated SAM result:
+
+```text
+SAM masks: 6
+```
+
+Therefore:
+
+```text
+bus.jpg
+   ↓
+YOLOv8
+   ↓
+6 Detections
+   ↓
+6 Bounding-Box Prompts
+   ↓
+SAM 3
+   ↓
+6 Masks
+```
+
+---
+
+## Person-Only Segmentation
+
+The six detections from `bus.jpg` contained:
+
+```text
+4 persons
+```
+
+After filtering:
+
+```text
+Total detections:  6
+Person detections: 4
+```
+
+Only the four person detections were passed to SAM.
+
+The resulting visualization is:
+
+[`person_only_segmentation.png`](./07-Advanced-MaskAnnotator-and-SAM2/practical/assets/output/person_only_segmentation.png)
+
+The validated workflow was:
+
+```text
+6 YOLO Detections
+        ↓
+Person Filter
+        ↓
+4 Person Detections
+        ↓
+SAM 3
+        ↓
+Person Segmentation Masks
+```
+
+---
+
+## Reusable Pipeline — zidane.jpg
+
+The practical then applies the same processing logic to:
+
+```text
+zidane.jpg
+```
+
+YOLOv8 detected:
+
+```text
+2 persons
+1 tie
+```
+
+Total:
+
+```text
+YOLO detections: 3
+```
+
+The same pipeline was reused:
+
+```text
+zidane.jpg
+    ↓
+YOLOv8
+    ↓
+sv.Detections
+    ↓
+Bounding Boxes
+    ↓
+SAM 3
+    ↓
+Segmentation Masks
+    ↓
+MaskAnnotator
+    ↓
+BoxAnnotator
+```
+
+Validated output:
+
+[`second_image_segmentation.png`](./07-Advanced-MaskAnnotator-and-SAM2/practical/assets/output/second_image_segmentation.png)
+
+This confirms that the implementation is reusable and not tied to one input image.
+
+---
+
+## Generated Outputs
+
+The practical successfully generated six visualization files:
+
+```text
+bounding_boxes.png
+segmentation_masks.png
+bbox_vs_mask.png
+opacity_comparison.png
+person_only_segmentation.png
+second_image_segmentation.png
+```
+
+Output directory:
+
+[`practical/assets/output/`](./07-Advanced-MaskAnnotator-and-SAM2/practical/assets/output/)
+
+---
+
+## Validated Practical Results
+
+The final validated results were:
+
+```text
+bus.jpg
+├── YOLO detections: 6
+├── SAM masks: 6
+└── Person detections: 4
+
+zidane.jpg
+└── YOLO detections: 3
+
+Generated visualization outputs: 6
+```
+
+The complete practical finished with:
+
+```text
+Session 07 practical completed.
+```
+
+---
+
+## SAM 3 Image-Size Warning
+
+During SAM 3 inference, Ultralytics displayed:
+
+```text
+WARNING ⚠️ imgsz=[1024] must be multiple of max stride 14,
+updating to [1036]
+```
+
+The warning did not interrupt execution.
+
+SAM automatically adjusted the inference size to:
+
+```text
+1036 × 1036
+```
+
+and segmentation completed successfully.
+
+---
+
+## Reusable Functions
+
+The practical organizes processing into reusable functions including:
+
+```python
+load_image()
+run_yolo()
+run_sam()
+save_image()
+create_bbox_vs_mask()
+create_opacity_comparison()
+save_opacity_figure()
+```
+
+The architecture separates:
+
+```text
+Input
+  ↓
+Detection
+  ↓
+Segmentation
+  ↓
+Visualization
+  ↓
+Output
+```
+
+This makes the implementation easier to maintain and extend.
+
+---
+
+# Introduction to SAM2
+
+The lesson also introduces the conceptual transition toward **SAM2** and temporal segmentation.
+
+Static image segmentation follows:
 
 ```text
 Image
   ↓
-YOLO
+Prompt
   ↓
-Detections
+Segmentation
+  ↓
+Mask
 ```
 
-Then visualization is added:
+Video segmentation introduces a temporal dimension.
 
 ```text
-Detections
-    ↓
-Supervision Annotators
-    ↓
-Visual Output
-```
-
-Filtering makes detections application-specific:
-
-```text
-Raw Detections
+Initial Frame
       ↓
-Confidence
+Object Prompt
       ↓
-Class
+Initial Mask
       ↓
-Size
+Temporal Memory
       ↓
-NMS
+Future Frames
       ↓
-Spatial Filtering
-      ↓
-Relevant Detections
-```
-
-Tracking introduces time:
-
-```text
-Relevant Detections
-        ↓
-ByteTrack
-        ↓
-Persistent tracker_id
-        ↓
-Movement Across Frames
-```
-
-Zones introduce spatial reasoning:
-
-```text
-Tracked Objects
-      ↓
-Spatial Zones
-      ↓
-┌───────────────┐
-↓               ↓
-PolygonZone   LineZone
-↓               ↓
-Occupancy       Flow
-```
-
-Together, these concepts form:
-
-```text
-Detection
-    +
-Visualization
-    +
-Filtering
-    +
-Tracking
-    +
-Spatial Analysis
-    =
-Spatial Video Analytics
+Mask Propagation
 ```
 
 ---
 
-# Current Computer Vision Pipeline
+## Temporal Memory
 
-After completing Zones and Counting, the repository now documents the following end-to-end conceptual pipeline:
+For static images, each image can be processed independently.
+
+For video, information from previous frames can help maintain object segmentation over time.
+
+Conceptually:
 
 ```text
-Real-World Video
+Frame 1
+   ↓
+Object Mask
+   ↓
+Memory
+   ↓
+Frame 2
+   ↓
+Updated Mask
+   ↓
+Memory
+   ↓
+Frame 3
+   ↓
+Updated Mask
+```
+
+The important conceptual progression is:
+
+```text
+Static Segmentation
         ↓
-Frame Extraction
+Spatial Information
+```
+
+to:
+
+```text
+Temporal Segmentation
         ↓
-YOLOv8
+Spatial Information
+        +
+Temporal Information
+```
+
+---
+
+## Mask Propagation
+
+Temporal segmentation allows an initial mask to influence segmentation in future frames.
+
+```text
+Initial Object Prompt
         ↓
-Raw Object Detections
+Initial Mask
         ↓
-sv.Detections
+Temporal Memory
+        ↓
+Next Frame
+        ↓
+Mask Propagation
+        ↓
+Future Frames
+```
+
+This introduces the foundation for persistent object segmentation in video.
+
+---
+
+## Session 07 Learning Outcomes
+
+After completing this session, I understand:
+
+- How `sv.MaskAnnotator` visualizes segmentation masks
+- How mask opacity changes visualization
+- How to combine masks with bounding boxes
+- How YOLO bounding boxes can prompt SAM 3
+- How to filter detections before segmentation
+- How to perform selective class segmentation
+- Why filtering before SAM can avoid unnecessary processing
+- How to reuse a segmentation pipeline on different images
+- How to organize segmentation code into reusable functions
+- How to save and validate segmentation visualizations
+- The difference between static and temporal segmentation
+- The concept of temporal memory
+- The concept of mask propagation across video frames
+
+---
+
+## Lesson Materials
+
+- [Main Lesson Documentation](./07-Advanced-MaskAnnotator-and-SAM2/README.md)
+- [Class Recording Documentation](./07-Advanced-MaskAnnotator-and-SAM2/CLASS-RECORDING.md)
+- [Original Class Notebook](./07-Advanced-MaskAnnotator-and-SAM2/03_b_sam_mask_annotator.ipynb)
+- [Practical Documentation](./07-Advanced-MaskAnnotator-and-SAM2/practical/README.md)
+- [Practical Python Script](./07-Advanced-MaskAnnotator-and-SAM2/practical/advanced_mask_annotator.py)
+- [Input Assets](./07-Advanced-MaskAnnotator-and-SAM2/practical/assets/input/)
+- [Generated Outputs](./07-Advanced-MaskAnnotator-and-SAM2/practical/assets/output/)
+- [Watch the Class Recording on YouTube](https://youtu.be/GNwQl-hy8Yw)
+
+**Status:** Completed
+
+---
+
+# Course Progression
+
+The course notes now document eight completed learning sessions:
+
+```text
+00 — Agentic AI Programming
+        ↓
+01 — Introduction to Supervision
+        ↓
+02 — Annotation and Visualization
+        ↓
+03 — Filtering and Manipulating Detections
+        ↓
+04 — Object Tracking
+        ↓
+05 — Zones and Counting
+        ↓
+06 — Segmentation with SAM
+        ↓
+07 — Advanced MaskAnnotator and SAM2
+```
+
+Each session builds on concepts introduced earlier in the learning journey.
+
+---
+
+# Learning Progression
+
+The technical progression across the completed sessions is:
+
+```text
+AI-Assisted Programming
+        ↓
+Object Detection
+        ↓
+Detection Representation
+        ↓
+Visualization
         ↓
 Detection Filtering
         ↓
-ByteTrack
+Object Tracking
         ↓
-Persistent tracker_id
+Spatial Analytics
         ↓
-Tracked Objects
+Pixel-Level Segmentation
         ↓
-┌──────────────────────────────┐
-│                              │
-↓                              ↓
-PolygonZone                 LineZone
-│                              │
-↓                              ↓
-Current Occupancy          Crossing Events
-│                              │
-└──────────────┬───────────────┘
-               ↓
-       Spatial Analytics
-               ↓
-       Supervision Annotators
-               ↓
-        Processed Video
-               ↓
-     Application-Level Data
+Advanced Mask Visualization
+        ↓
+Selective Segmentation
+        ↓
+Temporal Segmentation Concepts
 ```
 
-This combines the major concepts studied throughout the course so far into a single video-based computer vision architecture.
+This progression moves from basic computer vision inference toward increasingly complete and reusable analysis pipelines.
 
 ---
 
-# Next Learning Direction
+# Computer Vision Pipeline Progression
 
-After completing **Zones and Counting**, the repository has progressed from simple object detection to spatial video analytics.
+The sessions can also be understood as the gradual construction of a larger Computer Vision system.
 
-The next course session can build on the current pipeline:
+```text
+Input Image / Video
+        ↓
+YOLOv8
+        ↓
+Object Detection
+        ↓
+sv.Detections
+        ↓
+Filtering
+        ↓
+Visualization
+        ↓
+ByteTrack
+        ↓
+Persistent Object IDs
+        ↓
+PolygonZone / LineZone
+        ↓
+Spatial Analytics
+        ↓
+SAM 3
+        ↓
+Pixel-Level Segmentation
+        ↓
+MaskAnnotator
+        ↓
+Selective Segmentation
+        ↓
+Reusable Vision Pipelines
+```
+
+The SAM2 concepts introduced in Session 07 extend this progression toward:
+
+```text
+Video Frames
+     ↓
+Initial Segmentation
+     ↓
+Temporal Memory
+     ↓
+Mask Propagation
+     ↓
+Persistent Video Segmentation
+```
+
+---
+
+# Completed Sessions
+
+Current completed course sessions:
+
+```text
+8
+```
+
+Completed:
+
+```text
+00 — Agentic AI Programming
+01 — Introduction to Supervision
+02 — Annotation and Visualization
+03 — Filtering and Manipulating Detections
+04 — Object Tracking
+05 — Zones and Counting
+06 — Segmentation with SAM
+07 — Advanced MaskAnnotator and SAM2
+```
+
+Progress:
+
+```text
+Completed Sessions: 8
+Latest Completed Session: 07 — Advanced MaskAnnotator and SAM2
+```
+
+---
+
+# Practical Work Completed
+
+The course notes include practical implementations covering:
+
+```text
+AI-Assisted Programming
+        ↓
+YOLO Object Detection
+        ↓
+Supervision Detections
+        ↓
+Annotation Pipelines
+        ↓
+Detection Filtering
+        ↓
+ByteTrack Object Tracking
+        ↓
+Object Trajectories
+        ↓
+Polygon Occupancy
+        ↓
+Line Crossing Counts
+        ↓
+YOLO + SAM Segmentation
+        ↓
+Mask Inspection
+        ↓
+Object Extraction
+        ↓
+Mask Area Analysis
+        ↓
+Mask Serialization
+        ↓
+Advanced Mask Visualization
+        ↓
+Opacity Experiments
+        ↓
+Selective Person Segmentation
+        ↓
+Reusable Segmentation Pipelines
+```
+
+---
+
+# Validated Session Results
+
+Several sessions include practical results that were executed and validated.
+
+## Session 04 — Object Tracking
+
+```text
+Input video:
+960 × 540
+30 FPS
+300 frames
+
+Tracking:
+3 moving objects
+Persistent tracker IDs
+
+Validation:
+Google Colab successful
+Final H.264 video generated
+```
+
+---
+
+## Session 05 — Zones and Counting
+
+```text
+Input video:
+3840 × 2160
+25 FPS
+538 frames
+
+Final polygon occupancy: 1
+Crossings Down: 3
+Crossings Up: 3
+Total Crossings: 6
+```
+
+---
+
+## Session 06 — Segmentation with SAM
+
+Validated `bus.jpg` segmentation:
+
+```text
+YOLO detections: 6
+SAM masks generated: 6
+```
+
+Validated selected mask:
+
+```text
+Mask shape: (1080, 810)
+Object pixels: 265686
+```
+
+Validated serialization:
+
+```text
+Boolean pixels: 874800
+Packed bytes: 109350
+Base64 characters: 145800
+
+Decoded mask matches original: True
+```
+
+---
+
+## Session 07 — Advanced MaskAnnotator and SAM2
+
+Validated `bus.jpg` results:
+
+```text
+YOLO detections: 6
+SAM masks: 6
+Person detections: 4
+```
+
+Validated `zidane.jpg` results:
+
+```text
+YOLO detections: 3
+```
+
+Generated outputs:
+
+```text
+bounding_boxes.png
+segmentation_masks.png
+bbox_vs_mask.png
+opacity_comparison.png
+person_only_segmentation.png
+second_image_segmentation.png
+```
+
+Total:
+
+```text
+6 validated visualization outputs
+```
+
+---
+
+# Course Notes Organization
+
+Each course session is documented independently.
+
+Depending on the lesson, a session may contain:
+
+```text
+README.md
+CLASS-RECORDING.md
+Original Course Notebook
+Concept Documentation
+Practical Exercises
+Python Scripts
+Input Assets
+Output Assets
+Validated Results
+```
+
+This structure preserves the original course material while also documenting my own practical implementation and validation work.
+
+---
+
+# Repository Connections
+
+The course notes are connected with other sections of the repository.
+
+```text
+08-course-notes/
+      ↓
+Lesson Documentation
+
+04-examples/
+      ↓
+Small Reusable Code Examples
+
+05-projects/
+      ↓
+Larger Integrated Projects
+
+09-assets/
+      ↓
+Repository Visual Assets
+```
+
+The general learning workflow is:
+
+```text
+Course Lesson
+     ↓
+Concept Understanding
+     ↓
+Focused Code Example
+     ↓
+Practical Exercise
+     ↓
+Integrated Project
+     ↓
+Validation
+     ↓
+Documentation
+```
+
+---
+
+# Technologies Used Across the Course Notes
+
+The completed sessions currently use concepts and tools including:
+
+- Python
+- Google Colab
+- OpenCV
+- NumPy
+- Ultralytics
+- YOLOv8
+- SAM 3
+- Supervision
+- `sv.Detections`
+- `sv.BoxAnnotator`
+- `sv.LabelAnnotator`
+- `sv.TraceAnnotator`
+- `sv.MaskAnnotator`
+- ByteTrack
+- PolygonZone
+- LineZone
+- Matplotlib
+- FFmpeg
+- Base64
+- JSON
+
+The course also introduces concepts related to:
+
+- SAM2
+- Temporal segmentation
+- Temporal memory
+- Mask propagation
+
+---
+
+# Current Learning Status
+
+```text
+SAM3 Computer Vision Learning Journey
+
+Course Sessions Documented: 8
+
+00 Agentic AI Programming                 ✅
+01 Introduction to Supervision            ✅
+02 Annotation and Visualization           ✅
+03 Filtering and Manipulating Detections  ✅
+04 Object Tracking                        ✅
+05 Zones and Counting                     ✅
+06 Segmentation with SAM                  ✅
+07 Advanced MaskAnnotator and SAM2        ✅
+```
+
+The repository currently documents the learning progression through **Session 07 — Advanced MaskAnnotator and SAM2**.
+
+---
+
+# Next Steps
+
+The next course session will be documented when its lesson material is available.
+
+Future work will continue extending the progression from:
 
 ```text
 Detection
     ↓
-Filtering
-    ↓
 Tracking
     ↓
-Persistent IDs
+Spatial Analytics
     ↓
-Spatial Zones
+Segmentation
     ↓
-Occupancy + Crossing Events
+Advanced Mask Visualization
     ↓
-Advanced Computer Vision Analysis
-    ↓
-SAM3 Workflows
+Temporal Segmentation
 ```
 
-Future sessions can extend this foundation with additional computer vision concepts introduced by the course.
-
-The repository will continue to document each new lesson using the same progression:
-
-```text
-Course Material
-      ↓
-Concept Documentation
-      ↓
-Practical Implementation
-      ↓
-Reusable Code Examples
-      ↓
-Testing
-      ↓
-Complete Computer Vision Workflows
-```
+into the next concepts introduced by the SAM3 course.
 
 ---
 
-# Author
+# Purpose of These Notes
 
-**Peyman Miyandashti**
+These notes are designed to serve as:
 
-SAM3 Computer Vision Learning Journey  
-Computer Vision · Artificial Intelligence · Machine Learning
+- A structured record of my SAM3 learning journey
+- A reference for Computer Vision concepts
+- Documentation of practical experiments
+- Evidence of tested implementations
+- A connection between course lessons and larger projects
+- A reusable technical reference for future Computer Vision work
 
-[LinkedIn](https://www.linkedin.com/in/peyman-mxli/) | [GitHub](https://github.com/Peyman-mxli)
+The objective is not only to preserve course material, but to demonstrate the progression from individual concepts toward complete Computer Vision pipelines.
+
+---
+
+# Status
+
+```text
+08-course-notes/
+
+Sessions documented:  8
+Sessions completed:   8
+Latest session:       07 — Advanced MaskAnnotator and SAM2
+
+Status: UP TO DATE ✅
+```
