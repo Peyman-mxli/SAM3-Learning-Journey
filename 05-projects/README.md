@@ -262,6 +262,7 @@ This project demonstrates the progression from raw object detection to a control
 **Status:** Completed, tested successfully in Google Colab, documented, and supported with input/output evidence.
 
 ---
+
 ### 04 — Object Tracking
 
 [`04-Object-Tracking/`](./04-Object-Tracking/)
@@ -672,991 +673,1484 @@ Final Annotated Video
 **Status:** Completed, successfully tested in Google Colab, documented, and supported with real input/output video evidence.
 
 ---
+
 ### 06 — Visual Tracking and Analysis System
 
 [`06-Visual-Tracking-and-Analysis-System/`](./06-Visual-Tracking-and-Analysis-System/)
 
-A complete computer vision system combining **YOLO**, **ByteTrack**, **SAM 3**, **Supervision**, structured persistence, trajectory analytics, session comparison, visualization, an interactive dashboard, and formal ground-truth evaluation.
+A complete computer vision system that combines **object detection, segmentation, multi-object tracking, persistent storage, analytics, evaluation, and visualization**.
 
-Project 06 represents the integration stage of the learning journey.
+This project represents a major progression from the previous projects because it moves beyond a single detection or tracking task and builds a structured visual-analysis system capable of processing media, preserving results, and evaluating model performance.
 
-Instead of focusing on one isolated computer vision technique, the project combines detection, tracking, segmentation, persistence, analytics, evaluation, and presentation into a reproducible end-to-end system.
+The project was developed from the official **Sistema de Seguimiento y Análisis Visual** proposal.
 
-The project:
+The system:
 
-- Processes images and recorded videos
+- Processes images and video
 - Detects objects using YOLO
-- Converts detections into `sv.Detections`
-- Tracks objects using ByteTrack
-- Maintains persistent tracker IDs
-- Integrates SAM 3 segmentation
-- Visualizes segmentation masks
-- Draws bounding boxes and labels
-- Visualizes object trajectories
-- Stores structured observation history
-- Uses SQLite persistence
-- Preserves source and session information
-- Records timestamps and confidence values
-- Stores tracker and class information
-- Generates tracker-level analytics
-- Reconstructs object trajectories
-- Calculates image-space movement
-- Generates analytical CSV reports
-- Generates visual analytics charts
-- Compares recorded processing sessions
-- Provides an interactive results explorer
-- Provides a tracking dashboard
-- Documents system limitations and failure cases
-- Evaluates false positives
-- Evaluates omissions
-- Measures Precision and Recall
-- Measures segmentation IoU
-- Measures Dice coefficient
-- Generates pixel-level confusion-matrix values
-- Uses manually annotated ground-truth data
-- Documents lighting, scale, occlusion, and out-of-sample limitations
+- Segments objects using SAM 3
+- Tracks objects across video frames
+- Assigns persistent tracker IDs
+- Records object observations
+- Calculates tracking duration
+- Calculates trajectory information
+- Measures movement distance
+- Stores structured results
+- Uses SQLite for persistence
+- Generates CSV analytics
+- Produces charts and visualizations
+- Supports historical result analysis
+- Includes a minimal Streamlit interface
+- Includes a manually annotated evaluation dataset
+- Calculates detection and segmentation metrics
+- Documents limitations and evaluation results
 
-### System Pipeline
+---
+
+### System Architecture
 
 ```text
-Image / Recorded Video
-          ↓
-     YOLO Detection
-          ↓
-     sv.Detections
-          ↓
-       ByteTrack
-          ↓
- Persistent Tracker IDs
-          ↓
-   SAM 3 Segmentation
-          ↓
- Visualization / Masks
-          ↓
- Structured Persistence
-          ↓
-   SQLite Observation Data
-          ↓
- Tracker / Trajectory Analytics
-          ↓
-      CSV Reports
-          ↓
- Visual Analytics / Charts
-          ↓
-    Session Comparison
-          ↓
- Interactive Dashboard
-          ↓
- Ground-Truth Evaluation
-```
-
-### Core Technologies
-
-Project 06 integrates:
-
-```text
-Python
-OpenCV
-YOLO / Ultralytics
-Supervision
+Input Media
+    ↓
+Image / Video Processing
+    ↓
+YOLO Detection
+    ↓
+SAM 3 Segmentation
+    ↓
 ByteTrack
+    ↓
+Persistent Tracker IDs
+    ↓
+Observation Records
+    ↓
+SQLite Database
+    ↓
+Analytics Layer
+    ↓
+CSV Reports
+    ↓
+Charts / Visualizations
+    ↓
+Evaluation
+    ↓
+Streamlit Interface
+```
+
+The architecture separates inference, tracking, storage, analytics, evaluation, and presentation into different stages.
+
+---
+
+### Image Processing Pipeline
+
+The image-processing stage demonstrates:
+
+```text
+Input Image
+    ↓
+YOLO Detection
+    ↓
+Bounding Boxes
+    ↓
 SAM 3
-PyTorch
-SQLite
-Pandas
-Matplotlib
-Streamlit
-COCO Segmentation
-Roboflow
+    ↓
+Segmentation Masks
+    ↓
+Structured Results
 ```
 
-### Tracking and Analytics
+This allows detected objects to be represented using both rectangular detections and pixel-level segmentation information.
 
-A verified recorded-video processing run produced:
+---
+
+### Video Tracking Pipeline
+
+The video-processing stage extends the system to temporal analysis.
 
 ```text
-Processed frames: 75
-Recorded observations: 246
-Unique tracker IDs: 6
+Input Video
+    ↓
+Frame Extraction
+    ↓
+YOLO Detection
+    ↓
+ByteTrack
+    ↓
+tracker_id
+    ↓
+SAM 3 Segmentation
+    ↓
+Observation Storage
+    ↓
+Trajectory Analysis
 ```
 
-The tracked objects consisted of:
+Each tracked object can accumulate multiple observations over time.
+
+---
+
+### Tracking Validation
+
+The validated Project 06 tracking video contained:
 
 ```text
-5 person trackers
-1 bus tracker
+Frames: 75
+Object observations: 246
+Tracker IDs: 6
 ```
 
-Verified system-level analytics include:
+The six maintained tracker IDs were:
 
-| Metric | Result |
-|---|---:|
-| Total processed frames | 75 |
-| Total observations | 246 |
-| Unique tracker IDs | 6 |
-| Average observations per frame | 3.2800 |
-| Average observations per tracker | 41.0000 |
-| Minimum tracker observations | 3 |
-| Maximum tracker observations | 75 |
-| Average confidence | 0.6815 |
-| Minimum average confidence | 0.5124 |
-| Maximum average confidence | 0.8587 |
-| Average tracker duration | 2.7333 s |
-| Minimum tracker duration | 0.2000 s |
-| Maximum tracker duration | 5.0000 s |
-| Total movement distance | 693.1800 px |
-| Average movement distance per tracker | 115.5300 px |
-| Maximum movement distance | 203.3700 px |
-| Average step movement | 2.9883 px |
+```text
+1
+2
+3
+4
+5
+6
+```
 
-### Tracker Results
+Tracked classes included:
 
-The verified tracker summary includes:
+```text
+person
+bus
+```
+
+---
+
+### Tracking Analytics
+
+The validated tracking data produced:
+
+```text
+Average observations per frame:   3.2800
+Average observations per tracker: 41.0000
+
+Average confidence:                0.6815
+Minimum confidence:                0.5124
+Maximum confidence:                0.8587
+
+Average tracker duration:          2.7333 seconds
+Minimum tracker duration:          0.20 seconds
+Maximum tracker duration:          5.00 seconds
+
+Total movement distance:           693.18 px
+Average movement per tracker:      115.53 px
+Maximum movement distance:         203.37 px
+
+Average movement step:             2.9883 px
+```
+
+These measurements transform raw tracking observations into quantitative trajectory information.
+
+---
+
+### Tracker Summary
+
+The validated tracker-level results were:
 
 ```text
 Tracker 1
 Class: person
 Frames: 1–75
 Observations: 75
-Duration: 5.00 s
 Average confidence: 0.8385
-Movement: 159.26 px
+Movement distance: 159.26 px
 
 Tracker 2
 Class: person
 Frames: 1–75
 Observations: 75
-Duration: 5.00 s
 Average confidence: 0.8587
-Movement: 203.37 px
+Movement distance: 203.37 px
 
 Tracker 3
 Class: bus
 Frames: 3–75
 Observations: 59
-Duration: 3.93 s
 Average confidence: 0.5939
-Movement: 182.36 px
+Movement distance: 182.36 px
 
 Tracker 4
 Class: person
 Frames: 8–32
 Observations: 25
-Duration: 1.67 s
 Average confidence: 0.7579
-Movement: 139.34 px
+Movement distance: 139.34 px
 
 Tracker 5
 Class: person
 Frames: 29–31
 Observations: 3
-Duration: 0.20 s
 Average confidence: 0.5278
-Movement: 7.91 px
+Movement distance: 7.91 px
 
 Tracker 6
 Class: person
 Frames: 53–61
 Observations: 9
-Duration: 0.60 s
 Average confidence: 0.5124
-Movement: 0.94 px
+Movement distance: 0.94 px
 ```
 
-### Persistent Observation Storage
+This tracker-level analysis provides information about:
 
-Project 06 includes a SQLite persistence architecture.
-
-The database stores processing sessions and individual observations.
-
-Session information includes:
-
-```text
-Session ID
-Source
-Creation timestamp
-Notes
-```
-
-Observation information includes:
-
-```text
-Observation ID
-Session ID
-Frame number
-Timestamp
-Tracker ID
-Class ID
-Class name
-Confidence
-Bounding-box coordinates
-Notes
-```
-
-This satisfies the project's requirement to preserve structured historical tracking evidence rather than limiting results to annotated video output.
-
-### Session Comparison
-
-The project supports comparison between recorded processing sessions.
-
-Historical session data can be used to compare:
-
-- Source media
-- Observation counts
-- Tracker counts
-- Class distribution
+- Observation count
+- Object class
+- Tracking duration
 - Average confidence
-- Movement information
-- Session-level analytical results
-
-This allows Project 06 to move beyond single-run processing and provide historical analysis of previously processed media.
-
-### Analytical Reports
-
-Project 06 generates reusable reports under:
-
-```text
-reports/
-```
-
-Verified analytical outputs include:
-
-```text
-tracker_summary.csv
-trajectory_summary.csv
-performance_summary.csv
-
-trajectory_visualization.png
-tracker_duration_chart.png
-class_observation_chart.png
-movement_distance_chart.png
-confidence_chart.png
-performance_chart.png
-```
-
-The preserved CSV reports allow later analytics to be generated without rerunning the computationally expensive YOLO, ByteTrack, and SAM 3 pipeline.
-
-### Visual Analytics
-
-The generated visual analytics provide different views of system behavior.
-
-They include:
-
-```text
-Trajectory Visualization
-Tracker Duration Analysis
-Class Observation Analysis
-Movement Distance Analysis
-Detection Confidence Analysis
-System Performance Summary
-```
-
-These reports transform raw detection and tracking observations into interpretable project evidence.
-
-### Interactive Application
-
-Project 06 includes an application layer for exploring results.
-
-The interface provides access to:
-
-- Processing results
-- Tracker analytics
-- Confidence analytics
-- Movement analytics
-- Trajectory information
-- Analytical charts
-- Session information
-- Session comparison
-- Historical evidence
-
-This satisfies the project requirement for an analysis tool and tracking dashboard.
+- Approximate movement distance
 
 ---
 
-## Ground-Truth Segmentation Evaluation
+### Persistence Layer
 
-Project 06 includes a dedicated formal evaluation stage using manually annotated ground-truth data.
+Project 06 includes structured result persistence using **SQLite**.
 
-A **Roboflow Instance Segmentation** project was created specifically for evaluation.
+The database stores information associated with processing sessions and computer vision results.
 
-The ground-truth dataset contains:
-
-```text
-20 evaluation images
-424 manually annotated person instances
-```
-
-The images were selected from:
+The persistence design includes support for:
 
 ```text
-Session 001
-Session 002
+Identifier
+Timestamp
+Media information
+Result information
+Confidence
+Notes
 ```
 
-The annotations were exported using:
+This makes it possible to preserve analysis results instead of treating inference as temporary console output.
+
+Conceptually:
 
 ```text
-COCO Segmentation
+Computer Vision Pipeline
+          ↓
+Structured Observation
+          ↓
+SQLite Database
+          ↓
+Historical Analysis
 ```
 
-The evaluation compares SAM 3 `person` segmentation results against the manually annotated reference masks.
+---
 
-### Evaluation Pipeline
+### Analytics Layer
+
+The project contains a dedicated analytics workflow for transforming stored tracking information into interpretable results.
+
+Generated analytics include:
+
+- Tracker summaries
+- Observation statistics
+- Confidence statistics
+- Tracking duration
+- Trajectory measurements
+- Movement-distance measurements
+- CSV reports
+- Performance summaries
+- Visualization charts
+
+The analytics workflow produces files such as:
 
 ```text
-Evaluation Images
-        ↓
-Manual Ground-Truth Masks
-        ↓
-COCO Segmentation Dataset
-        ↓
-Project 06 Pipeline
-        ↓
-SAM 3 Person Segmentation
-        ↓
-Prediction / Ground-Truth Matching
-        ↓
-TP / FP / FN
-        ↓
-Precision / Recall
-        ↓
-IoU / Dice
-        ↓
-Pixel Confusion Matrix
-        ↓
-Evaluation Reports
+performance_summary.csv
+performance_chart.png
 ```
 
-### Ground-Truth Evaluation Results
+This allows tracking results to be inspected outside the raw inference pipeline.
+
+---
+
+### Evaluation Dataset
+
+Project 06 includes a dedicated manually annotated evaluation dataset created using **Roboflow**.
+
+Evaluation configuration:
+
+```text
+Project: Project-06-Evaluation
+Task: Instance Segmentation
+Target class: person
+Images: 20
+```
+
+The evaluation set contains manually reviewed ground-truth annotations.
+
+Total ground-truth instances:
+
+```text
+424
+```
+
+This dataset was used to evaluate the computer vision system against labeled reference data rather than relying only on visual inspection.
+
+---
+
+### Final Evaluation Results
 
 The completed evaluation produced:
 
-| Metric | Result |
-|---|---:|
-| Evaluated images | 20 |
-| Ground-truth person instances | 424 |
-| Predicted instances | 472 |
-| True positives | 381 |
-| False positives | 91 |
-| False negatives / omissions | 43 |
-| Precision | 0.8072 |
-| Recall | 0.8986 |
-| Average IoU | 0.7969 |
-| Average Dice | 0.8829 |
-
-### Pixel-Level Confusion Matrix
-
-The evaluation also produced pixel-level confusion-matrix values:
-
-| Pixel Classification | Count |
-|---|---:|
-| True-positive pixels | 1,604,567 |
-| False-positive pixels | 341,396 |
-| False-negative pixels | 229,371 |
-| True-negative pixels | 20,864,666 |
-
-These values provide quantitative evidence of segmentation agreement and disagreement between SAM 3 predictions and the manually annotated reference masks.
-
-### Evaluation Outputs
-
-The evaluation stage preserves:
-
 ```text
-evaluation/
-│
-├── README.md
-├── evaluate_ground_truth.py
-├── evaluation_metrics.csv
-├── evaluation_summary.json
-│
-└── ground_truth/
-    ├── README.md
-    │
-    └── roboflow_export/
-        ├── README.md
-        ├── _annotations.coco.json
-        └── evaluation images
+Evaluation images: 20
+
+Ground-truth instances: 424
+Predictions:             472
+
+True Positives:          381
+False Positives:          91
+False Negatives:          43
 ```
 
-The evaluation runner can reproduce the metrics from the preserved ground-truth dataset.
-
-### Evaluation Interpretation
-
-The measured results show:
+Detection metrics:
 
 ```text
-Precision:    0.8072
-Recall:       0.8986
+Precision: 0.8072
+Recall:    0.8986
+```
+
+Segmentation metrics:
+
+```text
 Average IoU:  0.7969
 Average Dice: 0.8829
 ```
 
-Recall is higher than precision in the evaluated dataset.
-
-The system successfully matched:
-
-```text
-381 / 424
-```
-
-ground-truth person instances while producing:
-
-```text
-91 false positives
-43 omissions
-```
-
-The results provide formal project-level evidence of model performance without claiming universal accuracy outside the evaluated dataset.
+These results show that the system achieved strong recall while maintaining useful precision and segmentation overlap.
 
 ---
 
-## Environmental Limitations and Failure Cases
+### Evaluation Interpretation
 
-The project explicitly documents failure conditions required by the original project proposal.
+Precision measures how many predicted objects correspond to valid ground-truth objects.
+
+```text
+Precision = TP / (TP + FP)
+```
+
+Validated value:
+
+```text
+0.8072
+```
+
+Recall measures how many ground-truth objects were successfully detected.
+
+```text
+Recall = TP / (TP + FN)
+```
+
+Validated value:
+
+```text
+0.8986
+```
+
+Intersection over Union evaluates segmentation overlap:
+
+```text
+           Intersection
+IoU = ─────────────────────
+           Union
+```
+
+Validated average:
+
+```text
+0.7969
+```
+
+Dice measures similarity between predicted and ground-truth masks:
+
+```text
+             2 × Intersection
+Dice = ─────────────────────────
+        Predicted Area + GT Area
+```
+
+Validated average:
+
+```text
+0.8829
+```
+
+Together, these metrics provide both detection-level and pixel-level evaluation.
+
+---
+
+### Evaluation Summary
+
+The final evaluation can be summarized as:
+
+```text
+20 evaluation images
+        ↓
+424 ground-truth persons
+        ↓
+472 predictions
+        ↓
+381 true positives
+        ↓
+Precision = 0.8072
+Recall    = 0.8986
+        ↓
+Average IoU  = 0.7969
+Average Dice = 0.8829
+```
+
+This moves Project 06 beyond demonstration-only computer vision by providing quantitative ground-truth evaluation.
+
+---
+
+### Limitations
+
+The project explicitly documents limitations affecting real-world computer vision performance.
 
 These include:
 
-### Lighting
+- Lighting conditions
+- Object scale
+- Occlusion
+- Out-of-sample data
+- False-positive detections
+- Omitted objects / false negatives
 
-Prediction reliability may decrease under:
+These limitations are important because model performance depends strongly on scene conditions and data distribution.
 
-```text
-Low illumination
-Strong shadows
-Backlighting
-Overexposure
-Underexposure
-Sudden lighting changes
-Low foreground/background contrast
-```
+Tracking also introduces additional limitations.
 
-### Scale
+A `tracker_id` represents an identity maintained by the tracking algorithm during the observed sequence.
 
-Small or distant people occupy fewer pixels and can be more difficult to:
+It should not be interpreted as a permanent real-world identity.
 
-```text
-Detect
-Track
-Segment
-```
-
-This can lead to missed detections, incomplete masks, and tracker fragmentation.
-
-### Occlusion
-
-Partial or complete occlusion can result in:
-
-```text
-Missing detections
-Incomplete segmentation
-Lost tracks
-Tracker fragmentation
-New tracker IDs
-```
-
-Crowded scenes increase this challenge because people frequently overlap.
-
-### Out-of-Sample Data
-
-Performance on substantially different environments cannot be assumed to equal the measured Project 06 evaluation results.
-
-Potential out-of-sample conditions include:
-
-```text
-Unusual camera viewpoints
-Extreme lighting
-Very different resolutions
-Severe compression
-Extreme crowd density
-Strong motion blur
-Infrared or non-standard imagery
-Environments substantially different from tested scenes
-```
-
-The measured evaluation metrics therefore apply to the Project 06 evaluation dataset and should not be interpreted as guaranteed performance on arbitrary unseen data.
+Objects that disappear, become heavily occluded, or later re-enter the scene may receive different tracker IDs.
 
 ---
 
-## Project 06 Evidence
+### Streamlit Interface
 
-Project 06 preserves implementation, analytics, evaluation, and documentation evidence across its organized directory structure.
+Project 06 also includes a minimal **Streamlit** application.
 
-Major project areas include:
+The interface provides an application layer for exploring the computer vision system rather than interacting only through Python scripts.
+
+Conceptually:
 
 ```text
-06-Visual-Tracking-and-Analysis-System/
-│
-├── analytics/
-├── data/
-├── docs/
-├── evaluation/
-├── notebooks/
-├── reports/
-├── src/
-│
-├── app.py
-├── requirements.txt
-└── README.md
+Computer Vision Pipeline
+          ↓
+Stored Results
+          ↓
+Analytics
+          ↓
+Streamlit
+          ↓
+User Exploration
 ```
 
-The project documentation includes detailed results, limitations, evaluation methodology, architecture, and reproducibility information.
+This demonstrates how computer vision processing can be integrated into a simple interactive application.
+
+---
+
+### Project Documentation
+
+The project contains dedicated documentation for:
+
+```text
+Results
+Limitations
+Analytics
+Evaluation
+```
+
+Important documentation includes:
+
+```text
+docs/RESULTS.md
+docs/LIMITATIONS.md
+```
+
+The documentation records the final validated metrics, project behavior, known limitations, and evaluation conclusions.
+
+---
 
 ### Definition of Done
 
-The original Project 06 proposal defines completion around three primary requirements:
+The official Project 06 MVP was completed.
+
+The final system includes:
 
 ```text
-Process recorded videos
-Register tracking history in the database
-Generate exportable reports containing performance metrics
+Image processing                 ✅
+YOLO object detection            ✅
+SAM 3 segmentation               ✅
+Video processing                 ✅
+ByteTrack tracking               ✅
+Persistent tracker IDs           ✅
+SQLite persistence               ✅
+Tracking analytics               ✅
+Trajectory analysis              ✅
+CSV reports                      ✅
+Charts and visualizations        ✅
+Streamlit interface              ✅
+Ground-truth evaluation          ✅
+Precision / Recall evaluation    ✅
+IoU evaluation                   ✅
+Dice evaluation                  ✅
+Results documentation            ✅
+Limitations documentation        ✅
 ```
-
-The completed implementation demonstrates all three.
-
-The broader MVP also demonstrates:
-
-```text
-Image and recorded-video processing
-Historical observation storage
-Session querying
-Session comparison
-Digital results exploration
-Analysis tooling
-Tracking dashboard
-Environmental failure documentation
-False-positive evaluation
-Omission evaluation
-Ground-truth segmentation evaluation
-```
-
-### Final Project Status
-
-**Status:** Completed.
-
-Project 06 successfully integrates the major concepts developed throughout the earlier projects into a complete computer vision analysis system.
-
-It demonstrates:
-
-```text
-Detection
-    ↓
-Tracking
-    ↓
-Segmentation
-    ↓
-Persistence
-    ↓
-Analytics
-    ↓
-Session Comparison
-    ↓
-Visualization
-    ↓
-Dashboard
-    ↓
-Ground-Truth Evaluation
-    ↓
-Documented Results and Limitations
-```
-
-The official Project 06 MVP requirements and Definition of Done are satisfied.
 
 ---
 
-# Skills Demonstrated
+### Final Outcome
 
-Across the six completed projects, the following computer vision and software-development skills are demonstrated:
+Project 06 demonstrates the transition from isolated computer vision operations into a more complete visual-analysis system.
 
-### Computer Vision
+The complete progression is:
 
-- Object detection
-- Instance segmentation
-- Multi-object tracking
-- Spatial analytics
-- Polygon-zone analysis
-- Line-crossing analysis
-- Trajectory reconstruction
-- Detection filtering
-- Non-Maximum Suppression
+```text
+Input Media
+    ↓
+Detection
+    ↓
+Segmentation
+    ↓
+Tracking
+    ↓
+Persistent Observations
+    ↓
+Database Storage
+    ↓
+Analytics
+    ↓
+Trajectory Analysis
+    ↓
+Visualization
+    ↓
+Ground-Truth Evaluation
+    ↓
+Application Interface
+```
+
+This project combines multiple concepts developed throughout the SAM3 Learning Journey into a single structured system.
+
+**Status:** Completed according to the official MVP / Definition of Done, quantitatively evaluated, documented, and validated.
+
+---
+
+### 07 — SAM 3 Segmentation Pipeline
+
+[`07-SAM3-Segmentation-Pipeline/`](./07-SAM3-Segmentation-Pipeline/)
+
+A complete multi-object detection and pixel-level segmentation pipeline using **YOLOv8**, **SAM 3**, **Supervision**, **OpenCV**, and **NumPy**.
+
+This project extends the concepts studied in **Session 06 — Segmentation with SAM** into a reusable end-to-end application.
+
+Unlike the smaller segmentation examples, Project 07 combines object detection, confidence filtering, SAM 3 prompting, mask generation, geometric analysis, object extraction, visualization, and structured JSON export into a single validated pipeline.
+
+The project:
+
+- Loads a custom multi-object input image
+- Runs YOLOv8 object detection
+- Converts YOLO predictions into `sv.Detections`
+- Applies confidence filtering
+- Extracts accepted bounding boxes
+- Uses YOLO bounding boxes as SAM 3 prompts
+- Generates pixel-level segmentation masks
+- Analyzes every generated mask
+- Calculates mask area
+- Calculates image coverage
+- Calculates bounding-box area
+- Compares mask area with bounding-box area
+- Extracts individual segmented objects
+- Exports individual mask images
+- Generates a complete annotated segmentation visualization
+- Exports structured segmentation results to JSON
+- Preserves representative masks and extracted objects as project evidence
+- Validates the complete detection-to-segmentation workflow
+
+---
+
+### Pipeline
+
+```text
+Custom Input Image
+        ↓
+      YOLOv8
+        ↓
+ Object Detection
+        ↓
+Confidence Filtering
+        ↓
+Accepted Detections
+        ↓
+ Bounding Boxes
+        ↓
+ SAM 3 Prompts
+        ↓
+Pixel-Level Masks
+        ↓
+Mask Analysis
+        ↓
+        ├──────────────────────────┐
+        ↓                          ↓
+Object Extraction            Mask Export
+        │                          │
+        └────────────┬─────────────┘
+                     ↓
+               Visualization
+                     ↓
+              Structured JSON
+```
+
+---
+
+### Custom Validation Scene
+
+Project 07 uses a custom validation image:
+
+```text
+assets/input/mexicali_bus_scene.png
+```
+
+Image resolution:
+
+```text
+1536 × 1024
+```
+
+The scene contains multiple objects at different positions and scales.
+
+Detected object categories during the validated run included:
+
+```text
+Person
+Bus
+Car
+Traffic light
+Backpack
+Handbag
+```
+
+Using a custom scene makes Project 07 independent from the original `bus.jpg` image used in the smaller Session 06 exercises.
+
+---
+
+### Detection Configuration
+
+The validated detection configuration uses:
+
+```text
+Detector: YOLOv8n
+Confidence Threshold: 0.25
+```
+
+YOLO provides:
+
+```text
+Object Class
+Confidence Score
+Bounding Box
+```
+
+The accepted bounding boxes are then passed to SAM 3 as spatial prompts.
+
+---
+
+### YOLO + SAM 3 Integration
+
+The central architecture of Project 07 is:
+
+```text
+YOLOv8
+   ↓
+Object Detection
+   ↓
+Bounding Box
+   ↓
+SAM 3 Prompt
+   ↓
+Pixel-Level Segmentation Mask
+```
+
+YOLO answers approximately:
+
+```text
+What is the object?
+Where is the object?
+```
+
+SAM 3 then provides a more precise pixel-level representation of the detected object.
+
+---
+
+### SAM 3 Model
+
+The SAM 3 checkpoint is stored externally because the model is too large to include directly in the GitHub repository.
+
+Validated Google Colab path:
+
+```text
+/content/drive/MyDrive/SAM3-Models/sam3.pt
+```
+
+Approximate model size:
+
+```text
+3.21 GB
+```
+
+The pipeline verifies that the checkpoint exists before starting SAM 3 inference.
+
+---
+
+### Final Validation Results
+
+Project 07 was successfully executed end-to-end in **Google Colab**.
+
+The validated run produced:
+
+```text
+Raw YOLO detections:       25
+Accepted detections:       25
+SAM 3 masks generated:     25
+Objects analyzed:          25
+```
+
+The complete relationship was:
+
+```text
+25 YOLO detections
+        ↓
+25 accepted detections
+        ↓
+25 bounding-box prompts
+        ↓
+25 SAM 3 masks
+        ↓
+25 analyzed objects
+```
+
+This confirms that every accepted YOLO detection produced a corresponding SAM 3 segmentation result during the validated execution.
+
+---
+
+### Segmentation Mask Representation
+
+SAM 3 masks are represented as boolean NumPy arrays.
+
+```text
+True  → pixel belongs to the object
+False → pixel belongs to the background
+```
+
+For the validated image, the complete mask array had the shape:
+
+```text
+(25, 1024, 1536)
+```
+
+This means:
+
+```text
+25 segmented objects
+1024 image rows
+1536 image columns
+```
+
+The masks therefore preserve pixel-level information at the original image resolution.
+
+---
+
+### Mask Analysis
+
+Each generated mask is analyzed independently.
+
+The project calculates:
+
+- Mask area
+- Bounding-box area
+- Image coverage
+- Mask-to-box percentage
+
+Mask area is calculated from the boolean array:
+
+```python
+mask_area = int(mask.sum())
+```
+
+Bounding-box area is calculated using:
+
+```text
+(x2 - x1) × (y2 - y1)
+```
+
+The mask-to-box relationship is:
+
+```text
+      Mask Area
+──────────────────── × 100
+Bounding Box Area
+```
+
+This demonstrates how much of the rectangular detection region is actually occupied by the segmented object.
+
+---
+
+### Bus Segmentation Result
+
+The bus produced one of the strongest and most visually useful segmentation results.
+
+Validated bus result:
+
+```text
+Class: bus
+YOLO confidence: 0.9149
+Mask area: 395,899 pixels
+Image coverage: 25.17%
+Mask / bounding-box area: 75.64%
+```
+
+Conceptually:
+
+```text
+YOLO Bus Detection
+        ↓
+Bus Bounding Box
+        ↓
+SAM 3 Prompt
+        ↓
+Pixel-Level Bus Mask
+        ↓
+Extracted Bus
+```
+
+The result demonstrates the difference between rectangular object localization and pixel-level segmentation.
+
+---
+
+### Object Extraction
+
+Every SAM 3 mask can be used to isolate its corresponding object from the original image.
+
+The central operation is:
+
+```python
+object_image[~mask] = 0
+```
+
+Conceptually:
+
+```text
+Original Image
+      +
+SAM 3 Mask
+      ↓
+Pixel Selection
+      ↓
+Background Removed
+      ↓
+Extracted Object
+```
+
+The complete validated execution generated:
+
+```text
+25 extracted objects
+```
+
+---
+
+### Mask Export
+
+The complete run also generated:
+
+```text
+25 individual mask images
+```
+
+The exported mask representation uses:
+
+```text
+White pixels → segmented object
+Black pixels → background
+```
+
+This allows each SAM 3 result to be inspected independently.
+
+---
+
+### Final Visualization
+
+The complete annotated segmentation result is stored at:
+
+```text
+assets/output/annotated_segmentation.png
+```
+
+The visualization combines:
+
+- Segmentation masks
+- Bounding boxes
+- Object classes
+- Confidence scores
+- Object indices
+
+The final image can be viewed here:
+
+![Project 07 Annotated Segmentation](./07-SAM3-Segmentation-Pipeline/assets/output/annotated_segmentation.png)
+
+This provides a single visual overview of the complete Project 07 inference result.
+
+---
+
+### Structured Results
+
+The complete machine-readable analysis is stored at:
+
+```text
+assets/output/segmentation_results.json
+```
+
+The JSON preserves project-level information such as:
+
+```text
+Input image
+Image dimensions
+Confidence threshold
+YOLO detection count
+Accepted detection count
+SAM mask count
+Analyzed object count
+```
+
+For individual objects, the structured results include information such as:
+
+```text
+Object index
+Class ID
+Class name
+Confidence
+Bounding-box coordinates
+Bounding-box area
+Mask area
+Image coverage
+Mask-to-box percentage
+Mask filename
+Extracted-object filename
+```
+
+This allows the segmentation results to be analyzed later without repeating model inference.
+
+---
+
+### Representative Project Evidence
+
+The complete execution generated:
+
+```text
+25 segmentation masks
+25 extracted objects
+```
+
+Rather than storing every generated visualization in the repository, Project 07 preserves a representative subset.
+
+Selected objects:
+
+```text
+object_00
+object_01
+object_02
+object_04
+object_05
+object_17
+```
+
+The corresponding extracted objects are stored inside:
+
+```text
+assets/output/extracted_objects/
+```
+
+The corresponding masks are stored inside:
+
+```text
+assets/output/masks/
+```
+
+---
+
+### Representative Extracted Objects
+
+```text
+assets/output/extracted_objects/
+│
+├── README.md
+├── object_00.png
+├── object_01.png
+├── object_02.png
+├── object_04.png
+├── object_05.png
+└── object_17.png
+```
+
+These examples demonstrate segmentation across different objects, positions, and scales.
+
+---
+
+### Representative Masks
+
+```text
+assets/output/masks/
+│
+├── README.md
+├── object_00_mask.png
+├── object_01_mask.png
+├── object_02_mask.png
+├── object_04_mask.png
+├── object_05_mask.png
+└── object_17_mask.png
+```
+
+Each representative mask corresponds directly to an extracted object:
+
+```text
+object_00_mask.png → object_00.png
+object_01_mask.png → object_01.png
+object_02_mask.png → object_02.png
+object_04_mask.png → object_04.png
+object_05_mask.png → object_05.png
+object_17_mask.png → object_17.png
+```
+
+---
+
+### Project Evidence Structure
+
+Project 07 contains:
+
+```text
+07-SAM3-Segmentation-Pipeline/
+│
+├── README.md
+├── requirements.txt
+├── sam3_segmentation_pipeline.py
+│
+└── assets/
+    │
+    ├── README.md
+    │
+    ├── input/
+    │   ├── README.md
+    │   └── mexicali_bus_scene.png
+    │
+    └── output/
+        │
+        ├── README.md
+        ├── annotated_segmentation.png
+        ├── segmentation_results.json
+        │
+        ├── extracted_objects/
+        │   ├── README.md
+        │   ├── object_00.png
+        │   ├── object_01.png
+        │   ├── object_02.png
+        │   ├── object_04.png
+        │   ├── object_05.png
+        │   └── object_17.png
+        │
+        └── masks/
+            ├── README.md
+            ├── object_00_mask.png
+            ├── object_01_mask.png
+            ├── object_02_mask.png
+            ├── object_04_mask.png
+            ├── object_05_mask.png
+            └── object_17_mask.png
+```
+
+---
+
+### Validation Summary
+
+The complete Project 07 pipeline was validated successfully.
+
+```text
+Input handling                  ✅
+YOLO detection                 ✅
+Confidence filtering           ✅
+Bounding-box extraction        ✅
+SAM 3 checkpoint loading       ✅
+SAM 3 segmentation             ✅
+25 masks generated             ✅
+Mask analysis                  ✅
+Bounding-box comparison        ✅
+Object extraction              ✅
+Mask export                    ✅
+Annotated visualization        ✅
+Structured JSON export         ✅
+Representative evidence        ✅
+Documentation                  ✅
+```
+
+Final relationship:
+
+```text
+Accepted YOLO detections
+          =
+Generated SAM 3 masks
+          =
+Analyzed objects
+
+25 = 25 = 25
+```
+
+**Status:** Completed, successfully tested in Google Colab, documented, and validated with real generated segmentation evidence.
+
+---
+
+# Project Progression
+
+The projects in this directory demonstrate a progressive development of computer vision skills.
+
+```text
+Project 01
+YOLO Object Detection
+        ↓
+Project 02
+Multi-Annotator Visualization
+        ↓
+Project 03
+Detection Filtering + NMS
+        ↓
+Project 04
+Object Tracking + ByteTrack
+        ↓
+Project 05
+Zones + Counting Analytics
+        ↓
+Project 06
+Visual Tracking + Analysis System
+        ↓
+Project 07
+SAM 3 Segmentation Pipeline
+```
+
+Each project builds on concepts developed in earlier stages.
+
+---
+
+# Skills Developed Across the Projects
+
+The seven completed projects demonstrate practical experience with:
+
+- Python
+- Computer Vision
+- OpenCV
+- NumPy
+- Ultralytics
+- YOLOv8
+- SAM 3
+- Supervision
+- `sv.Detections`
+- Bounding-box processing
 - Confidence filtering
 - Class filtering
+- Size filtering
+- Non-Maximum Suppression
+- Top-N selection
 - Spatial filtering
+- Multi-annotator visualization
+- Video processing
+- ByteTrack
+- Persistent tracker IDs
+- Tracking trajectories
+- PolygonZone
+- LineZone
+- Occupancy analytics
+- Directional crossing analytics
+- Pixel-level segmentation
+- Boolean segmentation masks
+- Mask-area analysis
+- Bounding-box vs. mask comparison
+- Object extraction
+- Mask export
+- JSON serialization
+- SQLite persistence
+- Tracking analytics
+- CSV reporting
+- Data visualization
 - Ground-truth evaluation
-- Mask comparison
-- False-positive analysis
-- Omission analysis
-
-### YOLO / Ultralytics
-
-- YOLOv8 inference
-- YOLOv8n
-- YOLOv8s
-- Confidence thresholds
-- Class filtering
-- Prediction processing
-- Video-frame inference
-
-### Supervision
-
-- `sv.Detections`
-- `BoxAnnotator`
-- `LabelAnnotator`
-- `EllipseAnnotator`
-- `DotAnnotator`
-- `TraceAnnotator`
-- `ByteTrack`
-- `PolygonZone`
-- `LineZone`
-- Detection filtering
-- Detection visualization
-- Tracking visualization
-- Spatial analytics
-
-### SAM 3
-
-- SAM 3 model integration
-- Prompt-based segmentation
-- Person segmentation
-- Segmentation-mask generation
-- Integration with detection and tracking workflows
-- Ground-truth mask comparison
-- Segmentation evaluation
-
-### Evaluation
-
-- Manual ground-truth annotation
-- COCO Segmentation datasets
-- True-positive analysis
-- False-positive analysis
-- False-negative / omission analysis
 - Precision
 - Recall
 - Intersection over Union
 - Dice coefficient
-- Pixel-level confusion matrices
-- Per-image evaluation metrics
-- Evaluation-summary generation
-
-### Tracking and Temporal Analytics
-
-- Persistent tracker IDs
-- Frame-level observations
-- Tracker duration
-- Visible-time analysis
-- Trajectory reconstruction
-- Image-space movement measurement
-- Average step movement
-- Session-level tracking analytics
-- Historical session comparison
-
-### Persistence and Data Analysis
-
-- SQLite
-- Structured session storage
-- Structured observation storage
-- Timestamp preservation
-- Source-media preservation
-- Confidence storage
-- Tracker and class storage
-- Bounding-box storage
-- Notes
-- Pandas
-- CSV report generation
-- Reusable analytics
-
-### Visualization
-
-- Bounding boxes
-- Detection labels
-- Tracking labels
-- Segmentation masks
-- Object traces
-- Polygon zones
-- Line zones
-- Trajectory plots
-- Tracker-duration charts
-- Class-observation charts
-- Movement-distance charts
-- Confidence charts
-- Performance charts
-
-### Application Development
-
-- Modular Python architecture
-- Command-line processing
-- Streamlit interface development
-- Results exploration
-- Tracking dashboards
-- Session comparison
-- Historical evidence presentation
-
-### Engineering Workflow
-
+- Streamlit
 - Google Colab
-- CUDA GPU execution
-- Git
-- GitHub
-- Dependency management
-- Project documentation
-- Reproducible testing
-- Input/output evidence preservation
-- H.264 video generation
-- Structured project organization
+- GitHub project organization
+- Technical documentation
+- Reproducible computer vision workflows
 
 ---
 
-# Project Progress
+# Project Categories
 
-| Project | Main Topic | Status |
-|---|---|---|
-| 01 | YOLO + Supervision Object Detection | ✅ Completed |
-| 02 | Multi-Annotator Visualization | ✅ Completed |
-| 03 | Detection Filtering and NMS | ✅ Completed |
-| 04 | Object Tracking with ByteTrack | ✅ Completed |
-| 05 | Zones and Counting Analytics | ✅ Completed |
-| 06 | Visual Tracking and Analysis System | ✅ Completed |
+The completed projects can be grouped into the following progression.
 
-```text
-Total completed projects: 6
-```
-
-Project 06 represents the integration and evaluation stage of the current project sequence.
-
----
-
-# Technologies Used
-
-The projects currently use:
-
-```text
-Python
-OpenCV
-NumPy
-Pandas
-Matplotlib
-PyTorch
-Ultralytics
-YOLOv8
-Supervision
-ByteTrack
-SAM 3
-SQLite
-Streamlit
-Roboflow
-COCO Segmentation
-Google Colab
-CUDA
-Git
-GitHub
-```
-
-Additional tools and formats are introduced when required by individual projects.
-
----
-
-# Project Structure
-
-```text
-05-projects/
-│
-├── README.md
-│
-├── 01-YOLO-Supervision-Object-Detector/
-│
-├── 02-Multi-Annotator-Visualization-Pipeline/
-│
-├── 03-Detection-Filtering-and-NMS-Pipeline/
-│
-├── 04-Object-Tracking/
-│
-├── 05-Zones-and-Counting-Analytics/
-│
-└── 06-Visual-Tracking-and-Analysis-System/
-```
-
-Each project maintains its own implementation, documentation, dependencies, assets, and generated evidence as required.
-
----
-
-# Learning Progression
-
-The six projects demonstrate a progressive development path.
+### Detection
 
 ```text
 Project 01
-Basic Object Detection
-        ↓
+YOLO + Supervision Object Detector
+```
+
+### Visualization
+
+```text
 Project 02
-Multi-Layer Visualization
-        ↓
+Multi-Annotator Visualization Pipeline
+```
+
+### Detection Post-Processing
+
+```text
 Project 03
-Detection Filtering and NMS
-        ↓
+Detection Filtering and NMS Pipeline
+```
+
+### Temporal Tracking
+
+```text
 Project 04
-Temporal Object Tracking
-        ↓
+Object Tracking
+```
+
+### Spatial Video Analytics
+
+```text
 Project 05
-Spatial Zones and Counting
-        ↓
+Zones and Counting Analytics
+```
+
+### Integrated Visual Analysis
+
+```text
 Project 06
-Integrated Tracking and Analysis System
+Visual Tracking and Analysis System
 ```
 
-The technical progression can also be represented as:
+### Pixel-Level Segmentation
 
 ```text
-Detection
-    ↓
-Visualization
-    ↓
-Filtering
-    ↓
-Tracking
-    ↓
-Spatial Analytics
-    ↓
-Segmentation
-    ↓
-Persistence
-    ↓
-Trajectory Analytics
-    ↓
-Session Comparison
-    ↓
-Dashboard
-    ↓
-Ground-Truth Evaluation
+Project 07
+SAM 3 Segmentation Pipeline
 ```
-
-Project 06 brings these concepts together into a complete system rather than demonstrating them independently.
 
 ---
 
-# Project 06 Evaluation Milestone
+# Repository Learning Flow
 
-The completion of Project 06 adds formal quantitative evaluation to the project collection.
-
-The manually annotated evaluation dataset contains:
+The projects connect with the other sections of the SAM3 Learning Journey.
 
 ```text
-20 images
-424 ground-truth person instances
+Course Notes
+08-course-notes/
+        ↓
+Concept Understanding
+        ↓
+Small Examples
+04-examples/
+        ↓
+Focused Implementation
+        ↓
+Projects
+05-projects/
+        ↓
+Complete Applications
+        ↓
+Validation
+        ↓
+Documentation
 ```
 
-The final evaluation produced:
+For Session 06 specifically:
 
 ```text
-Predicted instances:            472
-True positives:                 381
-False positives:                 91
-False negatives / omissions:     43
-
-Precision:                     0.8072
-Recall:                        0.8986
-Average IoU:                   0.7969
-Average Dice:                  0.8829
+06 — Segmentation with SAM
+        ↓
+Course Notes
+        ↓
+Practical
+        ↓
+Six Focused Examples
+        ↓
+Project 07
+        ↓
+Custom SAM 3 Segmentation Pipeline
 ```
 
-Pixel-level confusion-matrix values:
-
-```text
-True-positive pixels:       1,604,567
-False-positive pixels:        341,396
-False-negative pixels:        229,371
-True-negative pixels:      20,864,666
-```
-
-This milestone demonstrates the transition from verifying that a computer vision pipeline **runs successfully** to quantitatively evaluating **how accurately it performs against manually annotated reference data**.
+This structure separates learning material from reusable examples and larger integrated projects.
 
 ---
 
-# Current Project Collection Status
+# Completed Projects
 
-The current project collection now demonstrates six progressively more advanced computer vision applications.
+Current project status:
 
-The progression begins with basic object detection and develops through:
+```text
+01 — YOLO + Supervision Object Detector          ✅ Completed
+02 — Multi-Annotator Visualization Pipeline      ✅ Completed
+03 — Detection Filtering and NMS Pipeline        ✅ Completed
+04 — Object Tracking                             ✅ Completed
+05 — Zones and Counting Analytics                ✅ Completed
+06 — Visual Tracking and Analysis System         ✅ Completed
+07 — SAM 3 Segmentation Pipeline                 ✅ Completed
+```
+
+Total:
+
+```text
+7 completed computer vision projects
+```
+
+---
+
+# Current Technical Progression
+
+The repository now demonstrates the following computer vision progression:
 
 ```text
 Object Detection
-        ↓
-Annotation
-        ↓
+      ↓
+Visualization
+      ↓
 Detection Filtering
-        ↓
+      ↓
+Non-Maximum Suppression
+      ↓
 Object Tracking
-        ↓
-Zones and Counting
-        ↓
+      ↓
+Persistent IDs
+      ↓
+Spatial Zones
+      ↓
+Counting Analytics
+      ↓
+Visual Analysis
+      ↓
+Persistent Storage
+      ↓
+Performance Analytics
+      ↓
+Ground-Truth Evaluation
+      ↓
 SAM 3 Segmentation
-        ↓
-Structured Persistence
-        ↓
-Trajectory Analytics
-        ↓
-Historical Session Comparison
-        ↓
-Interactive Results Exploration
-        ↓
-Formal Ground-Truth Evaluation
+      ↓
+Pixel-Level Masks
+      ↓
+Object Extraction
+      ↓
+Structured Segmentation Results
 ```
 
-Project 06 completes the current integration objective by combining these concepts into a documented, reproducible computer vision analysis system.
-
 ---
 
-# Next Steps
+# Portfolio Value
 
-The six current projects are complete.
+Together, these projects demonstrate more than isolated model inference.
 
-Future projects may introduce additional computer vision concepts as they are covered during the learning journey.
-
-Potential future work should remain separate from the completed Project 06 MVP.
-
-Project 06 already documents possible extensions such as:
-
-- Larger evaluation datasets
-- Additional environmental-condition testing
-- Tracking-specific metrics such as MOTA, IDF1, and HOTA
-- Camera-motion compensation
-- Perspective calibration
-- Physical distance estimation
-- Processing-time benchmarking
-
-These are future extensions and are **not required for the completed Project 06 MVP**.
-
----
-
-# Purpose of the Projects Directory
-
-The `05-projects/` directory serves as practical portfolio evidence for the SAM3 Computer Vision Learning Journey.
-
-Each project demonstrates the ability to move from individual concepts toward complete implementations that include:
+They show the ability to build structured computer vision workflows involving:
 
 ```text
-Problem Definition
-        ↓
-Implementation
-        ↓
-Testing
-        ↓
-Evidence
-        ↓
-Documentation
-        ↓
+Data Input
+    ↓
+Model Inference
+    ↓
+Detection Processing
+    ↓
+Tracking / Segmentation
+    ↓
 Analysis
-        ↓
+    ↓
+Visualization
+    ↓
+Structured Storage
+    ↓
 Evaluation
+    ↓
+Documentation
 ```
 
-The completed projects preserve not only source code, but also the inputs, outputs, metrics, reports, and documentation required to understand and reproduce the work.
+The progression from Project 01 through Project 07 demonstrates increasing integration and complexity.
+
+Project 01 begins with basic object detection.
+
+Project 02 introduces layered visualization.
+
+Project 03 introduces detection post-processing.
+
+Project 04 introduces temporal tracking.
+
+Project 05 introduces spatial video analytics.
+
+Project 06 integrates tracking, segmentation, storage, analytics, evaluation, and an application interface.
+
+Project 07 focuses on a reusable YOLO + SAM 3 pixel-level segmentation pipeline with custom validation evidence.
 
 ---
 
-# Author
+# Final Summary
+
+The `05-projects/` directory currently contains **seven completed computer vision projects** developed as part of the SAM3 Computer Vision Learning Journey.
+
+```text
+01 — Detection
+02 — Visualization
+03 — Filtering and NMS
+04 — Tracking
+05 — Zones and Counting
+06 — Visual Tracking and Analysis
+07 — SAM 3 Segmentation
+```
+
+Together, these projects demonstrate practical experience moving from:
+
+```text
+Bounding-Box Detection
+        ↓
+Detection Visualization
+        ↓
+Detection Refinement
+        ↓
+Temporal Tracking
+        ↓
+Spatial Analytics
+        ↓
+Integrated Visual Analysis
+        ↓
+Pixel-Level Segmentation
+```
+
+The projects are designed to preserve:
+
+- Source code
+- Input evidence
+- Generated outputs
+- Validation results
+- Quantitative metrics
+- Technical documentation
+- Reproducible workflows
+
+This project collection will continue expanding as new concepts are studied and implemented throughout the SAM3 Computer Vision Learning Journey.
+
+---
+
+## Author
 
 **Peyman Miyandashti**
 
-GitHub: [Peyman-mxli](https://github.com/Peyman-mxli)
+SAM3 Computer Vision Learning Journey
 
-LinkedIn: [Peyman Miyandashti](https://www.linkedin.com/in/peyman-mxli/)
-
+Python · YOLOv8 · SAM 3 · Supervision · ByteTrack · OpenCV · NumPy · Computer Vision
