@@ -6,6 +6,8 @@ These examples continue from the segmentation concepts introduced in Session 06 
 
 The session also introduces the conceptual transition from static-image segmentation toward temporal segmentation with SAM2.
 
+All six examples in this directory were executed and validated successfully in Google Colab.
+
 ---
 
 ## Topics Covered
@@ -30,7 +32,7 @@ The examples in this folder cover:
 
 ---
 
-## Example Structure
+## Directory Structure
 
 ```text
 07-Advanced-MaskAnnotator-and-SAM2/
@@ -40,20 +42,36 @@ The examples in this folder cover:
 ├── 03_mask_and_box_annotator.py
 ├── 04_person_only_segmentation.py
 ├── 05_reusable_segmentation_function.py
-└── 06_sam2_temporal_concept.py
+├── 06_sam2_temporal_concept.py
+└── assets/
+    ├── README.md
+    └── output/
+        ├── README.md
+        ├── 01_basic_mask_annotator_output.png
+        ├── 02_mask_opacity_output.png
+        ├── 03_mask_and_box_annotator_output.png
+        ├── 04_person_only_segmentation_output.png
+        ├── 05_reusable_bus_output.png
+        └── 05_reusable_zidane_output.png
 ```
 
-Each script focuses on one specific concept so the workflow can be studied step by step.
+The first five examples generate visual outputs.
+
+Example 05 processes two different images and therefore generates two output files.
+
+Example 06 is intentionally conceptual and does not generate an image.
 
 ---
 
-## 01 — Basic MaskAnnotator
+# 01 — Basic MaskAnnotator
 
-File:
+Script:
 
-```text
-01_basic_mask_annotator.py
-```
+[`01_basic_mask_annotator.py`](./01_basic_mask_annotator.py)
+
+Output:
+
+[`01_basic_mask_annotator_output.png`](./assets/output/01_basic_mask_annotator_output.png)
 
 This example introduces:
 
@@ -83,35 +101,60 @@ Annotated Image
 
 YOLOv8 first detects the objects.
 
-The YOLO bounding boxes are then used as prompts for SAM 3.
+The resulting bounding boxes are used as prompts for SAM 3.
 
-SAM 3 generates pixel-level segmentation masks.
+SAM 3 generates pixel-level segmentation masks, and `MaskAnnotator` overlays those masks on the original image.
 
-Finally, `MaskAnnotator` overlays those masks on the original image.
+## Validated Results
 
-The main concept is:
+Input:
 
 ```text
-Detection
-    ↓
-Segmentation
-    ↓
-Mask Visualization
+bus.jpg
+```
+
+Image shape:
+
+```text
+(1080, 810, 3)
+```
+
+YOLO detected:
+
+```text
+4 persons
+1 bus
+1 stop sign
+```
+
+Results:
+
+```text
+YOLO detections:     6
+SAM masks generated: 6
+```
+
+Status:
+
+```text
+PASSED ✅
 ```
 
 ---
 
-## 02 — Mask Opacity
+# 02 — Mask Opacity
 
-File:
+Script:
 
-```text
-02_mask_opacity.py
-```
+[`02_mask_opacity.py`](./02_mask_opacity.py)
+
+Output:
+
+[`02_mask_opacity_output.png`](./assets/output/02_mask_opacity_output.png)
 
 This example demonstrates how the `opacity` parameter changes the appearance of segmentation masks.
 
-The session experiments with:
+The following values were tested:
 
 ```text
 0.2
@@ -132,9 +175,7 @@ Conceptually:
 ```text
 Opacity 0.2
     ↓
-Transparent Mask
-    ↓
-Original Image Highly Visible
+Original Image More Visible
 ```
 
 ```text
@@ -146,20 +187,39 @@ Balanced Visualization
 ```text
 Opacity 0.9
     ↓
-Strong Mask Visualization
+Segmentation Mask More Visible
 ```
 
-This example demonstrates that segmentation visualization can be customized depending on the purpose of the analysis.
+## Validated Results
+
+```text
+YOLO detections:     6
+SAM masks generated: 6
+
+Opacity 0.2: ✅
+Opacity 0.5: ✅
+Opacity 0.9: ✅
+```
+
+The comparison image was generated successfully.
+
+Status:
+
+```text
+PASSED ✅
+```
 
 ---
 
-## 03 — Mask + Box Annotator
+# 03 — Mask + Box Annotator
 
-File:
+Script:
 
-```text
-03_mask_and_box_annotator.py
-```
+[`03_mask_and_box_annotator.py`](./03_mask_and_box_annotator.py)
+
+Output:
+
+[`03_mask_and_box_annotator_output.png`](./assets/output/03_mask_and_box_annotator_output.png)
 
 This example combines:
 
@@ -178,23 +238,35 @@ The workflow becomes:
 ```text
 Original Image
       ↓
-SAM Segmentation Masks
+YOLOv8
+      ↓
+Bounding Boxes
+      ↓
+SAM 3
+      ↓
+Segmentation Masks
       ↓
 MaskAnnotator
-      ↓
-YOLO Bounding Boxes
       ↓
 BoxAnnotator
       ↓
 Combined Visualization
 ```
 
-This makes it possible to visually compare:
+The final image contains three visualization layers:
+
+```text
+1. Original image
+2. SAM 3 segmentation masks
+3. YOLO bounding boxes
+```
+
+This makes it possible to compare:
 
 ```text
 Bounding Box
      ↓
-Approximate Rectangular Region
+Rectangular Object Localization
 ```
 
 with:
@@ -202,22 +274,33 @@ with:
 ```text
 Segmentation Mask
      ↓
-Pixel-Level Object Shape
+Pixel-Level Object Representation
 ```
 
-Bounding boxes are useful for localization.
+## Validated Results
 
-Segmentation masks provide a more precise representation of the visible object.
+```text
+YOLO detections:     6
+SAM masks generated: 6
+```
+
+Status:
+
+```text
+PASSED ✅
+```
 
 ---
 
-## 04 — Person-Only Segmentation
+# 04 — Person-Only Segmentation
 
-File:
+Script:
 
-```text
-04_person_only_segmentation.py
-```
+[`04_person_only_segmentation.py`](./04_person_only_segmentation.py)
+
+Output:
+
+[`04_person_only_segmentation_output.png`](./assets/output/04_person_only_segmentation_output.png)
 
 This example combines filtering concepts from earlier sessions with SAM segmentation.
 
@@ -248,45 +331,74 @@ SAM 3
      ↓
 Person Segmentation Masks
      ↓
-MaskAnnotator
+MaskAnnotator + BoxAnnotator
 ```
 
 The important concept is:
 
 ```text
-Filter BEFORE segmentation
+Filter BEFORE SAM
 ```
 
 instead of:
 
 ```text
-Segment everything
-then filter afterwards
+Segment Everything
+      ↓
+Discard Unwanted Results
 ```
 
-This reduces unnecessary SAM inference when only specific object classes are relevant.
+## Validated Results
+
+```text
+Total YOLO detections:       6
+Person detections:           4
+Objects removed before SAM:  2
+Person masks generated:      4
+```
+
+Therefore:
+
+```text
+6 YOLO Detections
+        ↓
+Person Filter
+        ↓
+4 Person Detections
+        ↓
+SAM 3
+        ↓
+4 Person Masks
+```
+
+Status:
+
+```text
+PASSED ✅
+```
 
 ---
 
-## 05 — Reusable Segmentation Function
+# 05 — Reusable Segmentation Function
 
-File:
+Script:
 
-```text
-05_reusable_segmentation_function.py
-```
+[`05_reusable_segmentation_function.py`](./05_reusable_segmentation_function.py)
 
-This example restructures the YOLO + SAM workflow into reusable functions.
+Outputs:
 
-Instead of repeating the same processing steps for every image, the segmentation logic is encapsulated.
+- [`05_reusable_bus_output.png`](./assets/output/05_reusable_bus_output.png)
+- [`05_reusable_zidane_output.png`](./assets/output/05_reusable_zidane_output.png)
 
-Conceptually:
+This example restructures the YOLO + SAM workflow into a reusable:
 
 ```python
-segment_image(image)
+segment_image()
 ```
 
-can perform:
+function.
+
+The reusable function performs:
 
 ```text
 Image
@@ -301,30 +413,68 @@ SAM 3
   ↓
 Segmentation Masks
   ↓
-Annotation
+MaskAnnotator
+  ↓
+BoxAnnotator
   ↓
 Result
 ```
 
-The same function can then be reused with different images.
+The models are loaded once and the same function is then used to process different images.
 
-For example:
+## Validated Result — bus.jpg
 
 ```text
-Image A
-   ↓
-Same Function
-   ↓
-Segmentation Result A
-
-Image B
-   ↓
-Same Function
-   ↓
-Segmentation Result B
+YOLO detections: 6
+SAM masks:       6
 ```
 
-This demonstrates an important software-engineering principle:
+Output:
+
+```text
+05_reusable_bus_output.png
+```
+
+## Validated Result — zidane.jpg
+
+YOLO detected:
+
+```text
+2 persons
+1 tie
+```
+
+Results:
+
+```text
+YOLO detections: 3
+SAM masks:       3
+```
+
+Output:
+
+```text
+05_reusable_zidane_output.png
+```
+
+The same function successfully processed both images:
+
+```text
+bus.jpg ─────────┐
+                 ↓
+           segment_image()
+                 ↓
+             Result A
+
+
+zidane.jpg ──────┐
+                 ↓
+           segment_image()
+                 ↓
+             Result B
+```
+
+This demonstrates:
 
 ```text
 Reusable Pipeline
@@ -332,23 +482,27 @@ instead of
 Repeated Code
 ```
 
----
-
-## 06 — SAM2 Temporal Concept
-
-File:
+Status:
 
 ```text
-06_sam2_temporal_concept.py
+PASSED ✅
 ```
 
-This example focuses on the conceptual transition introduced at the end of Session 07.
+---
 
-The validated practical in this session uses SAM 3 for static-image segmentation.
+# 06 — SAM2 Temporal Concept
 
-SAM2 is introduced to explain how segmentation can extend toward video.
+Script:
 
-Static segmentation works like this:
+[`06_sam2_temporal_concept.py`](./06_sam2_temporal_concept.py)
+
+This example is intentionally conceptual.
+
+It does **not** load a SAM2 model and does **not** generate an image.
+
+The purpose is to demonstrate the temporal-segmentation concepts introduced in Session 07.
+
+Static segmentation follows:
 
 ```text
 Image
@@ -377,10 +531,12 @@ Next Frame
       ↓
 Updated Mask
       ↓
+Update Temporal Memory
+      ↓
 Future Frames
 ```
 
-The key idea is:
+The conceptual difference is:
 
 ```text
 Static Segmentation
@@ -388,7 +544,7 @@ Static Segmentation
 Spatial Information
 ```
 
-while:
+versus:
 
 ```text
 Temporal Segmentation
@@ -398,11 +554,120 @@ Spatial Information
 Temporal Information
 ```
 
-The purpose of this example is to make the temporal segmentation workflow easier to understand before implementing a complete video pipeline.
+The example also demonstrates the concept of mask propagation:
+
+```text
+Initial Frame
+     ↓
+Object Prompt
+     ↓
+Initial Mask
+     ↓
+Temporal Memory
+     ↓
+Frame 2
+     ↓
+Updated Mask
+     ↓
+Frame 3
+     ↓
+Updated Mask
+     ↓
+Future Frames
+```
+
+The script executed successfully in Google Colab.
+
+Status:
+
+```text
+PASSED ✅
+```
 
 ---
 
-## Relationship to Session 06
+# Validation Summary
+
+All six Python examples were executed successfully in Google Colab.
+
+```text
+01_basic_mask_annotator.py              ✅ PASSED
+02_mask_opacity.py                      ✅ PASSED
+03_mask_and_box_annotator.py            ✅ PASSED
+04_person_only_segmentation.py          ✅ PASSED
+05_reusable_segmentation_function.py    ✅ PASSED
+06_sam2_temporal_concept.py             ✅ PASSED
+```
+
+Visual outputs:
+
+```text
+Example 01 → 1 image
+Example 02 → 1 image
+Example 03 → 1 image
+Example 04 → 1 image
+Example 05 → 2 images
+Example 06 → 0 images (conceptual)
+
+Total validated examples: 6
+Total visual outputs:     6
+```
+
+---
+
+# Validated Results
+
+```text
+bus.jpg
+├── YOLO detections: 6
+├── SAM masks: 6
+└── Person-only masks: 4
+
+zidane.jpg
+├── YOLO detections: 3
+└── SAM masks: 3
+
+Mask opacity:
+├── 0.2 ✅
+├── 0.5 ✅
+└── 0.9 ✅
+
+Examples validated: 6
+Outputs generated:   6
+```
+
+---
+
+# Generated Assets
+
+The validated outputs are stored in:
+
+[`assets/output/`](./assets/output/)
+
+Asset documentation:
+
+[`assets/README.md`](./assets/README.md)
+
+Output documentation:
+
+[`assets/output/README.md`](./assets/output/README.md)
+
+Generated files:
+
+```text
+01_basic_mask_annotator_output.png
+02_mask_opacity_output.png
+03_mask_and_box_annotator_output.png
+04_person_only_segmentation_output.png
+05_reusable_bus_output.png
+05_reusable_zidane_output.png
+```
+
+These files provide visual evidence of the executed examples without requiring SAM 3 inference to be rerun.
+
+---
+
+# Relationship to Session 06
 
 Session 06 introduced:
 
@@ -452,11 +717,12 @@ Visualize + Customize + Reuse Masks
 
 ---
 
-## Technologies Used
+# Technologies Used
 
 The examples use:
 
 - Python
+- Google Colab
 - Ultralytics
 - YOLOv8
 - SAM 3
@@ -477,7 +743,7 @@ The session also introduces concepts related to:
 
 ---
 
-## SAM 3 Model
+# SAM 3 Model
 
 The SAM 3 checkpoint is not stored inside this repository because the model file is very large.
 
@@ -487,11 +753,22 @@ The validated Google Colab environment uses:
 /content/drive/MyDrive/SAM3-Models/sam3.pt
 ```
 
-Examples requiring SAM 3 should verify that this model exists before running segmentation.
+Examples requiring SAM 3 verify that this model exists before segmentation begins.
+
+During validated inference, Ultralytics displayed:
+
+```text
+WARNING ⚠️ imgsz=[1024] must be multiple of max stride 14,
+updating to [1036]
+```
+
+This was a non-fatal automatic image-size adjustment.
+
+SAM 3 inference continued successfully and generated the expected masks.
 
 ---
 
-## Learning Progression
+# Learning Progression
 
 The six examples follow this progression:
 
@@ -515,20 +792,12 @@ Reusable Segmentation Pipeline
 Temporal Segmentation Concept
 ```
 
-This progression moves from simple mask visualization toward reusable and more advanced segmentation workflows.
-
----
-
-## Learning Goal
-
-The purpose of these examples is to understand segmentation as more than simply generating a mask.
-
-The complete progression is:
+The broader progression is:
 
 ```text
 Object Detection
        ↓
-SAM Segmentation
+SAM 3 Segmentation
        ↓
 Pixel-Level Masks
        ↓
@@ -545,4 +814,33 @@ Reusable Processing
 Temporal Segmentation Concepts
 ```
 
-These examples provide the foundation for more advanced image and video segmentation systems.
+---
+
+# Learning Goal
+
+The purpose of these examples is to understand segmentation as more than simply generating a mask.
+
+The examples demonstrate how segmentation results can be:
+
+- Visualized
+- Customized
+- Combined with object detections
+- Filtered by object class
+- Reused across different images
+- Organized into reusable processing functions
+- Extended conceptually toward temporal video segmentation
+
+This provides the foundation for more advanced image and video segmentation systems.
+
+---
+
+# Status
+
+```text
+Example scripts:      6
+Examples validated:   6
+Visual outputs:       6
+Asset documentation:  Complete
+
+Status: COMPLETE ✅
+```
