@@ -45,6 +45,10 @@ The examples in this folder cover:
 ├── 06_sam2_temporal_concept.py
 └── assets/
     ├── README.md
+    ├── input/
+    │   ├── README.md
+    │   ├── bus.jpg
+    │   └── zidane.jpg
     └── output/
         ├── README.md
         ├── 01_basic_mask_annotator_output.png
@@ -55,11 +59,11 @@ The examples in this folder cover:
         └── 05_reusable_zidane_output.png
 ```
 
-The first five examples generate visual outputs.
+The first five examples use repository input assets and generate visual outputs.
 
 Example 05 processes two different images and therefore generates two output files.
 
-Example 06 is intentionally conceptual and does not generate an image.
+Example 06 is intentionally conceptual and does not require an input image or generate an output image.
 
 ---
 
@@ -68,6 +72,10 @@ Example 06 is intentionally conceptual and does not generate an image.
 Script:
 
 [`01_basic_mask_annotator.py`](./01_basic_mask_annotator.py)
+
+Input:
+
+[`assets/input/bus.jpg`](./assets/input/bus.jpg)
 
 Output:
 
@@ -82,21 +90,21 @@ sv.MaskAnnotator()
 The workflow is:
 
 ```text
-Input Image
-     ↓
+assets/input/bus.jpg
+        ↓
 YOLOv8
-     ↓
+        ↓
 Object Detections
-     ↓
+        ↓
 Bounding Boxes
-     ↓
+        ↓
 SAM 3
-     ↓
+        ↓
 Segmentation Masks
-     ↓
+        ↓
 MaskAnnotator
-     ↓
-Annotated Image
+        ↓
+assets/output/01_basic_mask_annotator_output.png
 ```
 
 YOLOv8 first detects the objects.
@@ -110,7 +118,7 @@ SAM 3 generates pixel-level segmentation masks, and `MaskAnnotator` overlays tho
 Input:
 
 ```text
-bus.jpg
+assets/input/bus.jpg
 ```
 
 Image shape:
@@ -134,6 +142,12 @@ YOLO detections:     6
 SAM masks generated: 6
 ```
 
+Output:
+
+```text
+assets/output/01_basic_mask_annotator_output.png
+```
+
 Status:
 
 ```text
@@ -147,6 +161,10 @@ PASSED ✅
 Script:
 
 [`02_mask_opacity.py`](./02_mask_opacity.py)
+
+Input:
+
+[`assets/input/bus.jpg`](./assets/input/bus.jpg)
 
 Output:
 
@@ -190,6 +208,24 @@ Opacity 0.9
 Segmentation Mask More Visible
 ```
 
+The complete workflow is:
+
+```text
+assets/input/bus.jpg
+        ↓
+YOLOv8
+        ↓
+Bounding Boxes
+        ↓
+SAM 3
+        ↓
+Segmentation Masks
+        ↓
+Multiple MaskAnnotator Opacities
+        ↓
+assets/output/02_mask_opacity_output.png
+```
+
 ## Validated Results
 
 ```text
@@ -202,6 +238,12 @@ Opacity 0.9: ✅
 ```
 
 The comparison image was generated successfully.
+
+Output:
+
+```text
+assets/output/02_mask_opacity_output.png
+```
 
 Status:
 
@@ -216,6 +258,10 @@ PASSED ✅
 Script:
 
 [`03_mask_and_box_annotator.py`](./03_mask_and_box_annotator.py)
+
+Input:
+
+[`assets/input/bus.jpg`](./assets/input/bus.jpg)
 
 Output:
 
@@ -236,21 +282,21 @@ sv.BoxAnnotator()
 The workflow becomes:
 
 ```text
-Original Image
-      ↓
+assets/input/bus.jpg
+        ↓
 YOLOv8
-      ↓
+        ↓
 Bounding Boxes
-      ↓
+        ↓
 SAM 3
-      ↓
+        ↓
 Segmentation Masks
-      ↓
+        ↓
 MaskAnnotator
-      ↓
+        ↓
 BoxAnnotator
-      ↓
-Combined Visualization
+        ↓
+assets/output/03_mask_and_box_annotator_output.png
 ```
 
 The final image contains three visualization layers:
@@ -284,6 +330,12 @@ YOLO detections:     6
 SAM masks generated: 6
 ```
 
+Output:
+
+```text
+assets/output/03_mask_and_box_annotator_output.png
+```
+
 Status:
 
 ```text
@@ -297,6 +349,10 @@ PASSED ✅
 Script:
 
 [`04_person_only_segmentation.py`](./04_person_only_segmentation.py)
+
+Input:
+
+[`assets/input/bus.jpg`](./assets/input/bus.jpg)
 
 Output:
 
@@ -317,21 +373,23 @@ person_detections = detections[
 The workflow becomes:
 
 ```text
-Input Image
-     ↓
+assets/input/bus.jpg
+        ↓
 YOLOv8
-     ↓
+        ↓
 All Detections
-     ↓
+        ↓
 Person Filter
-     ↓
+        ↓
 Person Bounding Boxes
-     ↓
+        ↓
 SAM 3
-     ↓
+        ↓
 Person Segmentation Masks
-     ↓
+        ↓
 MaskAnnotator + BoxAnnotator
+        ↓
+assets/output/04_person_only_segmentation_output.png
 ```
 
 The important concept is:
@@ -371,6 +429,12 @@ SAM 3
 4 Person Masks
 ```
 
+Output:
+
+```text
+assets/output/04_person_only_segmentation_output.png
+```
+
 Status:
 
 ```text
@@ -384,6 +448,11 @@ PASSED ✅
 Script:
 
 [`05_reusable_segmentation_function.py`](./05_reusable_segmentation_function.py)
+
+Inputs:
+
+- [`assets/input/bus.jpg`](./assets/input/bus.jpg)
+- [`assets/input/zidane.jpg`](./assets/input/zidane.jpg)
 
 Outputs:
 
@@ -422,6 +491,22 @@ Result
 
 The models are loaded once and the same function is then used to process different images.
 
+The repository workflow is:
+
+```text
+assets/input/IMAGE
+        ↓
+segment_image()
+        ↓
+YOLOv8
+        ↓
+SAM 3
+        ↓
+MaskAnnotator + BoxAnnotator
+        ↓
+assets/output/RESULT
+```
+
 ## Validated Result — bus.jpg
 
 ```text
@@ -432,7 +517,7 @@ SAM masks:       6
 Output:
 
 ```text
-05_reusable_bus_output.png
+assets/output/05_reusable_bus_output.png
 ```
 
 ## Validated Result — zidane.jpg
@@ -454,24 +539,24 @@ SAM masks:       3
 Output:
 
 ```text
-05_reusable_zidane_output.png
+assets/output/05_reusable_zidane_output.png
 ```
 
 The same function successfully processed both images:
 
 ```text
-bus.jpg ─────────┐
-                 ↓
-           segment_image()
-                 ↓
-             Result A
+assets/input/bus.jpg ────────┐
+                             ↓
+                       segment_image()
+                             ↓
+              assets/output/Result A
 
 
-zidane.jpg ──────┐
-                 ↓
-           segment_image()
-                 ↓
-             Result B
+assets/input/zidane.jpg ─────┐
+                             ↓
+                       segment_image()
+                             ↓
+              assets/output/Result B
 ```
 
 This demonstrates:
@@ -498,7 +583,7 @@ Script:
 
 This example is intentionally conceptual.
 
-It does **not** load a SAM2 model and does **not** generate an image.
+It does **not** load a SAM2 model, does **not** require an image from `assets/input/`, and does **not** generate an image in `assets/output/`.
 
 The purpose is to demonstrate the temporal-segmentation concepts introduced in Session 07.
 
@@ -638,6 +723,42 @@ Outputs generated:   6
 
 ---
 
+# Input Assets
+
+The repository input images are stored in:
+
+[`assets/input/`](./assets/input/)
+
+Input documentation:
+
+[`assets/input/README.md`](./assets/input/README.md)
+
+Files:
+
+```text
+assets/input/
+├── bus.jpg
+└── zidane.jpg
+```
+
+These images are stored in the repository so the validated examples use consistent inputs and do not need to download sample images at runtime.
+
+Usage:
+
+```text
+bus.jpg
+├── Example 01
+├── Example 02
+├── Example 03
+├── Example 04
+└── Example 05
+
+zidane.jpg
+└── Example 05
+```
+
+---
+
 # Generated Assets
 
 The validated outputs are stored in:
@@ -664,6 +785,38 @@ Generated files:
 ```
 
 These files provide visual evidence of the executed examples without requiring SAM 3 inference to be rerun.
+
+---
+
+# Asset Workflow
+
+The final repository workflow is:
+
+```text
+assets/input/
+├── bus.jpg
+└── zidane.jpg
+        ↓
+Python Examples
+        ↓
+YOLOv8
+        ↓
+SAM 3
+        ↓
+Supervision Annotation
+        ↓
+assets/output/
+├── 01_basic_mask_annotator_output.png
+├── 02_mask_opacity_output.png
+├── 03_mask_and_box_annotator_output.png
+├── 04_person_only_segmentation_output.png
+├── 05_reusable_bus_output.png
+└── 05_reusable_zidane_output.png
+```
+
+The Python scripts do not download the sample images during execution.
+
+Instead, they use the versioned input assets stored inside the repository.
 
 ---
 
@@ -839,6 +992,7 @@ This provides the foundation for more advanced image and video segmentation syst
 ```text
 Example scripts:      6
 Examples validated:   6
+Input assets:         2
 Visual outputs:       6
 Asset documentation:  Complete
 
