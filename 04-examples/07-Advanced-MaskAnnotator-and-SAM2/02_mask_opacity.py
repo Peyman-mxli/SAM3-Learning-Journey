@@ -10,10 +10,12 @@ from ultralytics import YOLO, SAM
 # Configuration
 # ============================================================
 
-IMAGE_URL = "https://ultralytics.com/images/bus.jpg"
-
 BASE_DIR = Path(__file__).resolve().parent
-IMAGE_PATH = BASE_DIR / "bus.jpg"
+
+INPUT_DIR = BASE_DIR / "assets" / "input"
+OUTPUT_DIR = BASE_DIR / "assets" / "output"
+
+IMAGE_PATH = INPUT_DIR / "bus.jpg"
 
 YOLO_MODEL_NAME = "yolov8n.pt"
 
@@ -21,31 +23,24 @@ SAM_MODEL_PATH = Path(
     "/content/drive/MyDrive/SAM3-Models/sam3.pt"
 )
 
-OUTPUT_PATH = BASE_DIR / "02_mask_opacity_output.png"
+OUTPUT_PATH = OUTPUT_DIR / "02_mask_opacity_output.png"
 
 OPACITY_VALUES = [
     0.2,
     0.5,
-    0.9
+    0.9,
 ]
 
 
 # ============================================================
-# Download input image if needed
+# Validate input image
 # ============================================================
 
 if not IMAGE_PATH.exists():
-    import urllib.request
-
-    print("Downloading bus.jpg...")
-
-    urllib.request.urlretrieve(
-        IMAGE_URL,
-        IMAGE_PATH
-    )
-
-    print(
-        f"Downloaded: {IMAGE_PATH}"
+    raise FileNotFoundError(
+        f"Input image not found: {IMAGE_PATH}\n\n"
+        "Expected repository path:\n"
+        "assets/input/bus.jpg"
     )
 
 
@@ -59,6 +54,16 @@ if not SAM_MODEL_PATH.exists():
         "Expected Google Colab path:\n"
         "/content/drive/MyDrive/SAM3-Models/sam3.pt"
     )
+
+
+# ============================================================
+# Prepare output directory
+# ============================================================
+
+OUTPUT_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
 
 
 # ============================================================
@@ -81,6 +86,10 @@ print("=" * 60)
 
 print(
     f"\nInput image: {IMAGE_PATH.name}"
+)
+
+print(
+    f"Input path: {IMAGE_PATH}"
 )
 
 print(
@@ -119,12 +128,10 @@ yolo_detections = (
     )
 )
 
-
 print(
     f"YOLO detections: "
     f"{len(yolo_detections)}"
 )
-
 
 if len(yolo_detections) == 0:
     raise RuntimeError(
@@ -157,7 +164,6 @@ bounding_boxes = (
     yolo_detections.xyxy.tolist()
 )
 
-
 print(
     "\nGenerating SAM 3 segmentation masks..."
 )
@@ -173,12 +179,10 @@ sam_detections = (
     )
 )
 
-
 if sam_detections.mask is None:
     raise RuntimeError(
         "SAM 3 did not return segmentation masks."
     )
-
 
 print(
     f"SAM masks generated: "
@@ -191,7 +195,6 @@ print(
 # ============================================================
 
 annotated_images = []
-
 
 for opacity in OPACITY_VALUES:
 
@@ -214,7 +217,7 @@ for opacity in OPACITY_VALUES:
     annotated_images.append(
         (
             opacity,
-            annotated_image
+            annotated_image,
         )
     )
 
@@ -227,25 +230,24 @@ plt.figure(
     figsize=(18, 6)
 )
 
-
 for index, (
     opacity,
-    annotated_image
+    annotated_image,
 ) in enumerate(
     annotated_images,
-    start=1
+    start=1,
 ):
 
     plt.subplot(
         1,
         len(annotated_images),
-        index
+        index,
     )
 
     plt.imshow(
         cv2.cvtColor(
             annotated_image,
-            cv2.COLOR_BGR2RGB
+            cv2.COLOR_BGR2RGB,
         )
     )
 
@@ -258,7 +260,7 @@ for index, (
 
 plt.suptitle(
     "SAM 3 MaskAnnotator Opacity Comparison",
-    fontsize=14
+    fontsize=14,
 )
 
 plt.tight_layout()
@@ -266,7 +268,7 @@ plt.tight_layout()
 plt.savefig(
     OUTPUT_PATH,
     dpi=150,
-    bbox_inches="tight"
+    bbox_inches="tight",
 )
 
 plt.close()
@@ -308,6 +310,21 @@ print(
 
 print(
     "0.9 → segmentation mask more visible"
+)
+
+
+print(
+    "\nWorkflow:"
+)
+
+print(
+    "assets/input/bus.jpg "
+    "→ YOLOv8 "
+    "→ Bounding Boxes "
+    "→ SAM 3 "
+    "→ Segmentation Masks "
+    "→ Multiple MaskAnnotator Opacities "
+    "→ assets/output/02_mask_opacity_output.png"
 )
 
 
