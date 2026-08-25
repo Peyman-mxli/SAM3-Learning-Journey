@@ -148,14 +148,7 @@ rather than modifying the original input images.
 
 ---
 
-## Current Status
 
-```text
-data/ documentation: CREATED ✅
-input/ folder:        PENDING
-output/ folder:       PENDING
-Input images:         PENDING
-Generated outputs:    PENDING
 
 Status: IN PROGRESS
 ```
