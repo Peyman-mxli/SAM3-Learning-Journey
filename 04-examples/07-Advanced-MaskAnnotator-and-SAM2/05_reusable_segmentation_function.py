@@ -11,11 +11,11 @@ from ultralytics import YOLO, SAM
 
 BASE_DIR = Path(__file__).resolve().parent
 
-BUS_URL = "https://ultralytics.com/images/bus.jpg"
-ZIDANE_URL = "https://ultralytics.com/images/zidane.jpg"
+INPUT_DIR = BASE_DIR / "assets" / "input"
+OUTPUT_DIR = BASE_DIR / "assets" / "output"
 
-BUS_IMAGE_PATH = BASE_DIR / "bus.jpg"
-ZIDANE_IMAGE_PATH = BASE_DIR / "zidane.jpg"
+BUS_IMAGE_PATH = INPUT_DIR / "bus.jpg"
+ZIDANE_IMAGE_PATH = INPUT_DIR / "zidane.jpg"
 
 YOLO_MODEL_NAME = "yolov8n.pt"
 
@@ -24,40 +24,54 @@ SAM_MODEL_PATH = Path(
 )
 
 BUS_OUTPUT_PATH = (
-    BASE_DIR
+    OUTPUT_DIR
     / "05_reusable_bus_output.png"
 )
 
 ZIDANE_OUTPUT_PATH = (
-    BASE_DIR
+    OUTPUT_DIR
     / "05_reusable_zidane_output.png"
 )
 
 
 # ============================================================
-# Helper — Download Image
+# Validate input images
 # ============================================================
 
-def download_if_missing(url, output_path):
-    """Download an image only when it does not already exist."""
+for image_path in [
+    BUS_IMAGE_PATH,
+    ZIDANE_IMAGE_PATH,
+]:
+    if not image_path.exists():
+        raise FileNotFoundError(
+            f"Input image not found: {image_path}\n\n"
+            "Expected repository paths:\n"
+            "assets/input/bus.jpg\n"
+            "assets/input/zidane.jpg"
+        )
 
-    if output_path.exists():
-        return
 
-    import urllib.request
+# ============================================================
+# Validate SAM 3 model
+# ============================================================
 
-    print(
-        f"Downloading {output_path.name}..."
+if not SAM_MODEL_PATH.exists():
+    raise FileNotFoundError(
+        f"SAM 3 model not found: "
+        f"{SAM_MODEL_PATH}\n\n"
+        "Expected Google Colab path:\n"
+        "/content/drive/MyDrive/SAM3-Models/sam3.pt"
     )
 
-    urllib.request.urlretrieve(
-        url,
-        output_path
-    )
 
-    print(
-        f"Downloaded: {output_path}"
-    )
+# ============================================================
+# Prepare output directory
+# ============================================================
+
+OUTPUT_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
 
 
 # ============================================================
@@ -215,31 +229,13 @@ def main():
         "=" * 60
     )
 
-    # --------------------------------------------------------
-    # Download sample images
-    # --------------------------------------------------------
-
-    download_if_missing(
-        BUS_URL,
-        BUS_IMAGE_PATH
+    print(
+        f"\nBus input: {BUS_IMAGE_PATH}"
     )
 
-    download_if_missing(
-        ZIDANE_URL,
-        ZIDANE_IMAGE_PATH
+    print(
+        f"Zidane input: {ZIDANE_IMAGE_PATH}"
     )
-
-    # --------------------------------------------------------
-    # Validate SAM 3
-    # --------------------------------------------------------
-
-    if not SAM_MODEL_PATH.exists():
-        raise FileNotFoundError(
-            f"SAM 3 model not found: "
-            f"{SAM_MODEL_PATH}\n\n"
-            "Expected Google Colab path:\n"
-            "/content/drive/MyDrive/SAM3-Models/sam3.pt"
-        )
 
     # --------------------------------------------------------
     # Load models ONCE
@@ -378,11 +374,25 @@ def main():
     )
 
     print(
-        "- bus.jpg"
+        "- assets/input/bus.jpg"
     )
 
     print(
-        "- zidane.jpg"
+        "- assets/input/zidane.jpg"
+    )
+
+    print(
+        "\nGenerated outputs:"
+    )
+
+    print(
+        "- assets/output/"
+        "05_reusable_bus_output.png"
+    )
+
+    print(
+        "- assets/output/"
+        "05_reusable_zidane_output.png"
     )
 
     print(
@@ -390,9 +400,14 @@ def main():
     )
 
     print(
-        "Image → YOLOv8 → sv.Detections "
-        "→ SAM 3 → Masks → MaskAnnotator "
-        "→ BoxAnnotator → Result"
+        "assets/input/IMAGE "
+        "→ YOLOv8 "
+        "→ sv.Detections "
+        "→ SAM 3 "
+        "→ Masks "
+        "→ MaskAnnotator "
+        "→ BoxAnnotator "
+        "→ assets/output/RESULT"
     )
 
     print(
