@@ -1,0 +1,90 @@
+{
+  "image": "bus.jpg",
+  "object_count": 6,
+  "detections": [
+    {
+      "image": "bus.jpg",
+      "object_id": 1,
+      "class_id": 5,
+      "class_name": "bus",
+      "confidence": 0.8734,
+      "x1": 22.87,
+      "y1": 231.28,
+      "x2": 805.0,
+      "y2": 756.84,
+      "box_area": 411059.34,
+      "mask_area": 265686,
+      "occupancy_ratio": 0.6463
+    },
+    {
+      "image": "bus.jpg",
+      "object_id": 2,
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8657,
+      "x1": 48.55,
+      "y1": 398.55,
+      "x2": 245.35,
+      "y2": 902.7,
+      "box_area": 99214.33,
+      "mask_area": 46648,
+      "occupancy_ratio": 0.4702
+    },
+    {
+      "image": "bus.jpg",
+      "object_id": 3,
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8528,
+      "x1": 669.47,
+      "y1": 392.19,
+      "x2": 809.72,
+      "y2": 877.04,
+      "box_area": 67998.79,
+      "mask_area": 20935,
+      "occupancy_ratio": 0.3079
+    },
+    {
+      "image": "bus.jpg",
+      "object_id": 4,
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.8252,
+      "x1": 221.52,
+      "y1": 405.8,
+      "x2": 344.97,
+      "y2": 857.54,
+      "box_area": 55768.55,
+      "mask_area": 32911,
+      "occupancy_ratio": 0.5901
+    },
+    {
+      "image": "bus.jpg",
+      "object_id": 5,
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.2611,
+      "x1": 0.0,
+      "y1": 550.53,
+      "x2": 63.01,
+      "y2": 873.44,
+      "box_area": 20346.07,
+      "mask_area": 10715,
+      "occupancy_ratio": 0.5266
+    },
+    {
+      "image": "bus.jpg",
+      "object_id": 6,
+      "class_id": 11,
+      "class_name": "stop sign",
+      "confidence": 0.2551,
+      "x1": 0.06,
+      "y1": 254.46,
+      "x2": 32.56,
+      "y2": 324.87,
+      "box_area": 2288.43,
+      "mask_area": 1878,
+      "occupancy_ratio": 0.8207
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+image,object_id,class_id,class_name,confidence,x1,y1,x2,y2,box_area,mask_area,occupancy_ratio
+zidane.jpg,1,0,person,0.836,114.87,197.41,1114.47,711.89,514270.99,230989,0.4492
+zidane.jpg,2,0,person,0.819,748.46,41.86,1143.08,713.02,264852.79,150589,0.5686
+zidane.jpg,3,27,tie,0.291,439.47,437.07,524.35,709.16,23092.28,9534,0.4129

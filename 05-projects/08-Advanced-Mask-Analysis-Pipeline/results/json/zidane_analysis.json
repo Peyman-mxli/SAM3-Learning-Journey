@@ -1,0 +1,48 @@
+{
+  "image": "zidane.jpg",
+  "object_count": 3,
+  "detections": [
+    {
+      "image": "zidane.jpg",
+      "object_id": 1,
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.836,
+      "x1": 114.87,
+      "y1": 197.41,
+      "x2": 1114.47,
+      "y2": 711.89,
+      "box_area": 514270.99,
+      "mask_area": 230989,
+      "occupancy_ratio": 0.4492
+    },
+    {
+      "image": "zidane.jpg",
+      "object_id": 2,
+      "class_id": 0,
+      "class_name": "person",
+      "confidence": 0.819,
+      "x1": 748.46,
+      "y1": 41.86,
+      "x2": 1143.08,
+      "y2": 713.02,
+      "box_area": 264852.79,
+      "mask_area": 150589,
+      "occupancy_ratio": 0.5686
+    },
+    {
+      "image": "zidane.jpg",
+      "object_id": 3,
+      "class_id": 27,
+      "class_name": "tie",
+      "confidence": 0.291,
+      "x1": 439.47,
+      "y1": 437.07,
+      "x2": 524.35,
+      "y2": 709.16,
+      "box_area": 23092.28,
+      "mask_area": 9534,
+      "occupancy_ratio": 0.4129
+    }
+  ]
+}
