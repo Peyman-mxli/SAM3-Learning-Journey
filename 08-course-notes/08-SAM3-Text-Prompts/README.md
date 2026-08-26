@@ -17,20 +17,6 @@ This lesson introduces `SAM3SemanticPredictor` and compares text prompts with th
 
 ---
 
-## Session Status
-
-```text
-Session:         08 — SAM3 Text Prompts
-Course Notes:    🟡 In Progress
-Class Notebook:  ✅ Preserved
-Class Recording: ⏳ Pending
-Practical:       ⏳ Pending
-Colab Test:      ⏳ Pending
-Outputs:         ⏳ Pending
-```
-
----
-
 # Session Objective
 
 The objective of this lesson is to understand how SAM 3 uses natural-language prompts to find and segment objects without requiring a separate detector to provide their locations.
