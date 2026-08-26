@@ -62,7 +62,7 @@ This session covers:
 
 ---
 
-# Planned Session Structure
+# Session Structure
 
 ```text
 08-SAM3-Text-Prompts/
@@ -86,10 +86,12 @@ This session covers:
         │   └── zidane.jpg
         │
         └── output/
-            └── README.md
+            ├── README.md
+            ├── sam3_person_text_prompt_filtered.png
+            └── sam3_text_prompts_comparison.png
 ```
 
-The practical files and validated outputs will be added progressively after completing the notebook execution in Google Colab.
+The practical files and validated outputs were added after completing and verifying the notebook execution in Google Colab.
 
 ---
 
@@ -601,15 +603,15 @@ The expected visualization is a `1 × 3` comparison containing the largest match
 
 ---
 
-# Planned Practical Implementation
+# Practical Implementation
 
-After validating the notebook, the lesson will include:
+The validated lesson includes:
 
 ```text
 practical/sam3_text_prompts.py
 ```
 
-The practical is expected to include reusable functions for:
+The practical includes reusable functions for:
 
 ```text
 Image Downloading
@@ -631,11 +633,11 @@ Text-vs-Bbox Comparison
 Output Saving
 ```
 
-The exact implementation and output names will be determined from the successful Google Colab execution.
+The implementation uses the successful Google Colab execution results.
 
 ---
 
-# Planned Practical Assets
+# Practical Assets
 
 Expected input images:
 
@@ -644,19 +646,14 @@ bus.jpg
 zidane.jpg
 ```
 
-Potential output visualizations:
+Validated output visualizations:
 
 ```text
-text_prompt_person.png
-concept_comparison.png
-confidence_comparison.png
-text_vs_bbox.png
-largest_mask_by_concept.png
+sam3_person_text_prompt_filtered.png
+sam3_text_prompts_comparison.png
 ```
 
-These names are provisional until the practical is implemented and validated.
-
-No output will be documented as completed until it has been generated and visually verified.
+Both outputs were generated and visually verified in Google Colab.
 
 ---
 
@@ -748,40 +745,34 @@ NumPy
 
 Completed:
 
-- Lesson 08 folder created
-- Original class notebook preserved
-- Notebook content reviewed
-- Lesson objectives identified
-- Initial session documentation prepared
+- Lesson 08 folder and documentation
+- Completed class notebook
+- Google Colab execution
+- Text prompts: vehicle, bus, person, and wheel
+- Confidence and mask-area inspection
+- Confidence and area filtering
+- Practical Python implementation
+- Input assets and documentation
+- Output assets and documentation
+- Visual verification of generated results
 
 Pending:
 
-- Google Colab execution
-- Runtime results
-- Class-recording URL
-- Practical implementation
-- Input assets
-- Output assets
-- Practical documentation
-- Final validation
-- Course index update
+- Session 08 class-recording URL
+- Course index update after all classes
 
 ---
 
-# Next Step
+# Validated Final Results
 
-Run the original class notebook in Google Colab and record:
+\`\`\`text
+vehicle: 1 object
+bus:     1 object
+person:  6 objects
+wheel:   2 objects
 
-- Installed library versions
-- GPU information
-- SAM 3 checkpoint path
-- Number of objects returned for each prompt
-- Confidence values
-- Mask areas
-- Results at each confidence threshold
-- Text-prompt result count
-- Bounding-box result count
-- Generated output images
-- Any warnings or runtime errors
+Person detections before filtering: 6
+Person detections after filtering:  5
+\`\`\`
 
-The verified results will be used to build the practical implementation and complete the final documentation.
+The practical structure and verified output evidence are preserved in [practical/](./practical/).
