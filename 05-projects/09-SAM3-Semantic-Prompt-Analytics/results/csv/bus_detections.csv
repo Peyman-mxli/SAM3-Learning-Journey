@@ -1,0 +1,7 @@
+image,prompt,object_id,confidence,mask_area,reliable
+bus.jpg,person,1,0.972,32208,True
+bus.jpg,person,2,0.970,45738,True
+bus.jpg,person,3,0.966,21145,True
+bus.jpg,person,4,0.943,11440,True
+bus.jpg,person,5,0.762,2803,True
+bus.jpg,person,6,0.301,547,False

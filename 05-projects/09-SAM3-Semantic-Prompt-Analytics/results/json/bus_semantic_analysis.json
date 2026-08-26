@@ -1,0 +1,22 @@
+{
+  "image": "bus.jpg",
+  "configuration": {
+    "model_confidence": 0.25,
+    "confidence_min": 0.5,
+    "area_min": 1000
+  },
+  "prompt_summary": [
+    {"prompt": "vehicle", "objects": 1},
+    {"prompt": "bus", "objects": 1},
+    {"prompt": "person", "objects": 6, "reliable_objects": 5},
+    {"prompt": "wheel", "objects": 2}
+  ],
+  "person_detections": [
+    {"object_id": 1, "confidence": 0.972, "mask_area": 32208, "reliable": true},
+    {"object_id": 2, "confidence": 0.970, "mask_area": 45738, "reliable": true},
+    {"object_id": 3, "confidence": 0.966, "mask_area": 21145, "reliable": true},
+    {"object_id": 4, "confidence": 0.943, "mask_area": 11440, "reliable": true},
+    {"object_id": 5, "confidence": 0.762, "mask_area": 2803, "reliable": true},
+    {"object_id": 6, "confidence": 0.301, "mask_area": 547, "reliable": false}
+  ]
+}

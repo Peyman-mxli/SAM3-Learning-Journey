@@ -1,0 +1,7 @@
+{
+  "prompts": ["vehicle", "bus", "person", "wheel"],
+  "model_confidence": 0.25,
+  "confidence_min": 0.5,
+  "area_min": 1000,
+  "filtered_prompt": "person"
+}
