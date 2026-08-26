@@ -8,7 +8,7 @@ This file documents the class recording for **Session 08 — SAM3 Text Prompts**
 
 ## Class Recording
 
-The recording URL has not yet been added to the repository.
+[Watch Session 08 — SAM3 Text Prompts on YouTube](https://youtu.be/eTwJfo3Q4ms)
 
 ---
 
