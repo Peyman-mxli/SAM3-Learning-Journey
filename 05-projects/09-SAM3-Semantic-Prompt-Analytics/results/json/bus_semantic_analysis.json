@@ -1,22 +1,151 @@
 {
   "image": "bus.jpg",
-  "configuration": {
-    "model_confidence": 0.25,
-    "confidence_min": 0.5,
-    "area_min": 1000
-  },
   "prompt_summary": [
-    {"prompt": "vehicle", "objects": 1},
-    {"prompt": "bus", "objects": 1},
-    {"prompt": "person", "objects": 6, "reliable_objects": 5},
-    {"prompt": "wheel", "objects": 2}
+    {
+      "image": "bus.jpg",
+      "prompt": "vehicle",
+      "objects": 1,
+      "reliable_objects": 1
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "bus",
+      "objects": 1,
+      "reliable_objects": 1
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "person",
+      "objects": 6,
+      "reliable_objects": 5
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "wheel",
+      "objects": 2,
+      "reliable_objects": 2
+    }
   ],
-  "person_detections": [
-    {"object_id": 1, "confidence": 0.972, "mask_area": 32208, "reliable": true},
-    {"object_id": 2, "confidence": 0.970, "mask_area": 45738, "reliable": true},
-    {"object_id": 3, "confidence": 0.966, "mask_area": 21145, "reliable": true},
-    {"object_id": 4, "confidence": 0.943, "mask_area": 11440, "reliable": true},
-    {"object_id": 5, "confidence": 0.762, "mask_area": 2803, "reliable": true},
-    {"object_id": 6, "confidence": 0.301, "mask_area": 547, "reliable": false}
+  "detections": [
+    {
+      "image": "bus.jpg",
+      "prompt": "vehicle",
+      "object_id": 1,
+      "confidence": 0.9521,
+      "mask_area": 252721,
+      "x1": 11.47,
+      "y1": 232.88,
+      "x2": 795.0,
+      "y2": 724.5,
+      "reliable": true
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "bus",
+      "object_id": 1,
+      "confidence": 0.9717,
+      "mask_area": 256232,
+      "x1": 10.88,
+      "y1": 232.0,
+      "x2": 794.0,
+      "y2": 724.0,
+      "reliable": true
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "person",
+      "object_id": 1,
+      "confidence": 0.9717,
+      "mask_area": 32208,
+      "x1": 226.62,
+      "y1": 404.5,
+      "x2": 335.75,
+      "y2": 852.5,
+      "reliable": true
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "person",
+      "object_id": 2,
+      "confidence": 0.9702,
+      "mask_area": 45738,
+      "x1": 56.47,
+      "y1": 398.75,
+      "x2": 240.5,
+      "y2": 896.5,
+      "reliable": true
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "person",
+      "object_id": 3,
+      "confidence": 0.9663,
+      "mask_area": 21145,
+      "x1": 671.0,
+      "y1": 395.5,
+      "x2": 809.0,
+      "y2": 874.5,
+      "reliable": true
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "person",
+      "object_id": 4,
+      "confidence": 0.9429,
+      "mask_area": 11440,
+      "x1": 0.17,
+      "y1": 556.0,
+      "x2": 70.19,
+      "y2": 861.5,
+      "reliable": true
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "person",
+      "object_id": 5,
+      "confidence": 0.7617,
+      "mask_area": 2803,
+      "x1": 121.12,
+      "y1": 708.0,
+      "x2": 149.25,
+      "y2": 814.5,
+      "reliable": true
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "person",
+      "object_id": 6,
+      "confidence": 0.3013,
+      "mask_area": 547,
+      "x1": 279.5,
+      "y1": 780.5,
+      "x2": 294.25,
+      "y2": 812.0,
+      "reliable": false
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "wheel",
+      "object_id": 1,
+      "confidence": 0.9463,
+      "mask_area": 5684,
+      "x1": 690.0,
+      "y1": 568.5,
+      "x2": 750.0,
+      "y2": 667.5,
+      "reliable": true
+    },
+    {
+      "image": "bus.jpg",
+      "prompt": "wheel",
+      "object_id": 2,
+      "confidence": 0.9248,
+      "mask_area": 3944,
+      "x1": 330.5,
+      "y1": 606.5,
+      "x2": 368.75,
+      "y2": 726.5,
+      "reliable": true
+    }
   ]
 }

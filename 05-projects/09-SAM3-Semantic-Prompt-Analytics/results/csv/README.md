@@ -1,6 +1,11 @@
 # CSV Results
 
 - `bus_prompt_summary.csv` records verified object counts by prompt.
-- `bus_detections.csv` records verified confidence, mask area, and reliability for six person detections.
+- `bus_detections.csv` records confidence, mask area, coordinates, and reliability for all 10 detections.
 
-Blank reliability values in the prompt summary mean that per-object filtering measurements were not recorded for that prompt during the validated notebook execution.
+Validated row counts:
+
+```text
+bus_detections.csv       10 rows
+bus_prompt_summary.csv    4 rows
+```

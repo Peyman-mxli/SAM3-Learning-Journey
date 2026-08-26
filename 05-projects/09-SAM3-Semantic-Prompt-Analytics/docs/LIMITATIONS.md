@@ -8,6 +8,6 @@
 - Prompt wording can change the number and quality of returned masks.
 - The SAM 3 checkpoint is external and must be available in Google Drive.
 - GPU inference is recommended.
-- The standalone project pipeline has passed syntax validation but has not yet been rerun end to end as a separate script.
+- Ultralytics currently warns that the `half` option is deprecated and recommends its newer quantization configuration.
 
-These limitations are documented explicitly so notebook validation is not confused with standalone pipeline validation.
+The standalone pipeline has now been validated end to end. These remaining limitations describe scope and future compatibility rather than incomplete execution.

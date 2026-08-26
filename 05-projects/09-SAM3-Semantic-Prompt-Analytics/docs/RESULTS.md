@@ -1,8 +1,8 @@
 # Project 09 Results
 
-## Validated Execution
+## Validated Standalone Execution
 
-The Session 08 notebook successfully processed `bus.jpg` with four semantic prompts.
+The complete Project 09 pipeline successfully processed `bus.jpg` in Google Colab using a Tesla T4 GPU and four semantic prompts.
 
 | Prompt | Objects detected |
 |---|---:|
@@ -34,4 +34,28 @@ results/csv/bus_detections.csv
 results/csv/bus_prompt_summary.csv
 ```
 
-The new standalone pipeline passed syntax validation. A complete standalone Colab rerun remains required before marking the pipeline itself runtime-validated.
+## Final Artifact Validation
+
+Original Colab artifacts before repository image optimization:
+
+```text
+data/output/bus_filtered_person.png       1,689,776 bytes ✅
+data/output/bus_prompt_comparison.png     3,654,198 bytes ✅
+results/json/bus_semantic_analysis.json       2,922 bytes ✅
+results/csv/bus_detections.csv                  667 bytes ✅
+results/csv/bus_prompt_summary.csv               116 bytes ✅
+```
+
+The JSON report contains 10 object records. The detection CSV contains 10 rows, and the prompt-summary CSV contains four rows.
+
+## Runtime Notes
+
+Ultralytics automatically adjusted the inference size from `640` to `644` to satisfy the model stride. It also displayed a deprecation warning for `half`; neither warning interrupted execution.
+
+```text
+Images processed: 1
+Object records:   10
+Runtime errors:    0
+```
+
+**Status: COMPLETE — standalone pipeline validated successfully.**

@@ -179,9 +179,24 @@ Session 08 introduced direct text-prompt segmentation, prompt specificity, confi
 
 - Project structure: complete
 - Source syntax validation: complete
-- Notebook-derived results: preserved
-- Input and visual evidence: preserved
-- JSON and CSV evidence: preserved from validated notebook values
-- Full standalone Colab rerun: pending
+- Full standalone Google Colab execution: complete
+- T4 GPU inference: complete
+- Four semantic prompts processed: complete
+- Ten object records generated: complete
+- Two visual outputs verified: complete
+- JSON export verified: complete
+- Detection CSV verified: complete
+- Prompt-summary CSV verified: complete
 
-The repository distinguishes between verified notebook evidence and the future standalone pipeline rerun; it does not invent unexecuted performance results.
+Final standalone results:
+
+```text
+Images processed:          1
+Prompts processed:         4
+Object records generated: 10
+Visual outputs:            2
+JSON reports:              1
+CSV reports:               2
+```
+
+**Status: COMPLETE — validated successfully in Google Colab.**

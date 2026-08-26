@@ -4,8 +4,7 @@
 
 - Pipeline thresholds
 - Counts for vehicle, bus, person, and wheel
-- Six measured person confidence scores
-- Six measured person mask areas
-- Reliability decisions for the person masks
+- Ten object records with confidence, mask area, coordinates, and reliability
+- Reliability counts for all four prompts
 
-No unmeasured coordinates or confidence values are fabricated.
+The file was generated directly by the standalone pipeline and validated successfully.
