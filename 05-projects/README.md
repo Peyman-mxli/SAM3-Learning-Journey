@@ -1117,6 +1117,96 @@ This confirms that every retained YOLO detection produced a corresponding SAM 3 
 
 ---
 
+### 09 — SAM3 Semantic Prompt Analytics
+
+[`09-SAM3-Semantic-Prompt-Analytics/`](./09-SAM3-Semantic-Prompt-Analytics/)
+
+A professional semantic-segmentation analytics system using **SAM3SemanticPredictor**, natural-language prompts, **Supervision**, **OpenCV**, **NumPy**, JSON, and CSV.
+
+Unlike detector-guided segmentation projects, Project 09 accepts concepts directly:
+
+```text
+vehicle
+bus
+person
+wheel
+```
+
+The project:
+
+- Discovers input images automatically
+- Loads a configurable list of natural-language prompts
+- Reuses one encoded image across multiple semantic queries
+- Locates and segments matching object instances
+- Converts predictions into `sv.Detections`
+- Measures confidence and mask area
+- Preserves bounding coordinates
+- Classifies reliable detections using confidence and minimum-area rules
+- Creates labeled filtered visualizations
+- Creates multi-prompt comparison figures
+- Exports detailed JSON analytics
+- Exports detection-level CSV results
+- Exports prompt-summary CSV results
+- Documents runtime results and limitations
+
+### Pipeline
+
+```text
+Input Image
+     ↓
+Configurable Text Prompts
+     ↓
+SAM3SemanticPredictor
+     ↓
+Matching Object Instances
+     ↓
+Segmentation Masks
+     ↓
+Confidence + Mask-Area Analysis
+     ↓
+Reliability Filtering
+     ↓
+Visualization
+     ↓
+├── Filtered Output
+└── Prompt Comparison
+     ↓
+Structured Results
+     ↓
+├── JSON
+└── CSV
+```
+
+### Validation Result
+
+The standalone pipeline was executed successfully in Google Colab using a Tesla T4 GPU.
+
+```text
+Images processed:          1
+Prompts processed:         4
+Object records generated: 10
+
+vehicle: 1
+bus:     1
+person:  6
+wheel:   2
+
+Reliable person masks:     5
+Runtime errors:            0
+```
+
+Generated and verified artifacts:
+
+```text
+2 visual outputs
+1 JSON report
+2 CSV reports
+```
+
+**Status:** Completed, successfully executed in Google Colab, documented, and validated with real visual, JSON, and CSV evidence.
+
+---
+
 # Project Progression
 
 The projects are intentionally organized so that each one introduces additional computer vision capabilities.
@@ -1145,15 +1235,18 @@ SAM 3 Segmentation Pipeline
         ↓
 Project 08
 Advanced Mask Analysis Pipeline
+        ↓
+Project 09
+SAM3 Semantic Prompt Analytics
 ```
 
-This progression moves from basic inference toward complete computer vision systems involving detection, visualization, filtering, tracking, spatial analytics, segmentation, quantitative mask analysis, persistence, evaluation, and structured results.
+This progression moves from basic inference toward complete computer vision systems involving detection, visualization, filtering, tracking, spatial analytics, detector-guided segmentation, semantic text prompting, quantitative mask analysis, persistence, evaluation, and structured results.
 
 ---
 
 # Skills Developed Across the Projects
 
-The eight completed projects demonstrate practical experience with:
+The nine completed projects demonstrate practical experience with:
 
 - Python
 - Computer Vision
@@ -1183,12 +1276,21 @@ The eight completed projects demonstrate practical experience with:
 - SAM 3
 - Instance Segmentation
 - Bounding-Box Prompting
+- Natural-Language Text Prompts
+- SAM3SemanticPredictor
+- Semantic Segmentation
+- Prompt Configuration
+- Prompt-Based Object Discovery
+- Reliability Filtering
 - Pixel-Level Masks
 - Mask Visualization
 - Mask-Area Analysis
 - Bounding-Box vs. Mask Comparison
 - Mask-to-Box Occupancy Analysis
 - Reusable Multi-Image Analysis Pipelines
+- Reusable Multi-Prompt Analysis Pipelines
+- Detection-Level Analytics
+- Prompt-Summary Analytics
 - JSON Result Export
 - CSV Result Export
 - SQLite Persistence
@@ -1387,6 +1489,29 @@ JSON + CSV Results
 
 ---
 
+## Semantic Prompt Analytics
+
+```text
+Project 09
+SAM3 Semantic Prompt Analytics
+```
+
+Focus:
+
+```text
+Natural-Language Concepts
+      ↓
+SAM3SemanticPredictor
+      ↓
+Semantic Object Masks
+      ↓
+Confidence + Area Filtering
+      ↓
+Visual + JSON + CSV Evidence
+```
+
+---
+
 # Repository Learning Flow
 
 The repository follows a layered learning structure.
@@ -1423,6 +1548,8 @@ Integrated Tracking Analysis
 Pixel-Level Segmentation
       ↓
 Quantitative Mask Analysis
+      ↓
+Semantic Text-Prompt Analytics
 ```
 
 Project 08 adds another important transition:
@@ -1437,6 +1564,20 @@ Bounding-Box Comparison
 Occupancy Ratio
       ↓
 Structured JSON / CSV Analytics
+```
+
+Project 09 adds the transition:
+
+```text
+Natural-Language Prompt
+      ↓
+Semantic Object Discovery
+      ↓
+Pixel-Level Masks
+      ↓
+Confidence + Area Filtering
+      ↓
+Multi-Prompt JSON / CSV Analytics
 ```
 
 This structure separates learning material from reusable examples and larger integrated projects.
@@ -1550,9 +1691,10 @@ This makes each project part of a larger learning path rather than an isolated e
 06 — Visual Tracking and Analysis System             ✅ Completed
 07 — SAM 3 Segmentation Pipeline                     ✅ Completed
 08 — Advanced Mask Analysis Pipeline                 ✅ Completed
+09 — SAM3 Semantic Prompt Analytics                  ✅ Completed
 ```
 
-**Total completed projects: 8**
+**Total completed projects: 9**
 
 ---
 
@@ -1598,13 +1740,19 @@ Quantitative Mask Analysis
 Mask-to-Box Occupancy
       ↓
 Reusable JSON / CSV Analytics
+      ↓
+Natural-Language Text Prompts
+      ↓
+Semantic Object Discovery
+      ↓
+Multi-Prompt Reliability Analytics
 ```
 
 ---
 
 # Portfolio Value
 
-The progression from Project 01 through Project 08 demonstrates increasing system complexity.
+The progression from Project 01 through Project 09 demonstrates increasing system complexity.
 
 The portfolio begins with:
 
@@ -1634,6 +1782,10 @@ Quantitative Mask Analysis
 Annotated Visual Evidence
       ↓
 JSON + CSV Analytics
+      ↓
+Natural-Language Prompt Configuration
+      ↓
+Semantic Multi-Prompt Analytics
 ```
 
 Along the way, the projects also demonstrate:
@@ -1658,7 +1810,7 @@ This progression shows development beyond basic model inference toward reusable 
 
 # Final Summary
 
-The `05-projects/` directory currently contains **8 completed computer vision projects**.
+The `05-projects/` directory currently contains **9 completed computer vision projects**.
 
 Together, these projects demonstrate a progression through:
 
@@ -1678,38 +1830,45 @@ Integrated Visual Analysis
 SAM 3 Segmentation
       ↓
 Advanced Mask Analysis
+      ↓
+SAM3 Semantic Prompt Analytics
 ```
 
-Project 08 represents the latest completed stage of this progression.
+Project 09 represents the latest completed stage of this progression.
 
 Its validated execution processed:
 
 ```text
-2 input images
-9 YOLO detections
-9 retained detections
-9 SAM 3 masks
-9 analyzed objects
+1 input image
+4 natural-language prompts
+10 semantic object records
+
+vehicle: 1
+bus:     1
+person:  6
+wheel:   2
 ```
 
 and generated:
 
 ```text
-2 annotated images
-2 JSON result files
+2 visual outputs
+1 JSON result file
 2 CSV result files
 ```
 
 with all expected generated artifacts verified successfully.
 
-The repository now demonstrates not only how to detect and segment objects, but also how to transform segmentation masks into measurable analytical information through:
+The repository now demonstrates detector-guided and text-guided segmentation, including the transformation of semantic masks into measurable analytical information through:
 
 ```text
+Natural-Language Prompt
+    +
+Confidence
+    +
 Mask Area
     +
-Bounding-Box Area
-    +
-Occupancy Ratio
+Reliability Rules
     +
 Structured JSON / CSV Results
 ```
