@@ -31,6 +31,7 @@ The session explores:
 ├── 04_b_sam_encoder_decoder.ipynb
 └── practical/
     ├── README.md
+    ├── requirements.txt
     ├── sam_encoder_decoder_caching.py
     └── assets/
         ├── README.md
@@ -202,6 +203,7 @@ The reusable practical is available at:
 Run from the lesson directory:
 
 ```bash
+python -m pip install -r practical/requirements.txt
 python practical/sam_encoder_decoder_caching.py
 ```
 
@@ -212,6 +214,8 @@ The practical:
 - Measures both execution strategies
 - Calculates time saved and speedup
 - Generates the comparison chart automatically
+- Uses a fixed random seed for reproducible simulated arrays
+- Regenerates the chart with the same Spanish labels as the validated output
 
 ---
 
@@ -238,6 +242,8 @@ The lesson does not require:
 - SAM checkpoint
 - Ultralytics installation
 - Input image file
+
+The reported timings describe this controlled simulation only. They are not benchmarks of real SAM, SAM 2, or SAM 3 inference.
 
 ---
 

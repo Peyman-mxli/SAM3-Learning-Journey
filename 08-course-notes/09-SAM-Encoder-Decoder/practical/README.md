@@ -26,6 +26,14 @@ Reuse Image Embedding for Three Prompts
 
 ## Run
 
+Install the declared dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Run the practical:
+
 ```bash
 python sam_encoder_decoder_caching.py
 ```
@@ -61,6 +69,7 @@ Exact times may vary slightly between executions because of runtime scheduling a
 ```text
 practical/
 ├── README.md
+├── requirements.txt
 ├── sam_encoder_decoder_caching.py
 └── assets/
     ├── README.md
@@ -68,3 +77,7 @@ practical/
         ├── README.md
         └── sam_encoder_decoder_caching_comparison.png
 ```
+
+## Scope and Honesty
+
+This practical measures a controlled latency simulation. It does **not** measure real SAM accuracy, GPU inference speed, image-embedding quality, or mask quality. The generated arrays are deterministic educational stand-ins created with a fixed random seed.

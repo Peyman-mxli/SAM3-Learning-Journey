@@ -31,3 +31,4 @@ This file documents the class recording for **Session 09 — SAM Encoder-Decoder
 
 - [README.md](./README.md)
 - [04_b_sam_encoder_decoder.ipynb](./04_b_sam_encoder_decoder.ipynb)
+- [practical/](./practical/)
