@@ -64,10 +64,7 @@ practical/
 ├── sam_encoder_decoder_caching.py
 └── assets/
     ├── README.md
-    ├── input/
-    │   └── README.md
     └── output/
         ├── README.md
         └── sam_encoder_decoder_caching_comparison.png
 ```
-

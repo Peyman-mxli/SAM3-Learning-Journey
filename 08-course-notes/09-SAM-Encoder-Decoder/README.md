@@ -34,8 +34,6 @@ The session explores:
     ├── sam_encoder_decoder_caching.py
     └── assets/
         ├── README.md
-        ├── input/
-        │   └── README.md
         └── output/
             ├── README.md
             └── sam_encoder_decoder_caching_comparison.png
@@ -299,4 +297,3 @@ Completed:
 Pending:
 
 - Course index update after all classes
-
