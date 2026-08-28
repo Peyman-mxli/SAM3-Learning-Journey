@@ -1,0 +1,6 @@
+{
+  "max_objects": 3,
+  "negative_point_offset": [-60, -80],
+  "mask_opacity": 0.6,
+  "yolo_model": "yolov8n.pt"
+}
