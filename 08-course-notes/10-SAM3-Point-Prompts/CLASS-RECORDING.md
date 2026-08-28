@@ -1,14 +1,14 @@
-# Session 10 — Class Recording
+# Course Session 11 — Class Recording
 
 ## SAM3 Point Prompts
 
-This file documents the class recording for **Session 10 — SAM3 Point Prompts**.
+This file documents the class recording for **Course Session 11 — SAM3 Point Prompts**, stored as GitHub lesson folder `10` because the repository starts at `00`.
 
 ---
 
 ## Class Recording
 
-The YouTube upload is currently in progress. The complete public video URL will be added after YouTube finishes processing and the full link is available.
+[Watch Course Session 11 — SAM3 Point Prompts on YouTube](https://youtu.be/MmGHsYvRyVc)
 
 ---
 

@@ -1,10 +1,10 @@
 # 10 — SAM3 Point Prompts
 
+> **Course Session 11** — The repository uses zero-based lesson numbering beginning with `00`, so Course Session 11 is stored in GitHub folder `10`.
+
 This session introduces **point-guided segmentation with SAM 3**.
 
 A point prompt identifies a pixel that belongs to the target object. SAM then infers the complete object mask. Positive points include regions, while negative points exclude unwanted regions and refine ambiguous masks.
-
-> **Numbering note:** The supplied source material contains inconsistent internal numbering. This repository records it as Session 10 to preserve the Learning Journey sequence. The original notebook is retained unchanged.
 
 ---
 
@@ -43,7 +43,7 @@ The practical implementation and output assets will be added only after the note
 
 [05_a_sam3_prompts_puntos.ipynb](./05_a_sam3_prompts_puntos.ipynb)
 
-The notebook is preserved as the source course artifact. Its original Spanish content and internal numbering are not silently rewritten.
+The original Spanish course notebook is preserved as the source artifact for Course Session 11.
 
 ---
 
@@ -116,7 +116,7 @@ The source notebook contains this checkpoint path:
 /content/drive/MyDrive/RandD/Archive_Zero_Resolved/sam3.pt
 ```
 
-For this Learning Journey, we will verify and use the actual configured checkpoint path before inference rather than assuming the source path exists.
+We will verify and use the actual configured checkpoint path before inference rather than assuming the source path exists.
 
 ---
 
@@ -129,7 +129,7 @@ bus.jpg
 zidane.jpg
 ```
 
-The primary experiments use `bus.jpg`. These inputs will be copied into the practical assets only after successful execution confirms which files are genuinely used.
+The primary experiments use `bus.jpg`. Inputs will be copied into practical assets only after successful execution confirms which files are genuinely used.
 
 ---
 
@@ -137,44 +137,23 @@ The primary experiments use `bus.jpg`. These inputs will be copied into the prac
 
 ## 1. YOLO-Guided Point Selection
 
-YOLO detects objects and the notebook calculates the center of the first bounding box:
-
-```python
-point = [
-    int((x1 + x2) / 2),
-    int((y1 + y2) / 2)
-]
-```
+YOLO detects objects and the notebook calculates the center of the first bounding box.
 
 ## 2. One Positive Point
 
-A positive label requests the object containing the selected pixel:
-
-```python
-labels=[1]
-```
+A positive label requests the object containing the selected pixel.
 
 ## 3. Multiple Positive Points
 
-The notebook compares one, two, and three points inside the same detected object to determine whether additional guidance changes the mask.
+The notebook compares one, two, and three points inside the same detected object.
 
 ## 4. Positive and Negative Points
 
-A positive point selects the object and a negative point marks background to exclude:
-
-```python
-labels=[1, 0]
-```
+A positive point selects the object and a negative point marks background to exclude.
 
 ## 5. Prompt-Type Comparison
 
-The same scene is analyzed with:
-
-```text
-Text prompt
-Point prompt
-YOLO bounding-box prompt
-```
+The same scene is analyzed with text, point, and YOLO bounding-box prompts.
 
 ## 6. Text Discovery and Point Refinement
 
@@ -196,13 +175,13 @@ The learner must:
 6. Display object IDs and class IDs.
 7. Save the completed visual evidence.
 
-The supplied final cell currently displays the original image because the mask-annotation lines are commented out. We will complete and validate this cell in Colab before calling Lesson 10 finished.
+The supplied final cell currently displays the original image because the mask-annotation lines are commented out. We will complete and validate this cell in Colab before calling the lesson finished.
 
 ---
 
 # Validation Requirements
 
-Lesson 10 will be considered complete only after verifying:
+The lesson will be considered complete only after verifying:
 
 - Google Drive mounted
 - Real `sam3.pt` path confirmed
@@ -229,9 +208,10 @@ Lesson 10 will be considered complete only after verifying:
 
 Completed:
 
-- Source notebook reviewed
-- Professional Lesson 10 folder created
-- Notebook preserved
+- Course Session 11 source notebook reviewed
+- GitHub folder 10 created
+- Professional lesson documentation created
+- Class recording documented
 - Tasks and validation criteria documented
 
 Pending:
@@ -241,4 +221,4 @@ Pending:
 - Extension-challenge completion
 - Practical code
 - Validated input/output assets
-- Full class-recording URL
+
