@@ -1,0 +1,7 @@
+{
+  "prompt_counts": [1, 3, 5, 10],
+  "trials_per_scenario": 3,
+  "image_encoder_delay_seconds": 0.05,
+  "prompt_interaction_delay_seconds": 0.01,
+  "random_seed": 42
+}

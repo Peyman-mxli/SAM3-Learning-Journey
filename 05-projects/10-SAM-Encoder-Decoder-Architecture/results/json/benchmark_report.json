@@ -1,0 +1,57 @@
+{
+  "project": "10-SAM-Encoder-Decoder-Architecture",
+  "generated_at_utc": "2026-08-28T09:51:58.519854+00:00",
+  "scope": "controlled architecture simulation; not real SAM inference",
+  "configuration": {
+    "prompt_counts": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "trials_per_scenario": 3,
+    "image_encoder_delay_seconds": 0.05,
+    "prompt_interaction_delay_seconds": 0.01,
+    "random_seed": 42
+  },
+  "scenario_count": 4,
+  "trial_count": 12,
+  "summary": [
+    {
+      "prompt_count": 1,
+      "trials": 3,
+      "mean_without_cache_seconds": 0.0609617906678371,
+      "mean_with_cache_seconds": 0.060308246000204235,
+      "mean_seconds_saved": 0.0006535446676328646,
+      "speedup": 1.0108367381075989,
+      "time_reduction_percent": 1.0720562182857107
+    },
+    {
+      "prompt_count": 3,
+      "trials": 3,
+      "mean_without_cache_seconds": 0.18087934533226266,
+      "mean_with_cache_seconds": 0.081611167001635,
+      "mean_seconds_saved": 0.09926817833062766,
+      "speedup": 2.2163553344193563,
+      "time_reduction_percent": 54.88088103607352
+    },
+    {
+      "prompt_count": 5,
+      "trials": 3,
+      "mean_without_cache_seconds": 0.3016666153319723,
+      "mean_with_cache_seconds": 0.10118344399961643,
+      "mean_seconds_saved": 0.20048317133235588,
+      "speedup": 2.981383153286578,
+      "time_reduction_percent": 66.45852114319378
+    },
+    {
+      "prompt_count": 10,
+      "trials": 3,
+      "mean_without_cache_seconds": 0.6044138480004525,
+      "mean_with_cache_seconds": 0.15278673200009507,
+      "mean_seconds_saved": 0.45162711600035743,
+      "speedup": 3.9559315137395332,
+      "time_reduction_percent": 74.72150373365028
+    }
+  ]
+}
