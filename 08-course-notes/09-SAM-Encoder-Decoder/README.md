@@ -1,6 +1,6 @@
 # 09 — SAM Encoder-Decoder Architecture
 
-This session explains the **promptable encoder-decoder architecture behind Segment Anything Model (SAM)** and why image embeddings can be cached to support fast interactive segmentation.
+This session explains the **promptable encoder-decoder architecture behind Segment Anything Model (SAM)** and demonstrates why image embeddings should be cached for fast interactive segmentation.
 
 The lesson uses a lightweight Python simulation to isolate the computational roles of the image encoder, prompt encoder, and mask decoder without requiring a SAM checkpoint.
 
@@ -8,38 +8,17 @@ The lesson uses a lightweight Python simulation to isolate the computational rol
 
 # Session Objective
 
-The objective of this lesson is to understand how SAM separates expensive image processing from lightweight prompt interaction.
+The objective is to understand how SAM separates expensive image processing from lightweight prompt interaction.
 
 The session explores:
 
-- The promptable segmentation paradigm
+- Promptable segmentation
 - Image, prompt, and mask embeddings
-- The three principal SAM components
+- Image Encoder, Prompt Encoder, and Mask Decoder
 - Image-embedding caching
 - Interactive segmentation latency
-- Reuse of one image embedding across multiple prompts
-- Why video requires a different temporal strategy
-- The conceptual evolution from SAM to SAM 2.1 and SAM 3
-
----
-
-# Topics Covered
-
-- Foundation models for segmentation
-- Promptable segmentation
-- Point prompts
-- Bounding-box prompts
-- Text prompts
-- Mask prompts
-- Vision Transformer image encoders
-- Prompt encoders
-- Mask decoders
-- Image embeddings
-- Prompt embeddings
-- Caching and reuse
-- Interactive latency
-- Frame-by-frame video processing
-- Spatiotemporal feature reuse
+- Reusing one image embedding for multiple prompts
+- Why video requires spatiotemporal memory
 
 ---
 
@@ -49,28 +28,43 @@ The session explores:
 09-SAM-Encoder-Decoder/
 ├── README.md
 ├── CLASS-RECORDING.md
-└── 04_b_sam_encoder_decoder.ipynb
+├── 04_b_sam_encoder_decoder.ipynb
+└── practical/
+    ├── README.md
+    ├── sam_encoder_decoder_caching.py
+    └── assets/
+        ├── README.md
+        ├── input/
+        │   └── README.md
+        └── output/
+            ├── README.md
+            └── sam_encoder_decoder_caching_comparison.png
 ```
-
-The practical implementation and its input/output evidence will be added after the notebook is executed, extended, and validated.
 
 ---
 
-# Original Class Notebook
+# Class Notebook
 
-The original class notebook is preserved as:
+The completed and validated notebook is preserved as:
 
 [04_b_sam_encoder_decoder.ipynb](./04_b_sam_encoder_decoder.ipynb)
 
-The notebook contains the original Spanish lesson content and a computational simulation of encoder-decoder latency.
+It includes:
+
+- Original Spanish lesson material
+- Encoder-decoder simulation
+- Successful interactive latency demonstration
+- Caching versus no-caching experiment
+- Validated Colab outputs
+- Saved comparison chart
 
 ---
 
-# The Promptable Segmentation Paradigm
+# Promptable Segmentation
 
-Traditional task-specific segmentation systems normally require a labeled dataset and training for a fixed category. SAM changes the interaction model: a user provides a prompt that identifies what should be segmented.
+Instead of training a separate segmentation model for every fixed category, SAM receives a prompt that identifies what should be segmented.
 
-Supported prompt concepts include:
+Prompt types can include:
 
 ```text
 Point
@@ -85,39 +79,29 @@ The model combines the image representation with the prompt representation to ge
 
 # SAM Architecture
 
-SAM is organized into three principal components.
+## Image Encoder
 
-## 1. Image Encoder
-
-The image encoder processes the complete image and produces a high-dimensional image embedding.
+The Image Encoder processes the complete image and creates a high-dimensional image embedding.
 
 ```text
-Image
-  ↓
-Image Encoder
-  ↓
-Image Embedding
+Image → Image Encoder → Image Embedding
 ```
 
-It is the computationally expensive component. The central optimization is to run it once per image and cache its output.
+This is the computationally expensive component. For a static image, its output can be calculated once and cached.
 
-## 2. Prompt Encoder
+## Prompt Encoder
 
-The prompt encoder converts a point, box, text instruction, or mask into a mathematical prompt embedding.
+The Prompt Encoder converts a point, box, text instruction, or mask into a mathematical prompt embedding.
 
 ```text
-User Prompt
-    ↓
-Prompt Encoder
-    ↓
-Prompt Embedding
+Prompt → Prompt Encoder → Prompt Embedding
 ```
 
-It is designed to be lightweight so the user can provide new prompts interactively.
+It is lightweight enough to support interactive use.
 
-## 3. Mask Decoder
+## Mask Decoder
 
-The mask decoder combines the cached image embedding with the new prompt embedding and predicts the final mask.
+The Mask Decoder combines the cached image embedding with a prompt embedding and predicts the final mask.
 
 ```text
 Image Embedding + Prompt Embedding
@@ -126,23 +110,6 @@ Image Embedding + Prompt Embedding
                   ↓
           Segmentation Mask
 ```
-
----
-
-# Complete Inference Flow
-
-```text
-Image ──→ Image Encoder ──→ Cached Image Embedding
-                                      │
-Prompt ─→ Prompt Encoder ─→ Prompt Embedding
-                                      │
-                                      ↓
-                                Mask Decoder
-                                      ↓
-                             Segmentation Mask
-```
-
-The expensive image representation remains fixed while the lightweight prompt path can be executed repeatedly.
 
 ---
 
@@ -156,27 +123,19 @@ DummyPromptEncoder
 DummyMaskDecoder
 ```
 
-They simulate the relative cost of each architectural stage.
-
 | Component | Simulated latency | Output |
 |---|---:|---|
-| Image Encoder | 2.00 seconds | `(1, 256, 64, 64)` image embedding |
-| Prompt Encoder | 0.05 seconds | `(1, 256)` prompt embedding |
+| Image Encoder | 2.00 seconds | `(1, 256, 64, 64)` embedding |
+| Prompt Encoder | 0.05 seconds | `(1, 256)` embedding |
 | Mask Decoder | 0.05 seconds | `(500, 500)` binary mask |
 
-These arrays are randomly generated educational stand-ins. They are not predictions from a trained SAM model.
+These randomly generated arrays are educational stand-ins, not predictions from a trained SAM checkpoint.
 
 ---
 
-# Interactive Latency Demonstration
+# Interactive Latency Validation
 
-The notebook encodes the image once:
-
-```python
-image_embedding = image_encoder.encode(image)
-```
-
-It then reuses that embedding for three prompts:
+The image embedding was calculated once and reused for three prompts:
 
 ```text
 Point(100, 150)
@@ -184,112 +143,119 @@ Point(200, 200)
 Point(400, 50)
 ```
 
-For every interaction, only the lightweight components run:
-
-```python
-prompt_embedding = prompt_encoder.encode(prompt)
-mask = mask_decoder.decode(
-    image_embedding,
-    prompt_embedding
-)
-```
-
-Expected conceptual timing:
+Validated Google Colab results:
 
 ```text
-Initial image encoding: approximately 2.00 s
+Image Encoder: 2.02 seconds
 
-Each prompt:
-Prompt Encoder: 0.05 s
-Mask Decoder:   0.05 s
-Total:          approximately 0.10 s
+Prompt 1: 0.105 seconds
+Prompt 2: 0.105 seconds
+Prompt 3: 0.103 seconds
 ```
 
-The exact printed values may vary slightly because operating-system scheduling and notebook overhead affect `time.time()` measurements.
+This confirms that the expensive image representation can remain fixed while the lightweight prompt path runs repeatedly.
 
 ---
 
-# Why Caching Matters
+# Caching Experiment
 
-Without caching, every user click would repeat the expensive image encoder.
-
-For three prompts:
+## Without Caching
 
 ```text
-Without caching:
-3 × (2.00 + 0.05 + 0.05) ≈ 6.30 s
-
-With caching:
-2.00 + 3 × (0.05 + 0.05) ≈ 2.30 s
+Prompt 1 → Encode Image → Encode Prompt → Decode Mask
+Prompt 2 → Encode Image → Encode Prompt → Decode Mask
+Prompt 3 → Encode Image → Encode Prompt → Decode Mask
 ```
 
-In this simulation, caching avoids approximately four seconds of redundant encoder work.
+## With Caching
+
+```text
+Encode Image Once
+        ↓
+Cached Image Embedding
+        ↓
+Prompt 1 → Encode Prompt → Decode Mask
+Prompt 2 → Encode Prompt → Decode Mask
+Prompt 3 → Encode Prompt → Decode Mask
+```
+
+## Validated Results
+
+| Strategy | Total time |
+|---|---:|
+| Without caching | 6.352 seconds |
+| With caching | 2.322 seconds |
+
+```text
+Time saved: 4.031 seconds
+Speedup:    2.74x
+```
+
+![Caching comparison](./practical/assets/output/sam_encoder_decoder_caching_comparison.png)
+
+---
+
+# Practical Implementation
+
+The reusable practical is available at:
+
+[practical/sam_encoder_decoder_caching.py](./practical/sam_encoder_decoder_caching.py)
+
+Run from the lesson directory:
+
+```bash
+python practical/sam_encoder_decoder_caching.py
+```
+
+The practical:
+
+- Simulates all three architectural components
+- Processes three point prompts
+- Measures both execution strategies
+- Calculates time saved and speedup
+- Generates the comparison chart automatically
 
 ---
 
 # Image Segmentation versus Video
 
-Caching is straightforward for a static image because its embedding remains valid while the pixels do not change.
+Caching is straightforward for a static image because its embedding remains valid while its pixels do not change.
 
-Video introduces a different challenge:
+A basic video workflow must encode every changing frame. Modern video-aware SAM workflows use memory and spatiotemporal information to propagate object representations and maintain temporal consistency while reducing redundant work.
+
+---
+
+# Requirements
 
 ```text
-Frame 1 → Image changes
-Frame 2 → Image changes
-Frame 3 → Image changes
+Python
+NumPy
+Matplotlib
+Google Colab (optional)
 ```
 
-A basic frame-independent approach must encode every frame. Modern video-aware SAM workflows use memory and spatiotemporal information to propagate object representations and reduce redundant computation while maintaining temporal consistency.
+The lesson does not require:
 
-The notebook presents this as the conceptual motivation for SAM 2.1 and SAM 3 video capabilities.
-
----
-
-# Required Libraries
-
-The lesson simulation only requires:
-
-```python
-import time
-import numpy as np
-```
-
-No GPU, model checkpoint, image file, Ultralytics installation, or network download is required for the original six-cell notebook.
+- GPU
+- SAM checkpoint
+- Ultralytics installation
+- Input image file
 
 ---
 
-# Validation Requirements
-
-This lesson will be considered complete after verifying:
-
-- Notebook opens successfully
-- NumPy imports successfully
-- Dummy encoder-decoder classes initialize
-- Image embedding is calculated once
-- Three prompts reuse the cached embedding
-- One binary mask is returned per prompt
-- Image-encoder and interaction times are printed
-- The latency comparison is analyzed
-- A practical extension is implemented
-- Practical outputs are saved and visually inspected
-- Session documentation is finalized
-
----
-
-# Expected Learning Outcomes
+# Learning Outcomes
 
 After completing this lesson, the learner should be able to:
 
 - Explain promptable segmentation
 - Identify the three principal SAM components
 - Distinguish image and prompt embeddings
-- Explain why the image encoder is expensive
+- Explain why the Image Encoder is expensive
 - Explain why prompt interaction can be fast
 - Reuse a cached image embedding
+- Measure the performance benefit of caching
 - Interpret an encoder-decoder latency simulation
-- Estimate the benefit of caching
-- Explain why video requires spatiotemporal memory
-- Connect this architecture to interactive segmentation applications
+- Explain why video benefits from spatiotemporal memory
 
 ---
 
@@ -303,10 +269,10 @@ Session 08
 Natural-Language Text Prompts
           ↓
 Session 09
-How SAM Encodes Images and Decodes Prompts
+SAM Encoder-Decoder and Embedding Caching
 ```
 
-Session 09 asks:
+Session 09 answers:
 
 ```text
 Why can SAM respond quickly to many prompts
@@ -315,35 +281,22 @@ after an image has been encoded once?
 
 ---
 
-# Technologies
+# Status
 
-```text
-Python
-Google Colab
-NumPy
-SAM Architecture
-Encoder-Decoder Models
-Image Embeddings
-Prompt Embeddings
-Interactive Segmentation
-```
-
----
-
-# Current Progress
+**COMPLETE — validated in Google Colab**
 
 Completed:
 
-- Lesson 09 folder design
-- Original class notebook reviewed
-- Lesson README
-- Class-recording documentation
-- Original notebook preserved
+- Original lesson reviewed
+- Class recording documented
+- Notebook repaired and executed
+- Three interactive prompts validated
+- Caching experiment completed
+- Comparison chart generated and inspected
+- Practical Python implementation added
+- Input and output assets documented
 
 Pending:
 
-- Notebook execution and timing validation
-- Practical extension
-- Input and output asset documentation
-- Visual output evidence
 - Course index update after all classes
+
