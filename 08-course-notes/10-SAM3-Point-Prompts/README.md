@@ -1,224 +1,104 @@
 # 10 — SAM3 Point Prompts
 
-> **Course Session 11** — The repository uses zero-based lesson numbering beginning with `00`, so Course Session 11 is stored in GitHub folder `10`.
+> **Course Session 11** — This repository starts at lesson `00`, so Course Session 11 is stored as folder `10`.
 
-This session introduces **point-guided segmentation with SAM 3**.
+This lesson develops point-guided segmentation with SAM 3. Positive points select an object, negative points exclude unwanted regions, and detector- or text-derived coordinates enable reproducible refinement workflows.
 
-A point prompt identifies a pixel that belongs to the target object. SAM then infers the complete object mask. Positive points include regions, while negative points exclude unwanted regions and refine ambiguous masks.
+## Learning objectives
 
----
-
-# Session Objective
-
-The objective is to build and evaluate interactive segmentation workflows using positive and negative point prompts.
-
-The notebook asks the learner to:
-
-- Use `points=` and `labels=` with SAM 3
-- Generate point coordinates from YOLO detections
-- Segment an object using one positive point
-- Inspect mask count, area, and confidence
+- Segment an object with one positive point
+- Inspect mask area and confidence
 - Compare one, two, and three positive points
-- Add a negative point to exclude background
+- Refine a mask with a negative point
 - Compare text, point, and bounding-box prompts
-- Combine text discovery with point refinement
-- Complete an extension challenge for the first three YOLO detections
+- Use text discovery followed by point refinement
+- Segment the first three YOLO detections with individual point prompts
 
----
-
-# Current Structure
+## Repository structure
 
 ```text
 10-SAM3-Point-Prompts/
 ├── README.md
 ├── CLASS-RECORDING.md
-└── 05_a_sam3_prompts_puntos.ipynb
+├── 05_a_sam3_prompts_puntos.ipynb
+└── practical/
+    ├── README.md
+    ├── requirements.txt
+    ├── common.py
+    ├── 01_basic_positive_point.py
+    ├── 02_multiple_positive_points.py
+    ├── 03_positive_negative_refinement.py
+    ├── 04_prompt_type_comparison.py
+    ├── 05_text_to_point_refinement.py
+    ├── 06_three_object_point_challenge.py
+    └── assets/
+        ├── README.md
+        ├── input/
+        │   ├── README.md
+        │   └── bus.jpg
+        └── output/
+            ├── README.md
+            └── 6 validated PNG results
 ```
 
-The practical implementation and output assets will be added only after the notebook is executed and the extension challenge is genuinely completed.
+Only `bus.jpg` is included because it is the input genuinely used by every validated experiment. No empty or unused input folder is preserved.
 
----
+## Notebook
 
-# Original Class Notebook
+[Open the corrected lesson notebook](./05_a_sam3_prompts_puntos.ipynb)
 
-[05_a_sam3_prompts_puntos.ipynb](./05_a_sam3_prompts_puntos.ipynb)
+The notebook now uses the verified checkpoint location:
 
-The original Spanish course notebook is preserved as the source artifact for Course Session 11.
+```text
+/content/drive/MyDrive/SAM3-Models/sam3.pt
+```
 
----
+Its extension challenge has also been completed: the first three YOLO detections are segmented, annotated, displayed, and saved.
 
-# Point Labels
-
-SAM uses labels to distinguish inclusion from exclusion:
+## Point labels
 
 | Label | Meaning | Purpose |
 |---:|---|---|
-| `1` | Positive point | Include the object containing this pixel |
-| `0` | Negative point | Exclude the region containing this pixel |
+| `1` | Positive point | Include the object containing the pixel |
+| `0` | Negative point | Exclude the region containing the pixel |
 
-Example:
+## Validated results
 
-```python
-sam_model.predict(
-    source=image,
-    points=[positive_point, negative_point],
-    labels=[1, 0]
-)
+The practical suite was executed in Google Colab using a Tesla T4 GPU.
+
+| Experiment | Validated result |
+|---|---|
+| Basic positive point | Point `[413, 494]`; 1 mask |
+| Mask analytics | 27,808 px²; confidence 0.683 |
+| Positive/negative refinement | Positive `[413, 494]`; negative `[353, 414]` |
+| Prompt comparison | Text: 6 people; Point: 1 object; YOLO boxes: 4 objects |
+| Text-to-point refinement | 6 people discovered; refined center `[281, 628]` |
+| Three-object challenge | 3 objects segmented |
+
+All six visual results are available in [practical/assets/output](./practical/assets/output/).
+
+## Run locally or in Colab
+
+```bash
+cd 08-course-notes/10-SAM3-Point-Prompts/practical
+pip install -r requirements.txt
+export SAM3_MODEL_PATH=/content/drive/MyDrive/SAM3-Models/sam3.pt
+python 01_basic_positive_point.py
 ```
 
----
+Run the remaining numbered scripts in order to reproduce the full lesson.
 
-# Lesson Workflow
+## Class recording
 
-```text
-Load SAM 3 and bus.jpg
-          ↓
-Detect objects with YOLOv8
-          ↓
-Use a box center as a point
-          ↓
-Segment with one positive point
-          ↓
-Inspect masks, areas, and confidence
-          ↓
-Compare multiple positive points
-          ↓
-Add a negative point
-          ↓
-Compare text, point, and box prompts
-          ↓
-Text discovery → point refinement
-          ↓
-Complete the three-object challenge
-```
+[Watch Course Session 11 — SAM3 Point Prompts](https://youtu.be/MmGHsYvRyVc)
 
----
+## Status
 
-# Required Environment
+**COMPLETE AND VALIDATED**
 
-The notebook expects:
-
-```text
-Google Colab
-Python
-Ultralytics
-SAM 3 checkpoint
-YOLOv8n
-Supervision
-OpenCV
-NumPy
-Matplotlib
-```
-
-The source notebook contains this checkpoint path:
-
-```text
-/content/drive/MyDrive/RandD/Archive_Zero_Resolved/sam3.pt
-```
-
-We will verify and use the actual configured checkpoint path before inference rather than assuming the source path exists.
-
----
-
-# Input Images
-
-The notebook downloads:
-
-```text
-bus.jpg
-zidane.jpg
-```
-
-The primary experiments use `bus.jpg`. Inputs will be copied into practical assets only after successful execution confirms which files are genuinely used.
-
----
-
-# Experiments
-
-## 1. YOLO-Guided Point Selection
-
-YOLO detects objects and the notebook calculates the center of the first bounding box.
-
-## 2. One Positive Point
-
-A positive label requests the object containing the selected pixel.
-
-## 3. Multiple Positive Points
-
-The notebook compares one, two, and three points inside the same detected object.
-
-## 4. Positive and Negative Points
-
-A positive point selects the object and a negative point marks background to exclude.
-
-## 5. Prompt-Type Comparison
-
-The same scene is analyzed with text, point, and YOLO bounding-box prompts.
-
-## 6. Text Discovery and Point Refinement
-
-The semantic text predictor discovers people automatically. The center of one discovered instance becomes a point prompt for individual refinement.
-
----
-
-# Required Extension Challenge
-
-The notebook’s final task is incomplete by design.
-
-The learner must:
-
-1. Select the first three YOLO detections.
-2. Calculate one center point for each object.
-3. Run SAM point-prompt segmentation independently.
-4. Annotate the generated masks.
-5. Show the three results side by side.
-6. Display object IDs and class IDs.
-7. Save the completed visual evidence.
-
-The supplied final cell currently displays the original image because the mask-annotation lines are commented out. We will complete and validate this cell in Colab before calling the lesson finished.
-
----
-
-# Validation Requirements
-
-The lesson will be considered complete only after verifying:
-
-- Google Drive mounted
-- Real `sam3.pt` path confirmed
-- Required packages installed
-- `bus.jpg` loaded
-- YOLO detection completed
-- First point coordinate calculated
-- Positive-point segmentation completed
-- Mask count, area, and confidence inspected
-- One-, two-, and three-point comparison completed
-- Negative-point experiment completed
-- Text, point, and box comparison completed
-- Text-to-point workflow completed
-- Three-object extension challenge completed
-- Final outputs saved and visually inspected
-- Completed notebook downloaded
-- Practical structure created from validated work
-
----
-
-# Status
-
-**IN PROGRESS**
-
-Completed:
-
-- Course Session 11 source notebook reviewed
-- GitHub folder 10 created
-- Professional lesson documentation created
-- Class recording documented
-- Tasks and validation criteria documented
-
-Pending:
-
-- Colab execution
-- Checkpoint-path correction
-- Extension-challenge completion
-- Practical code
-- Validated input/output assets
-
+- Correct checkpoint path documented
+- Extension challenge implemented
+- Six practical scripts validated
+- One genuine input preserved
+- Six real outputs preserved
+- Recording and reproducibility instructions included

@@ -1,0 +1,6 @@
+matplotlib>=3.8
+numpy>=1.26
+opencv-python>=4.9
+supervision>=0.27
+torch>=2.0
+ultralytics>=8.4

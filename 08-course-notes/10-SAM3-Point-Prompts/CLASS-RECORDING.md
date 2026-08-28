@@ -2,31 +2,24 @@
 
 ## SAM3 Point Prompts
 
-This file documents the class recording for **Course Session 11 — SAM3 Point Prompts**, stored as GitHub lesson folder `10` because the repository starts at `00`.
+This repository stores Course Session 11 as lesson folder `10` because numbering begins at `00`.
 
----
-
-## Class Recording
+## Recording
 
 [Watch Course Session 11 — SAM3 Point Prompts on YouTube](https://youtu.be/MmGHsYvRyVc)
 
----
+## Topics
 
-## Topics Covered
-
-- Positive point prompts
-- Negative point prompts
+- Positive and negative point prompts
 - YOLO-guided point coordinates
-- Point-based SAM 3 segmentation
 - Mask count, area, and confidence
 - Multiple-point refinement
 - Text, point, and bounding-box comparison
 - Text discovery followed by point refinement
 - Three-object extension challenge
 
----
+## Related materials
 
-## Related Files
-
-- [README.md](./README.md)
-- [05_a_sam3_prompts_puntos.ipynb](./05_a_sam3_prompts_puntos.ipynb)
+- [Lesson README](./README.md)
+- [Course notebook](./05_a_sam3_prompts_puntos.ipynb)
+- [Validated practical](./practical/)
