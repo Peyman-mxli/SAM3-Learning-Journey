@@ -1,0 +1,5 @@
+huggingface_hub>=0.34
+transformers>=5,<6
+torch>=2.7
+torchvision>=0.22
+pillow>=10
