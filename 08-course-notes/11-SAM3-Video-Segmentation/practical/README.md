@@ -79,6 +79,32 @@ Dedicated implementation:
 
 ![Normalized top-down football pitch](./assets/output/football_pitch_top_down.svg)
 
+### Player / Robot Detections
+
+![Detected football robots](./assets/output/04_detected_players.svg)
+
+### Bottom-Center Foot Anchors
+
+The ground-contact point for each bounding box is calculated as:
+
+```python
+center_x = (x1 + x2) / 2
+bottom_y = y2
+```
+
+![Bottom-center player anchors](./assets/output/05_player_anchor_points.svg)
+
+### FIFA-Style Minimap
+
+The anchor points are transformed by matrix H and drawn in canonical field coordinates.
+
+![Transformed football minimap](./assets/output/06_football_minimap.svg)
+
+### Coordinate Evidence
+
+- [Homography matrix and points](./assets/output/homography_matrix.json)
+- [Original and transformed coordinates](./assets/output/transformed_coordinates.csv)
+
 ### Run with the Included Demonstration
 
 ```bash
@@ -95,9 +121,25 @@ python football_pitch_homography.py \
 
 Click the four corners in the required order and press Enter after the selection. The program saves:
 
-- `football_pitch_four_points.png`
-- `football_pitch_top_down.png`
+- `01_original_field.png`
+- `02_four_selected_points.png`
+- `03_top_down_field.png`
+- `04_detected_players.png`
+- `05_player_anchor_points.png`
+- `06_football_minimap.png`
 - `homography_matrix.json`
+- `transformed_coordinates.csv`
+
+To run YOLO instead of the included demonstration boxes:
+
+```bash
+python football_pitch_homography.py \
+  --input /path/to/football_pitch.jpg \
+  --interactive \
+  --detect \
+  --yolo-model yolov8n.pt \
+  --class-id 0
+```
 
 ---
 
