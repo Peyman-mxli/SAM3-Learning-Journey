@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#183f22"/><stop offset="1" stop-color="#398b42"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="1280" height="720" fill="#0d1822"/><rect x="30" y="30" width="1220" height="660" rx="28" fill="url(#g)"/>
+<g opacity=".16" fill="#b8efb5"><path d="M30 30h152v660H30z"/><path d="M334 30h152v660H334z"/><path d="M638 30h152v660H638z"/><path d="M942 30h152v660H942z"/></g>
+<polygon points="240,90 1040,90 1220,650 60,650" fill="none" stroke="#fff" stroke-width="7"/>
+<line x1="640" y1="90" x2="640" y2="650" stroke="#fff" stroke-width="5"/><ellipse cx="640" cy="370" rx="84" ry="102" fill="none" stroke="#fff" stroke-width="5"/><circle cx="640" cy="370" r="7" fill="#fff"/>
+<polygon points="240,90 1040,90 1220,650 60,650" fill="#ffd400" fill-opacity=".08" stroke="#ffd400" stroke-width="5" stroke-dasharray="14 10"/>
+<g font-family="Arial" font-size="26" font-weight="700" text-anchor="middle" filter="url(#glow)">
+<g><circle cx="240" cy="90" r="22" fill="#e53935" stroke="#fff" stroke-width="5"/><text x="240" y="99" fill="#fff">1</text><text x="240" y="145" fill="#fff">Top Left</text></g>
+<g><circle cx="1040" cy="90" r="22" fill="#e53935" stroke="#fff" stroke-width="5"/><text x="1040" y="99" fill="#fff">2</text><text x="1040" y="145" fill="#fff">Top Right</text></g>
+<g><circle cx="1220" cy="650" r="22" fill="#e53935" stroke="#fff" stroke-width="5"/><text x="1220" y="659" fill="#fff">3</text><text x="1138" y="627" fill="#fff">Bottom Right</text></g>
+<g><circle cx="60" cy="650" r="22" fill="#e53935" stroke="#fff" stroke-width="5"/><text x="60" y="659" fill="#fff">4</text><text x="145" y="627" fill="#fff">Bottom Left</text></g></g>
+<text x="640" y="55" text-anchor="middle" fill="#fff" font-family="Arial" font-size="30" font-weight="700">Four Selected Points for Homography</text>
+</svg>
