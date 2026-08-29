@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#183f22"/><stop offset="1" stop-color="#398b42"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-opacity=".35"/></filter></defs>
+<rect width="1280" height="720" fill="#0d1822"/>
+<rect x="30" y="30" width="1220" height="660" rx="28" fill="url(#g)" filter="url(#s)"/>
+<g opacity=".16" fill="#b8efb5"><path d="M30 30h152v660H30z"/><path d="M334 30h152v660H334z"/><path d="M638 30h152v660H638z"/><path d="M942 30h152v660H942z"/></g>
+<polygon points="240,90 1040,90 1220,650 60,650" fill="none" stroke="#fff" stroke-width="7"/>
+<line x1="640" y1="90" x2="640" y2="650" stroke="#fff" stroke-width="5"/>
+<ellipse cx="640" cy="370" rx="84" ry="102" fill="none" stroke="#fff" stroke-width="5"/>
+<circle cx="640" cy="370" r="7" fill="#fff"/>
+<path d="M240 90L60 650M1040 90l180 560" stroke="#fff" stroke-width="2" opacity=".6"/>
+<text x="640" y="55" text-anchor="middle" fill="#fff" font-family="Arial" font-size="30" font-weight="700">Perspective Football Pitch — Source Image</text>
+</svg>
