@@ -143,6 +143,14 @@ assets/output/bus_yolov8.jpg
 assets/output/bus_yolov8_detections.json
 ```
 
+## Verified Runtime Output
+
+The example was executed successfully with `yolov8n.pt` at confidence 0.50. Four detections were retained: one bus and three people.
+
+![Verified YOLOv8 detection output](./assets/output/bus_yolov8.jpg)
+
+- [Structured detection results](./assets/output/bus_yolov8_detections.json)
+
 ## Command-Line Usage
 
 ```bash
