@@ -608,9 +608,19 @@ After completing this session, I understand:
 
 [practical/README.md](./practical/README.md)
 
-## Reusable Python Implementation
+## Reusable Python Implementations
+
+Video segmentation:
 
 [practical/sam3_video_segmentation.py](./practical/sam3_video_segmentation.py)
+
+Four-point football-pitch homography:
+
+[practical/football_pitch_homography.py](./practical/football_pitch_homography.py)
+
+Visual homography example:
+
+[practical/assets/output/football_pitch_four_points.svg](./practical/assets/output/football_pitch_four_points.svg)
 
 ## Practical Dependencies
 
