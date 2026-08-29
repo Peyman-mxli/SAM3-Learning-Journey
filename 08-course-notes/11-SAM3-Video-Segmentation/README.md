@@ -7,20 +7,17 @@ The lesson explores two different pipelines for processing video:
 - **Option A — YOLO + ByteTrack + SAM 3:** YOLO detects objects, ByteTrack assigns persistent IDs, and SAM 3 generates precise masks.
 - **Option B — SAM 3 with text prompts:** `SAM3VideoSemanticPredictor` detects, segments, and tracks semantic concepts directly from text.
 
-The original course notebook and class recording are preserved in this folder. A structured practical section will be developed from the notebook experiments and validated outputs.
+The original course notebook and class recording are preserved in this folder.
 
 ---
 
 ## Session Status
 
 ```text
-Session:          11 — SAM 3 Video Segmentation
-Course Notebook:  ✅ Preserved
-Class Recording:  ✅ Added
-Documentation:    ✅ Added
-Practical:        ⏳ In progress
-Colab Validation: ⏳ Pending
-Outputs:          ⏳ Pending
+Session:         11 — SAM 3 Video Segmentation
+Course Notebook: ✅ Preserved
+Class Recording: ✅ Added
+Documentation:   ✅ Completed
 ```
 
 ---
@@ -90,13 +87,8 @@ The main learning goals are:
 │
 ├── README.md
 ├── CLASS-RECORDING.md
-├── 05_b_segmentacion_sam_video.ipynb
-│
-└── practical/
-    └── README.md
+└── 05_b_segmentacion_sam_video.ipynb
 ```
-
-Additional practical assets and validated outputs will be added after the notebook is executed in Google Colab.
 
 ---
 
@@ -609,12 +601,6 @@ After completing this session, I understand:
 
 [05_b_segmentacion_sam_video.ipynb](./05_b_segmentacion_sam_video.ipynb)
 
-## Practical
-
-[practical/README.md](./practical/README.md)
-
----
-
 # Session Progression
 
 ```text
@@ -638,12 +624,9 @@ This session combines the concepts of detection, tracking, segmentation, filteri
 ```text
 Session 11 — SAM 3 Video Segmentation
 
-Documentation:       ADDED       ✅
-Class Notebook:      PRESERVED   ✅
-Class Recording:     ADDED       ✅
-Practical Planning:  ADDED       ✅
-Colab Validation:    PENDING     ⏳
-Generated Outputs:   PENDING     ⏳
+Documentation:   COMPLETED   ✅
+Class Notebook:  PRESERVED   ✅
+Class Recording: ADDED       ✅
 ```
 
-**Session 11 has been created. Practical execution and validation will continue from the original notebook.**
+**Session 11 documentation has been created successfully.**
