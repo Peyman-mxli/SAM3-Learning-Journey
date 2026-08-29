@@ -590,6 +590,51 @@ After completing this session, I understand:
 
 ---
 
+# Sector Use Case — Football-Pitch Homography
+
+The class recording extends the video lesson with a sports-sector use case based on an oblique robotic-football image.
+
+The complete practical now implements:
+
+```text
+Oblique Football Image
+        ↓
+Four Ordered Field Corners
+        ↓
+3×3 Homography Matrix H
+        ↓
+Player / Robot Bounding Boxes
+        ↓
+Bottom-Center Foot Anchors
+        ↓
+Transformed Field Coordinates
+        ↓
+FIFA-Style Top-Down Minimap
+```
+
+## Four Selected Field Points
+
+![Four selected football-pitch points](./practical/assets/output/football_pitch_four_points.svg)
+
+## Player Ground-Contact Anchors
+
+![Bottom-center player anchors](./practical/assets/output/05_player_anchor_points.svg)
+
+## Transformed Football Minimap
+
+![Football minimap](./practical/assets/output/06_football_minimap.svg)
+
+Practical implementation:
+
+[football_pitch_homography.py](./practical/football_pitch_homography.py)
+
+Coordinate evidence:
+
+- [homography_matrix.json](./practical/assets/output/homography_matrix.json)
+- [transformed_coordinates.csv](./practical/assets/output/transformed_coordinates.csv)
+
+---
+
 # Session Resources
 
 ## Class Recording
