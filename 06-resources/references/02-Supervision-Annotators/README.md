@@ -264,6 +264,12 @@ The gallery compares:
 - Ellipses and labels
 - Bottom-center dots and labels
 
+## Verified Output
+
+The example was executed with Supervision 0.30.1 and retained four detections at a confidence threshold of 0.50.
+
+![Verified Supervision annotator gallery](./assets/output/annotator_gallery.jpg)
+
 ## Choosing the Right Annotator
 
 | Requirement | Recommended visualization |
