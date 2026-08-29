@@ -12,25 +12,32 @@ The practical script writes generated artifacts to this directory.
 | `mask_area_chart.png` | Temporal mask-area chart |
 | `mask_areas.json` | Frame-level mask-area observations by tracker ID |
 
-Generated files should be documented only after their execution and visual verification.
+Generated files are documented here after execution and visual verification.
 
 
 ---
 
-## Football-Pitch Homography Visuals
+## Football-Pitch Homography — Verified Runtime Outputs
+
+The included football demonstration was executed successfully. These PNG files are the direct program outputs.
 
 | File | Description |
 |---|---|
-| [`football_pitch_four_points.svg`](./football_pitch_four_points.svg) | Perspective pitch with four ordered source points |
-| [`football_pitch_top_down.svg`](./football_pitch_top_down.svg) | Normalized top-down homography result |
-| [`04_detected_players.svg`](./04_detected_players.svg) | Three detected robots with bounding boxes |
-| [`05_player_anchor_points.svg`](./05_player_anchor_points.svg) | Bottom-center ground-contact points |
-| [`06_football_minimap.svg`](./06_football_minimap.svg) | FIFA-style minimap using transformed coordinates |
-| [`homography_matrix.json`](./homography_matrix.json) | Matrix H, source points, anchors, and field points |
-| [`transformed_coordinates.csv`](./transformed_coordinates.csv) | Original image coordinates and transformed field coordinates |
-| `01_original_field.png` | Runtime source image |
-| `02_four_selected_points.png` | Runtime four-point visualization |
-| `03_top_down_field.png` | Runtime warped field |
-| `04_detected_players.png` | Runtime YOLO/demonstration detections |
-| `05_player_anchor_points.png` | Runtime foot-anchor visualization |
-| `06_football_minimap.png` | Runtime minimap |
+| [`01_original_field.png`](./01_original_field.png) | Original perspective football field |
+| [`02_four_selected_points.png`](./02_four_selected_points.png) | Four ordered source points: TL, TR, BR, BL |
+| [`03_top_down_field.png`](./03_top_down_field.png) | Perspective-corrected top-down field |
+| [`04_detected_players.png`](./04_detected_players.png) | Three demonstration player/robot detections |
+| [`05_player_anchor_points.png`](./05_player_anchor_points.png) | Bottom-center ground-contact anchors |
+| [`06_football_minimap.png`](./06_football_minimap.png) | Transformed player positions on the minimap |
+| [`homography_matrix.json`](./homography_matrix.json) | Calculated matrix H, source points, anchors, and field points |
+| [`transformed_coordinates.csv`](./transformed_coordinates.csv) | Image coordinates and calculated field coordinates |
+
+### Result Preview
+
+![Four selected points](./02_four_selected_points.png)
+
+![Bottom-center anchor points](./05_player_anchor_points.png)
+
+![Football minimap](./06_football_minimap.png)
+
+The SVG files remain as lightweight explanatory diagrams. The PNG files above are the verified outputs produced by `football_pitch_homography.py`.
