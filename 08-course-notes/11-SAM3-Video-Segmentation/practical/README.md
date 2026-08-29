@@ -35,6 +35,72 @@ The input video can be supplied manually or downloaded automatically by the scri
 
 ---
 
+## Football-Pitch Homography — Four Selected Points
+
+The class also demonstrates perspective correction by selecting four ordered points around a football pitch.
+
+The point order is:
+
+```text
+1 — Top Left
+2 — Top Right
+3 — Bottom Right
+4 — Bottom Left
+```
+
+Those four source coordinates are mapped to the corners of a normalized rectangle with:
+
+```python
+matrix = cv2.getPerspectiveTransform(
+    source_points,
+    target_points
+)
+
+top_down = cv2.warpPerspective(
+    image,
+    matrix,
+    (output_width, output_height)
+)
+```
+
+Dedicated implementation:
+
+[View `football_pitch_homography.py`](./football_pitch_homography.py)
+
+### Source Football Pitch
+
+![Perspective football pitch](./assets/input/football_pitch_perspective.svg)
+
+### Four Selected Points
+
+![Four selected homography points](./assets/output/football_pitch_four_points.svg)
+
+### Top-Down Homography Result
+
+![Normalized top-down football pitch](./assets/output/football_pitch_top_down.svg)
+
+### Run with the Included Demonstration
+
+```bash
+python football_pitch_homography.py
+```
+
+### Select Four Points Interactively
+
+```bash
+python football_pitch_homography.py \
+  --input /path/to/football_pitch.jpg \
+  --interactive
+```
+
+Click the four corners in the required order and press Enter after the selection. The program saves:
+
+- `football_pitch_four_points.png`
+- `football_pitch_top_down.png`
+- `homography_matrix.json`
+
+---
+
 ## Main Implementation
 
 [View `sam3_video_segmentation.py`](./sam3_video_segmentation.py)
