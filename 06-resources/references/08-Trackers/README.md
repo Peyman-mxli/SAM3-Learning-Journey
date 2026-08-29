@@ -177,6 +177,52 @@ Visual inspection is useful, but a professional evaluation uses labeled sequence
 - Preserve source timestamps when they matter.
 - Separate tracking accuracy from detection accuracy.
 
+## Complete Verified Course-Video Pipeline
+
+The included [`track_vehicles.py`](./track_vehicles.py) runs YOLOv8 detection and the current `ByteTrackTracker` API on the official course traffic video.
+
+```bash
+python track_vehicles.py \
+  --input /path/to/vehicles.mp4 \
+  --output-dir assets/output
+```
+
+The program:
+
+1. Reads and validates the source video.
+2. Resizes 4K frames to 1280×720 for efficient output.
+3. Detects COCO vehicle classes: car, motorcycle, bus, and truck.
+4. Converts Ultralytics results to `sv.Detections`.
+5. Assigns persistent IDs with `ByteTrackTracker`.
+6. Excludes temporary unconfirmed ID `-1` from persistent analytics.
+7. Draws tracker-colored boxes, labels, and movement traces.
+8. Saves an annotated video, preview image, summary JSON, and observation CSV.
+
+### Verified Results
+
+| Measurement | Result |
+|---|---:|
+| Source resolution | 3840×2160 |
+| Source frame rate | 25 FPS |
+| Processed frames | 538 |
+| Duration | 21.52 seconds |
+| Output resolution | 1280×720 |
+| Confidence threshold | 0.35 |
+| Confirmed tracker IDs | 11 |
+| Confirmed observations | 1,217 |
+| Output codec | H.264 |
+
+![Verified ByteTrack preview](./assets/output/vehicles_bytetrack_preview.jpg)
+
+### Verified Artifacts
+
+- [Browser-compatible tracking video](./assets/output/vehicles_bytetrack.mp4)
+- [Tracking preview](./assets/output/vehicles_bytetrack_preview.jpg)
+- [Tracking summary](./assets/output/tracking_summary.json)
+- [Frame-level observations](./assets/output/tracking_observations.csv)
+
+The ID count describes one execution with the recorded model, threshold, package versions, and input. Tracker IDs are session-local analytical identifiers, not personal identities.
+
 ## Official References
 
 - PyPI package: <https://pypi.org/project/trackers/>
