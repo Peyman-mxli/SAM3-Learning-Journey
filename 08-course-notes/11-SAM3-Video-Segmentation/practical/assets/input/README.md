@@ -22,3 +22,14 @@ python sam3_video_segmentation.py \
 ```
 
 Large input videos do not need to be committed to the repository.
+
+
+---
+
+## Football-Pitch Homography Input
+
+The repository includes an original perspective-pitch visual:
+
+[football_pitch_perspective.svg](./football_pitch_perspective.svg)
+
+It is used to document the four-point selection concept from the class. The Python implementation can also accept a real football-field photograph through `--input`.
