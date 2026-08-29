@@ -1,0 +1,133 @@
+{
+  "input": {
+    "filename": "vehicles(3).mp4",
+    "source_width": 3840,
+    "source_height": 2160,
+    "fps": 25.0,
+    "declared_frames": 538
+  },
+  "processing": {
+    "model": "yolov8n.pt",
+    "confidence_threshold": 0.35,
+    "vehicle_class_ids": [
+      2,
+      3,
+      5,
+      7
+    ],
+    "output_width": 1280,
+    "output_height": 720,
+    "processed_frames": 538
+  },
+  "results": {
+    "unique_tracker_ids": 11,
+    "total_tracked_observations": 1217,
+    "tracks": {
+      "0": {
+        "first_frame": 1,
+        "last_frame": 146,
+        "observations": 146,
+        "max_confidence": 0.8868,
+        "class_names": [
+          "car"
+        ]
+      },
+      "1": {
+        "first_frame": 1,
+        "last_frame": 54,
+        "observations": 54,
+        "max_confidence": 0.8409,
+        "class_names": [
+          "car"
+        ]
+      },
+      "2": {
+        "first_frame": 1,
+        "last_frame": 72,
+        "observations": 62,
+        "max_confidence": 0.8743,
+        "class_names": [
+          "bus",
+          "truck"
+        ]
+      },
+      "3": {
+        "first_frame": 22,
+        "last_frame": 61,
+        "observations": 40,
+        "max_confidence": 0.8144,
+        "class_names": [
+          "car",
+          "truck"
+        ]
+      },
+      "4": {
+        "first_frame": 29,
+        "last_frame": 50,
+        "observations": 18,
+        "max_confidence": 0.8202,
+        "class_names": [
+          "bus",
+          "truck"
+        ]
+      },
+      "5": {
+        "first_frame": 37,
+        "last_frame": 221,
+        "observations": 175,
+        "max_confidence": 0.8846,
+        "class_names": [
+          "car"
+        ]
+      },
+      "6": {
+        "first_frame": 117,
+        "last_frame": 256,
+        "observations": 140,
+        "max_confidence": 0.9191,
+        "class_names": [
+          "car"
+        ]
+      },
+      "7": {
+        "first_frame": 218,
+        "last_frame": 397,
+        "observations": 159,
+        "max_confidence": 0.8846,
+        "class_names": [
+          "car",
+          "truck"
+        ]
+      },
+      "8": {
+        "first_frame": 300,
+        "last_frame": 495,
+        "observations": 180,
+        "max_confidence": 0.8684,
+        "class_names": [
+          "bus",
+          "truck"
+        ]
+      },
+      "9": {
+        "first_frame": 386,
+        "last_frame": 518,
+        "observations": 120,
+        "max_confidence": 0.8864,
+        "class_names": [
+          "car"
+        ]
+      },
+      "10": {
+        "first_frame": 415,
+        "last_frame": 537,
+        "observations": 123,
+        "max_confidence": 0.8859,
+        "class_names": [
+          "car",
+          "truck"
+        ]
+      }
+    }
+  }
+}
