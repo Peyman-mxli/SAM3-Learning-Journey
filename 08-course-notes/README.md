@@ -18,6 +18,10 @@ The purpose of this section is to document each course session in a structured w
 | 05 | [Zones and Counting](./05-Zones-and-Counting/) | Completed |
 | 06 | [Segmentation with SAM](./06-Segmentation-with-SAM/) | Completed |
 | 07 | [Advanced MaskAnnotator and SAM2](./07-Advanced-MaskAnnotator-and-SAM2/) | Completed |
+| 08 | [SAM 3 Text Prompts](./08-SAM3-Text-Prompts/) | Completed |
+| 09 | [SAM Encoder-Decoder](./09-SAM-Encoder-Decoder/) | Completed |
+| 10 | [SAM 3 Point Prompts](./10-SAM3-Point-Prompts/) | Completed |
+| 11 | [SAM 3 Video Segmentation](./11-SAM3-Video-Segmentation/) | In Progress |
 
 ---
 
@@ -2879,6 +2883,64 @@ Total:
 
 ---
 
+# Session 08 — SAM 3 Text Prompts
+
+[`08-SAM3-Text-Prompts/`](./08-SAM3-Text-Prompts/)
+
+This session introduces semantic segmentation with natural-language prompts in SAM 3.
+
+Topics include text prompts, open-vocabulary concepts, prompt comparison, confidence analysis, mask visualization, and practical semantic segmentation.
+
+**Status:** Completed
+
+---
+
+# Session 09 — SAM Encoder-Decoder
+
+[`09-SAM-Encoder-Decoder/`](./09-SAM-Encoder-Decoder/)
+
+This session explores the internal encoder-decoder architecture behind SAM, including image embeddings, prompt encoding, mask decoding, and the relationship between model components.
+
+**Status:** Completed
+
+---
+
+# Session 10 — SAM 3 Point Prompts
+
+[`10-SAM3-Point-Prompts/`](./10-SAM3-Point-Prompts/)
+
+This session explores positive and negative point prompts for interactive SAM 3 segmentation, including coordinate selection, point labels, mask refinement, and visual feedback.
+
+**Status:** Completed
+
+---
+
+# Session 11 — SAM 3 Video Segmentation
+
+[`11-SAM3-Video-Segmentation/`](./11-SAM3-Video-Segmentation/)
+
+This session extends SAM 3 into video using two pipelines:
+
+```text
+YOLO → ByteTrack → SAM 3
+```
+
+and:
+
+```text
+Text Prompts → SAM3VideoSemanticPredictor
+```
+
+Topics include frame-by-frame segmentation, persistent tracker IDs, attribute transfer, mask and trace visualization, polygon-zone filtering, confidence-based opacity, temporal mask-area analysis, streaming inference, and direct semantic video prompts.
+
+Class recording:
+
+[SAM 3 en Video — Segmentación y Tracking](https://youtu.be/_EuNGCYS35k)
+
+**Status:** In Progress — documentation and source notebook added; Colab validation pending.
+
+---
+
 # Course Notes Organization
 
 Each course session is documented independently.
@@ -2982,7 +3044,7 @@ The course also introduces concepts related to:
 ```text
 SAM3 Computer Vision Learning Journey
 
-Course Sessions Documented: 8
+Course Sessions Documented: 12
 
 00 Agentic AI Programming                 ✅
 01 Introduction to Supervision            ✅
@@ -2992,17 +3054,21 @@ Course Sessions Documented: 8
 05 Zones and Counting                     ✅
 06 Segmentation with SAM                  ✅
 07 Advanced MaskAnnotator and SAM2        ✅
+08 SAM 3 Text Prompts                     ✅
+09 SAM Encoder-Decoder                    ✅
+10 SAM 3 Point Prompts                    ✅
+11 SAM 3 Video Segmentation               ⏳
 ```
 
-The repository currently documents the learning progression through **Session 07 — Advanced MaskAnnotator and SAM2**.
+The repository currently documents the learning progression through **Session 11 — SAM 3 Video Segmentation**.
 
 ---
 
 # Next Steps
 
-The next course session will be documented when its lesson material is available.
+The next step is to execute and validate Session 11 in Google Colab, preserve the generated video outputs, and document confirmed results.
 
-Future work will continue extending the progression from:
+Current progression:
 
 ```text
 Detection
@@ -3011,14 +3077,14 @@ Tracking
     ↓
 Spatial Analytics
     ↓
-Segmentation
+Image Segmentation
     ↓
-Advanced Mask Visualization
+Semantic and Point Prompts
     ↓
-Temporal Segmentation
+Video Segmentation
+    ↓
+Temporal Analysis
 ```
-
-into the next concepts introduced by the SAM3 course.
 
 ---
 
@@ -3042,9 +3108,9 @@ The objective is not only to preserve course material, but to demonstrate the pr
 ```text
 08-course-notes/
 
-Sessions documented:  8
-Sessions completed:   8
-Latest session:       07 — Advanced MaskAnnotator and SAM2
+Sessions documented:  12
+Sessions completed:   11
+Latest session:       11 — SAM 3 Video Segmentation
 
-Status: UP TO DATE ✅
+Status: SESSION 11 IN PROGRESS ⏳
 ```
