@@ -1,0 +1,4 @@
+trackers==2.6.0
+supervision==0.30.1
+ultralytics>=8.4,<9
+opencv-python-headless>=4.10,<5
