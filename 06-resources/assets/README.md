@@ -168,6 +168,18 @@ An asset being downloadable does not mean every form of redistribution is permit
 | Notebook cannot find asset | Print current working directory and use a resolved path |
 | Colab asset disappears | Colab storage is temporary; redownload or mount Drive |
 
+## Verified Course Files
+
+The three course assets supplied for runtime validation were inspected without modifying their contents.
+
+| File | Size | Media properties | SHA-256 |
+|---|---:|---|---|
+| `bus.jpg` | 137,419 bytes | JPEG · 810×1080 | `c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63` |
+| `zidane.jpg` | 50,427 bytes | JPEG · 1280×720 | `16d73869e3267a7d4ed00de8e860833bd1657c1b252e94c0c348277adc7b6edb` |
+| `vehicles.mp4` | approximately 34 MB | H.264/AAC · 3840×2160 · 25 FPS · 538 frames · 21.52 seconds | `ac81100d9310bd4e9c02bc0b13b6492781d009742ced347766b2601be3c44ad4` |
+
+The video was used to produce the [verified ByteTrack workflow](../references/08-Trackers/). The original external media is not duplicated in GitHub; the canonical download links remain the source of record.
+
 ## Canonical Sources
 
 - Ultralytics sample images: <https://ultralytics.com/images/bus.jpg> and <https://ultralytics.com/images/zidane.jpg>
