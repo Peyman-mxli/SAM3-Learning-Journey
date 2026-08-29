@@ -1,0 +1,46 @@
+[
+  {
+    "xyxy": [
+      22.87,
+      231.28,
+      805.0,
+      756.84
+    ],
+    "confidence": 0.8734,
+    "class_id": 5,
+    "class_name": "bus"
+  },
+  {
+    "xyxy": [
+      48.55,
+      398.55,
+      245.35,
+      902.7
+    ],
+    "confidence": 0.8657,
+    "class_id": 0,
+    "class_name": "person"
+  },
+  {
+    "xyxy": [
+      669.47,
+      392.19,
+      809.72,
+      877.04
+    ],
+    "confidence": 0.8528,
+    "class_id": 0,
+    "class_name": "person"
+  },
+  {
+    "xyxy": [
+      221.52,
+      405.8,
+      344.97,
+      857.54
+    ],
+    "confidence": 0.8252,
+    "class_id": 0,
+    "class_name": "person"
+  }
+]
