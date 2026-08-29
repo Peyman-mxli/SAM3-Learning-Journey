@@ -608,6 +608,18 @@ After completing this session, I understand:
 
 [practical/README.md](./practical/README.md)
 
+## Reusable Python Implementation
+
+[practical/sam3_video_segmentation.py](./practical/sam3_video_segmentation.py)
+
+## Practical Dependencies
+
+[practical/requirements.txt](./practical/requirements.txt)
+
+## Practical Assets
+
+[practical/assets/](./practical/assets/)
+
 # Session Progression
 
 ```text
