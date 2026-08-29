@@ -21,7 +21,7 @@ The purpose of this section is to document each course session in a structured w
 | 08 | [SAM 3 Text Prompts](./08-SAM3-Text-Prompts/) | Completed |
 | 09 | [SAM Encoder-Decoder](./09-SAM-Encoder-Decoder/) | Completed |
 | 10 | [SAM 3 Point Prompts](./10-SAM3-Point-Prompts/) | Completed |
-| 11 | [SAM 3 Video Segmentation](./11-SAM3-Video-Segmentation/) | In Progress |
+| 11 | [SAM 3 Video Segmentation](./11-SAM3-Video-Segmentation/) | Completed |
 
 ---
 
@@ -2937,7 +2937,7 @@ Class recording:
 
 [SAM 3 en Video — Segmentación y Tracking](https://youtu.be/_EuNGCYS35k)
 
-**Status:** In Progress — documentation and source notebook added; Colab validation pending.
+**Status:** Completed
 
 ---
 
@@ -3057,7 +3057,7 @@ Course Sessions Documented: 12
 08 SAM 3 Text Prompts                     ✅
 09 SAM Encoder-Decoder                    ✅
 10 SAM 3 Point Prompts                    ✅
-11 SAM 3 Video Segmentation               ⏳
+11 SAM 3 Video Segmentation               ✅
 ```
 
 The repository currently documents the learning progression through **Session 11 — SAM 3 Video Segmentation**.
@@ -3066,7 +3066,7 @@ The repository currently documents the learning progression through **Session 11
 
 # Next Steps
 
-The next step is to execute and validate Session 11 in Google Colab, preserve the generated video outputs, and document confirmed results.
+The next course session will be documented when its lesson material is available.
 
 Current progression:
 
@@ -3109,8 +3109,8 @@ The objective is not only to preserve course material, but to demonstrate the pr
 08-course-notes/
 
 Sessions documented:  12
-Sessions completed:   11
+Sessions completed:   12
 Latest session:       11 — SAM 3 Video Segmentation
 
-Status: SESSION 11 IN PROGRESS ⏳
+Status: UP TO DATE ✅
 ```
