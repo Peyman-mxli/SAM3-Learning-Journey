@@ -67,21 +67,21 @@ Dedicated implementation:
 
 [View `football_pitch_homography.py`](./football_pitch_homography.py)
 
-### Source Football Pitch
+### Verified Runtime — Original Field
 
-![Perspective football pitch](./assets/input/football_pitch_perspective.svg)
+![Verified original football field](./assets/output/01_original_field.png)
 
 ### Four Selected Points
 
-![Four selected homography points](./assets/output/football_pitch_four_points.svg)
+![Verified four selected homography points](./assets/output/02_four_selected_points.png)
 
 ### Top-Down Homography Result
 
-![Normalized top-down football pitch](./assets/output/football_pitch_top_down.svg)
+![Verified normalized top-down football pitch](./assets/output/03_top_down_field.png)
 
 ### Player / Robot Detections
 
-![Detected football robots](./assets/output/04_detected_players.svg)
+![Verified football robot detections](./assets/output/04_detected_players.png)
 
 ### Bottom-Center Foot Anchors
 
@@ -92,15 +92,17 @@ center_x = (x1 + x2) / 2
 bottom_y = y2
 ```
 
-![Bottom-center player anchors](./assets/output/05_player_anchor_points.svg)
+![Verified bottom-center player anchors](./assets/output/05_player_anchor_points.png)
 
 ### FIFA-Style Minimap
 
 The anchor points are transformed by matrix H and drawn in canonical field coordinates.
 
-![Transformed football minimap](./assets/output/06_football_minimap.svg)
+![Verified transformed football minimap](./assets/output/06_football_minimap.png)
 
-### Coordinate Evidence
+### Verified Runtime Evidence
+
+The included demonstration was executed end-to-end. It generated the perspective warp, three bottom-center player anchors, and their transformed field coordinates.
 
 - [Homography matrix and points](./assets/output/homography_matrix.json)
 - [Original and transformed coordinates](./assets/output/transformed_coordinates.csv)
