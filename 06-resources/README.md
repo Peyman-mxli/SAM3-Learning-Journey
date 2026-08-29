@@ -71,7 +71,7 @@ Every professional guide includes the applicable parts of this standard:
 ├── references/
 │   ├── 01-Supervision/
 │   ├── 02-Supervision-Annotators/
-│   ├── 03-Ultralytics-YOv8/
+│   ├── 03-Ultralytics-YOLOv8/
 │   ├── 04-Original-YOLO-Darknet/
 │   ├── 05-COCO-Dataset/
 │   ├── 06-Meta-SAM3-Hugging-Face/
