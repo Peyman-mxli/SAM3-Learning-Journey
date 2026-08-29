@@ -87,7 +87,10 @@ The main learning goals are:
 │
 ├── README.md
 ├── CLASS-RECORDING.md
-└── 05_b_segmentacion_sam_video.ipynb
+├── 05_b_segmentacion_sam_video.ipynb
+│
+└── practical/
+    └── README.md
 ```
 
 ---
@@ -600,6 +603,10 @@ After completing this session, I understand:
 ## Original Notebook
 
 [05_b_segmentacion_sam_video.ipynb](./05_b_segmentacion_sam_video.ipynb)
+
+## Practical
+
+[practical/README.md](./practical/README.md)
 
 # Session Progression
 
