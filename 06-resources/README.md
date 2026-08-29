@@ -47,6 +47,7 @@ This section documents:
 |---|---|
 | Supervision Annotators | [Four-panel annotator gallery](./references/02-Supervision-Annotators/assets/output/annotator_gallery.jpg) |
 | Ultralytics YOLOv8 | [Annotated detection image](./references/03-Ultralytics-YOLOv8/assets/output/bus_yolov8.jpg) and [JSON results](./references/03-Ultralytics-YOLOv8/assets/output/bus_yolov8_detections.json) |
+| Trackers / ByteTrack | [Annotated H.264 video](./references/08-Trackers/assets/output/vehicles_bytetrack.mp4), [preview](./references/08-Trackers/assets/output/vehicles_bytetrack_preview.jpg), [summary](./references/08-Trackers/assets/output/tracking_summary.json), and [observations](./references/08-Trackers/assets/output/tracking_observations.csv) |
 
 ## Resource Standard
 
