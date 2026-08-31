@@ -1,0 +1,10 @@
+{
+  "agent_backend": "mock",
+  "sam3_backend": "mock",
+  "sam3_checkpoint": "/content/drive/MyDrive/SAM3-Models/sam3.pt",
+  "confidence_threshold": 0.25,
+  "max_retries": 2,
+  "output_directory": "data/output",
+  "results_directory": "results",
+  "record_runtime_metrics": true
+}
