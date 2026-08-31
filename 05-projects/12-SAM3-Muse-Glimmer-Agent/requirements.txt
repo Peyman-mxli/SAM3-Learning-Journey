@@ -1,0 +1,2 @@
+# Mock pipeline uses only the Python standard library.
+# Add pinned dependencies only after selecting and validating the real runtimes.
