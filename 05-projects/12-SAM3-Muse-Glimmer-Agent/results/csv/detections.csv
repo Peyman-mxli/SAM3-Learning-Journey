@@ -1,0 +1,2 @@
+detection_id,label,confidence,x1,y1,x2,y2,pixel_area,mask_path,backend
+0,vehicle,1.0,1,1,4,3,6,data/output/demo-red-mask.pgm,demo-color-segmentation

@@ -1,0 +1,42 @@
+{
+  "request": {
+    "media_path": "data/input/sample-scene.ppm",
+    "goal": "Segment the red vehicle and measure its visible area",
+    "prompt": "vehicle",
+    "confidence": 0.25
+  },
+  "segmentation": {
+    "request_id": "demo-0703fb4efd94",
+    "backend": "demo-color-segmentation",
+    "detections": [
+      {
+        "detection_id": 0,
+        "label": "vehicle",
+        "confidence": 1.0,
+        "bbox_xyxy": [
+          1,
+          1,
+          4,
+          3
+        ],
+        "mask_path": "data/output/demo-red-mask.pgm",
+        "pixel_area": 6
+      }
+    ],
+    "warnings": [
+      "Measured deterministic demo; Muse Glimmer and SAM 3 model weights were not loaded."
+    ],
+    "metadata": {
+      "validated_inference": false,
+      "measured_processing": true,
+      "image_size": [
+        6,
+        4
+      ],
+      "rule": "red-dominant pixels"
+    }
+  },
+  "summary": "Verified tool result: 1 detection(s), combined mask area 6 pixels. Backend: demo-color-segmentation.",
+  "attempts": 1,
+  "elapsed_ms": 0.669
+}

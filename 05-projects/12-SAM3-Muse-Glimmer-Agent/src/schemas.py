@@ -1,5 +1,3 @@
-"""Stable data contracts for the vision-agent pipeline."""
-
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
@@ -14,13 +12,9 @@ class AgentRequest:
     confidence: float = 0.25
 
     def validate(self) -> None:
-        if not self.media_path.strip():
-            raise ValueError("media_path must not be empty")
-        if not self.goal.strip():
-            raise ValueError("goal must not be empty")
-        if not self.prompt.strip():
-            raise ValueError("prompt must not be empty")
-        if not 0.0 <= self.confidence <= 1.0:
+        if not all((self.media_path.strip(), self.goal.strip(), self.prompt.strip())):
+            raise ValueError("media_path, goal, and prompt are required")
+        if not 0 <= self.confidence <= 1:
             raise ValueError("confidence must be between 0 and 1")
 
 
@@ -29,22 +23,16 @@ class Detection:
     detection_id: int
     label: str
     confidence: float
-    bbox_xyxy: tuple[float, float, float, float]
+    bbox_xyxy: tuple[int, int, int, int]
     mask_path: str
     pixel_area: int
 
     def validate(self) -> None:
         x1, y1, x2, y2 = self.bbox_xyxy
-        if self.detection_id < 0:
-            raise ValueError("detection_id must be non-negative")
-        if not self.label:
-            raise ValueError("label must not be empty")
-        if not 0.0 <= self.confidence <= 1.0:
-            raise ValueError("detection confidence must be between 0 and 1")
-        if x2 <= x1 or y2 <= y1:
-            raise ValueError("bbox_xyxy must have positive width and height")
-        if self.pixel_area < 0:
-            raise ValueError("pixel_area must be non-negative")
+        if self.detection_id < 0 or not self.label or not 0 <= self.confidence <= 1:
+            raise ValueError("invalid detection identity, label, or confidence")
+        if x2 <= x1 or y2 <= y1 or self.pixel_area < 0:
+            raise ValueError("invalid bounding box or mask area")
 
 
 @dataclass
@@ -56,16 +44,14 @@ class SegmentationResult:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def validate(self) -> None:
-        if not self.request_id:
-            raise ValueError("request_id must not be empty")
-        if not self.backend:
-            raise ValueError("backend must not be empty")
+        if not self.request_id or not self.backend:
+            raise ValueError("request_id and backend are required")
         ids: set[int] = set()
-        for detection in self.detections:
-            detection.validate()
-            if detection.detection_id in ids:
+        for item in self.detections:
+            item.validate()
+            if item.detection_id in ids:
                 raise ValueError("detection IDs must be unique")
-            ids.add(detection.detection_id)
+            ids.add(item.detection_id)
 
     def to_dict(self) -> dict[str, Any]:
         self.validate()

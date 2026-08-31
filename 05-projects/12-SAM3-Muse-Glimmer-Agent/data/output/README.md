@@ -1,5 +1,3 @@
-# Generated Media
+# Generated visual artifacts
 
-Real masks and annotated images will be stored here after practical validation.
-
-No real Muse Glimmer + SAM 3 output has been generated for this project yet.
+The demo writes `demo-red-mask.pgm` here. A real SAM 3 adapter should write masks and annotated previews here without overwriting source inputs.

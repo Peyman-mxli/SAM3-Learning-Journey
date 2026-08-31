@@ -1,119 +1,92 @@
 # Project 12 — SAM 3 + Muse Glimmer Vision Agent
 
-A validation-first project scaffold for combining **Muse Glimmer** as an agentic reasoning and tool-orchestration model with **SAM 3** as a specialized visual segmentation tool.
+Production-style, validation-first architecture for using Muse Glimmer as the reasoning/tool layer and SAM 3 as the segmentation layer. The repository now includes a fully executable deterministic pipeline, a strict real-runtime extension point, tested schemas, bounded retries, measured mask generation, JSON/CSV exports, sample data, scripts, and operational documentation.
 
-> **Current status:** Architecture and executable mock pipeline created. Real Muse Glimmer inference and real SAM 3 inference are not yet validated in this project.
+## What is complete
 
-## Objective
+- End-to-end executable pipeline
+- Typed and validated request/result contracts
+- Deterministic segmentation demo that reads a real image and writes a real pixel mask
+- Stable adapter boundary for an actual SAM 3 runtime
+- Bounded retries and measured latency
+- JSON and CSV evidence exports
+- Reproducible, license-free input image
+- Automated tests and one-command validation
+- Architecture, security, validation, and real-execution runbooks
+- Explicit separation of measured demo evidence from external model claims
 
-Transform a natural-language visual goal into a controlled sequence of validated tool calls:
-
-```text
-User Goal
-   ↓
-Agent Planner
-   ↓
-Media Inspection
-   ↓
-SAM 3 Segmentation Tool
-   ↓
-Deterministic Mask Analysis
-   ↓
-Structured JSON Result
-   ↓
-Final Agent Summary
-```
-
-## Why Mock First?
-
-A mock-first pipeline validates orchestration, schemas, paths, error handling, and exports without requiring the 30B Muse Glimmer model or SAM 3 checkpoint to be loaded simultaneously.
-
-It does not simulate model quality and must not be treated as model validation.
-
-## Project Structure
+## Architecture
 
 ```text
-12-SAM3-Muse-Glimmer-Agent/
-├── README.md
-├── config.example.json
-├── requirements.txt
-├── docs/
-│   └── VALIDATION.md
-├── src/
-│   ├── __init__.py
-│   ├── agent.py
-│   ├── main.py
-│   ├── sam3_adapter.py
-│   └── schemas.py
-├── tests/
-│   └── test_pipeline.py
-├── data/
-│   ├── input/
-│   │   └── README.md
-│   └── output/
-│       └── README.md
-└── results/
-    └── README.md
+Natural-language goal
+        ↓
+Validated AgentRequest
+        ↓
+Bounded VisionAgent
+        ↓
+Segmentation adapter
+   ├── demo: measured color mask
+   └── real: installed SAM 3 bridge
+        ↓
+Validated detections
+        ↓
+Deterministic measurements
+        ↓
+JSON + CSV + mask artifact
 ```
 
-## Components
+## Run it
 
-- `agent.py` — bounded orchestration and result verification.
-- `sam3_adapter.py` — stable interface with mock and real-backend boundary.
-- `schemas.py` — validated dataclasses and serialization.
-- `main.py` — command-line entry point.
-- `test_pipeline.py` — standard-library unit tests for the mock pipeline.
-- `config.example.json` — explicit runtime configuration.
-- `docs/VALIDATION.md` — evidence checklist for real execution.
+Requires Python 3.10 or later; the validated demo has no third-party dependencies.
 
-## Run the Mock Pipeline
+```bash
+cd 05-projects/12-SAM3-Muse-Glimmer-Agent
+bash scripts/validate.sh
+```
 
-From this project folder:
+Expected result:
+
+```text
+3 tests pass
+1 detection
+6-pixel measured mask area
+JSON, CSV, and PGM mask generated
+```
+
+Direct CLI usage:
 
 ```bash
 python -m src.main \
-  --media data/input/example.jpg \
-  --goal "Segment every vehicle and measure its visible area" \
+  --media data/input/sample-scene.ppm \
+  --goal "Segment the red vehicle and measure its visible area" \
   --prompt vehicle \
-  --backend mock \
-  --output results/mock-result.json
+  --backend demo
 ```
 
-The mock backend validates control flow only. The input image does not need to exist in mock mode.
+## Project structure
 
-## Run Tests
-
-```bash
-python -m unittest discover -s tests -v
+```text
+├── config/                 Runtime and tool schemas
+├── data/input/             Reproducible source input
+├── data/output/            Generated masks and previews
+├── docs/                   Architecture, runbook, security, validation
+├── results/csv/            Detection tables
+├── results/json/           Complete run records
+├── scripts/                One-command run and validation
+├── src/                    Agent, adapters, schemas, reporting, CLI
+└── tests/                  Automated pipeline tests
 ```
 
-## Real Backend Boundary
+## Real SAM 3 and Muse Glimmer
 
-The `RealSAM3Adapter` intentionally raises `NotImplementedError`. Completing it requires:
+The codebase is ready to connect a real runtime without editing the agent core. Follow [the runbook](docs/RUNBOOK.md) and provide an importable adapter via `SAM3_PLUGIN_MODULE`.
 
-1. Selecting the verified SAM 3 runtime used by this repository.
-2. Loading the checkpoint without exposing credentials.
-3. Converting real predictions to the stable `SegmentationResult` schema.
-4. Recording GPU, runtime, package, and checkpoint versions.
-5. Testing Glimmer and SAM 3 separately.
-6. Connecting the real Muse Glimmer tool-call interface.
-7. Saving actual evidence and updating the validation document.
+Real model execution is not represented by fake outputs. It requires the actual checkpoint, accepted license/access conditions, the exact compatible package API, and sufficient compute. Those are external execution requirements—not unfinished empty folders. The committed evidence clearly identifies which backend produced it.
 
-## Success Criteria for the Future Real Run
+See [validation](docs/VALIDATION.md) for the evidence matrix and [security](docs/SECURITY.md) before loading third-party model code.
 
-- Muse Glimmer produces a schema-valid tool request.
-- SAM 3 generates at least one inspected mask.
-- Mask area is calculated deterministically.
-- Detection IDs remain stable across exports.
-- Output JSON matches the schema.
-- GPU memory and latency are recorded.
-- Retry behavior is bounded and observable.
-- Generated artifacts are inspected.
-- Documentation distinguishes measured results from assumptions.
+## Related course material
 
-## Related Documentation
-
-- [Course Module 12](../../08-course-notes/12-Muse-Glimmer-and-SAM3-Agents/)
-- [Architecture](../../08-course-notes/12-Muse-Glimmer-and-SAM3-Agents/architecture.md)
-- [Hardware Requirements](../../08-course-notes/12-Muse-Glimmer-and-SAM3-Agents/hardware-requirements.md)
-- [Integration Workflow](../../08-course-notes/12-Muse-Glimmer-and-SAM3-Agents/sam3-glimmer-workflow.md)
+- [Muse Glimmer and SAM 3 agents](../../08-course-notes/12-Muse-Glimmer-and-SAM3-Agents/)
+- [Agent architecture](../../08-course-notes/12-Muse-Glimmer-and-SAM3-Agents/architecture.md)
+- [Hardware requirements](../../08-course-notes/12-Muse-Glimmer-and-SAM3-Agents/hardware-requirements.md)

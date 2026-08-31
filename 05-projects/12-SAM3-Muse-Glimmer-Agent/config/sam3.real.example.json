@@ -1,0 +1,7 @@
+{
+  "checkpoint": "/absolute/path/to/sam3-checkpoint",
+  "device": "cuda",
+  "precision": "bfloat16",
+  "confidence_threshold": 0.25,
+  "notes": "Consumed only by the module named in SAM3_PLUGIN_MODULE. Do not commit tokens or private checkpoint URLs."
+}

@@ -2,13 +2,13 @@
   "type": "function",
   "function": {
     "name": "segment_with_sam3",
-    "description": "Segment instances of a visual concept in one local image using SAM 3 and return deterministic measurements.",
+    "description": "Segment objects matching a semantic prompt and return measured masks.",
     "parameters": {
       "type": "object",
       "properties": {
-        "media_path": {"type": "string", "description": "Path to the input image."},
-        "prompt": {"type": "string", "description": "Semantic concept to segment."},
-        "confidence": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.25}
+        "media_path": {"type": "string"},
+        "prompt": {"type": "string"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
       },
       "required": ["media_path", "prompt"],
       "additionalProperties": false

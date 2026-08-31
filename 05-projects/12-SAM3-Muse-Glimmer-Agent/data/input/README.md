@@ -1,5 +1,3 @@
-# Input Data
+# Input data
 
-Place test images or videos here.
-
-Do not commit private, licensed, or sensitive media without permission. The mock pipeline does not inspect the input file.
+`sample-scene.ppm` is a tiny, license-free, text-based test image committed for reproducible validation. Replace it with a JPG/PNG when using a real SAM 3 adapter.

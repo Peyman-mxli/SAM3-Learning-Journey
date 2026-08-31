@@ -1,0 +1,8 @@
+{
+  "agent_backend": "deterministic",
+  "sam3_backend": "demo",
+  "confidence_threshold": 0.25,
+  "max_retries": 2,
+  "output_directory": "data/output",
+  "results_directory": "results"
+}

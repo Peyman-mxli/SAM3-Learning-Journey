@@ -1,2 +1,2 @@
-# Mock pipeline uses only the Python standard library.
-# Add pinned dependencies only after selecting and validating the real runtimes.
+# The validated demo and tests use only Python 3.10+ standard-library modules.
+# Install SAM 3 and Muse Glimmer dependencies in a separate hardware-specific environment.
