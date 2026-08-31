@@ -1,0 +1,6 @@
+{
+  "media_path": "../09-SAM3-Semantic-Prompt-Analytics/data/input/bus.jpg",
+  "goal": "Find all vehicles, segment them, and report visible pixel area.",
+  "prompt": "vehicle",
+  "confidence": 0.25
+}
