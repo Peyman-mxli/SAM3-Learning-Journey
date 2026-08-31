@@ -1207,6 +1207,45 @@ Generated and verified artifacts:
 
 ---
 
+### 12 — SAM 3 + Muse Glimmer Vision Agent
+
+[`12-SAM3-Muse-Glimmer-Agent/`](./12-SAM3-Muse-Glimmer-Agent/)
+
+A validation-first agentic computer-vision project that separates reasoning, segmentation, and deterministic analysis.
+
+```text
+Natural-Language Goal
+        ↓
+Muse Glimmer Agent Layer
+        ↓
+Schema-Validated Tool Call
+        ↓
+SAM 3 Segmentation Adapter
+        ↓
+Deterministic Mask Measurement
+        ↓
+Structured JSON Result
+```
+
+The initial scaffold includes:
+
+- An executable standard-library mock pipeline
+- Stable request, detection, and segmentation schemas
+- A mock SAM 3 adapter for control-flow testing
+- An explicit real-SAM boundary that cannot be mistaken for completed inference
+- Bounded retry orchestration
+- JSON result export
+- Unit tests
+- Runtime configuration template
+- Input, output, results, and validation documentation
+- A checklist for the future real Muse Glimmer + SAM 3 execution
+
+The mock backend validates software structure and orchestration only. It does not inspect images, run either model, or provide model-quality evidence.
+
+**Status:** Project scaffold completed; mock pipeline available; real Muse Glimmer and SAM 3 integration pending practical validation.
+
+---
+
 # Project Progression
 
 The projects are intentionally organized so that each one introduces additional computer vision capabilities.
@@ -1238,6 +1277,15 @@ Advanced Mask Analysis Pipeline
         ↓
 Project 09
 SAM3 Semantic Prompt Analytics
+        ↓
+Project 10
+SAM Encoder-Decoder Architecture
+        ↓
+Project 11
+SAM3 Interactive Point Refinement
+        ↓
+Project 12
+SAM 3 + Muse Glimmer Vision Agent
 ```
 
 This progression moves from basic inference toward complete computer vision systems involving detection, visualization, filtering, tracking, spatial analytics, detector-guided segmentation, semantic text prompting, quantitative mask analysis, persistence, evaluation, and structured results.
