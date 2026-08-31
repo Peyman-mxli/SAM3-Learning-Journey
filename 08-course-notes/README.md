@@ -22,6 +22,7 @@ The purpose of this section is to document each course session in a structured w
 | 09 | [SAM Encoder-Decoder](./09-SAM-Encoder-Decoder/) | Completed |
 | 10 | [SAM 3 Point Prompts](./10-SAM3-Point-Prompts/) | Completed |
 | 11 | [SAM 3 Video Segmentation](./11-SAM3-Video-Segmentation/) | Completed |
+| 12 | [Muse Glimmer and SAM 3 Agents](./12-Muse-Glimmer-and-SAM3-Agents/) | Documentation completed |
 
 ---
 
@@ -2941,6 +2942,40 @@ Class recording:
 
 ---
 
+# Session 12 — Muse Glimmer and SAM 3 Agents
+
+[`12-Muse-Glimmer-and-SAM3-Agents/`](./12-Muse-Glimmer-and-SAM3-Agents/)
+
+This extension connects the course's computer-vision work with local agentic AI. It documents how Meta Muse Glimmer can provide multimodal reasoning, planning, tool calling, orchestration, and failure recovery while SAM 3 remains the specialized perception and segmentation component.
+
+The proposed division of responsibilities is:
+
+```text
+Muse Glimmer → Reasoning + Planning + Tool Orchestration
+SAM 3        → Visual Perception + Pixel-Level Segmentation
+Python       → Deterministic Measurement + Validation
+```
+
+Topics include:
+
+- Open-weight and local model deployment
+- Multimodal text-and-image reasoning
+- Agentic task completion
+- Tool and function calling
+- Failure recovery
+- SAM 3 tool contracts
+- Schema-validated vision results
+- Deterministic mask measurement
+- Hardware and quantization planning
+- Security, permissions, observability, and bounded retries
+- A validation-first integration roadmap
+
+The module contains architecture, installation, hardware, workflow, and official-reference documentation. It does not claim that the combined runtime has already been installed or tested.
+
+**Status:** Documentation completed; practical integration not yet validated
+
+---
+
 # Course Notes Organization
 
 Each course session is documented independently.
@@ -3044,7 +3079,7 @@ The course also introduces concepts related to:
 ```text
 SAM3 Computer Vision Learning Journey
 
-Course Sessions Documented: 12
+Course Sessions Documented: 13
 
 00 Agentic AI Programming                 ✅
 01 Introduction to Supervision            ✅
@@ -3058,15 +3093,16 @@ Course Sessions Documented: 12
 09 SAM Encoder-Decoder                    ✅
 10 SAM 3 Point Prompts                    ✅
 11 SAM 3 Video Segmentation               ✅
+12 Muse Glimmer and SAM 3 Agents          📘
 ```
 
-The repository currently documents the learning progression through **Session 11 — SAM 3 Video Segmentation**.
+The repository currently documents the learning progression through **Session 12 — Muse Glimmer and SAM 3 Agents**.
 
 ---
 
 # Next Steps
 
-The next course session will be documented when its lesson material is available.
+The next practical milestone is to validate a minimal Muse Glimmer tool-calling environment before creating the corresponding project in `05-projects/`.
 
 Current progression:
 
@@ -3084,6 +3120,8 @@ Semantic and Point Prompts
 Video Segmentation
     ↓
 Temporal Analysis
+    ↓
+Agentic Vision Orchestration
 ```
 
 ---
@@ -3108,9 +3146,10 @@ The objective is not only to preserve course material, but to demonstrate the pr
 ```text
 08-course-notes/
 
-Sessions documented:  12
-Sessions completed:   12
-Latest session:       11 — SAM 3 Video Segmentation
+Sessions documented:  13
+Course sessions completed: 12
+Extension modules documented: 1
+Latest module:        12 — Muse Glimmer and SAM 3 Agents
 
 Status: UP TO DATE ✅
 ```
