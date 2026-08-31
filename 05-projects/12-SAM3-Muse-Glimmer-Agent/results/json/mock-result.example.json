@@ -1,0 +1,10 @@
+{
+  "request": {"media_path": "data/input/example.jpg", "goal": "Segment every vehicle and measure its visible area", "prompt": "vehicle", "confidence": 0.25},
+  "segmentation": {
+    "request_id": "mock-example", "backend": "mock",
+    "detections": [{"detection_id": 0, "label": "vehicle", "confidence": 0.9, "bbox_xyxy": [120.0, 240.0, 510.0, 690.0], "mask_path": "data/output/mock-mask-000.png", "pixel_area": 84210}],
+    "warnings": ["Mock output: no image was inspected and no model inference ran."],
+    "metadata": {"validated_inference": false, "purpose": "orchestration and schema testing only"}
+  },
+  "summary": "The mock pipeline returned 1 detection with a combined mask area of 84210 pixels."
+}
