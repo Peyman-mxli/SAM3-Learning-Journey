@@ -1,0 +1,2 @@
+detection_id,label,confidence,x1,y1,x2,y2,pixel_area,mask_path
+0,vehicle,0.9,120.0,240.0,510.0,690.0,84210,data/output/mock-mask-000.png
