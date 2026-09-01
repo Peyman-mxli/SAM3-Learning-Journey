@@ -107,6 +107,7 @@ Render the 94 model candidates over the 25 extracted review frames:
 python evaluation/render_review_candidates.py \
   evaluation/ground_truth_frames \
   evaluation/ground_truth_frames/review_candidates.csv \
+  --manifest evaluation/ground_truth_frames/manifest.csv \
   --output-dir evaluation/review_pack
 ```
 
