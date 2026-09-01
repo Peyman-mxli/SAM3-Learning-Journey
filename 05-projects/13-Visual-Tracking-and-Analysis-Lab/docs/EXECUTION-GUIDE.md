@@ -97,3 +97,43 @@ from `src/metrics.py`.
 Only generated Project 13 artifacts should be placed in `results/` and called Project 13 validation evidence.
 
 Project 06 can be cited as previous experimentation, but its metrics must stay labeled as Project 06 metrics.
+
+
+## 11. Run the complete controlled validation suite
+
+Create five reproducible test videos from the verified source:
+
+```bash
+python evaluation/create_condition_variants.py data/input/tracking_test_01.mp4
+```
+
+Process all five videos as independent Project 13 sessions:
+
+```bash
+python evaluation/run_validation_suite.py
+```
+
+Compare robustness against the baseline:
+
+```bash
+python evaluation/analyze_validation_conditions.py
+```
+
+The suite covers baseline, low light, partial occlusion, motion blur, and
+reduced scale.
+
+## 12. Tracking identity ground truth
+
+Use `evaluation/tracking_ground_truth_template.csv` to create reviewed temporal
+identity annotations, then run `evaluation/evaluate_tracking_csv.py`.
+
+## 13. Segmentation ground truth
+
+Create human-reviewed binary masks and a manifest based on
+`evaluation/segmentation_manifest_template.csv`, then run
+`evaluation/evaluate_segmentation_masks.py`.
+
+## 14. Final completion audit
+
+See `docs/FINAL-COMPLETION-AUDIT.md` for the requirement-by-requirement
+completion map and evidence boundary.
