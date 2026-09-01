@@ -5,7 +5,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from database import connect
+try:
+    from .database import connect
+except ImportError:  # direct script execution
+    from database import connect
 
 
 def export_session(db_path: str, session_id: str, output_dir: str) -> None:
