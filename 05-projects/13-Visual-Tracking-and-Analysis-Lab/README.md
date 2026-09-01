@@ -114,16 +114,27 @@ The project is considered complete when it can:
 ├── app.py
 ├── requirements.txt
 ├── data/
-│   └── README.md
+│   ├── README.md
+│   └── input/
+│       ├── README.md
+│       └── tracking_test_01.mp4
 ├── docs/
 │   ├── LABORATORY-PROPOSAL.md
-│   └── IMPLEMENTATION-MAP.md
+│   ├── IMPLEMENTATION-MAP.md
+│   └── EXECUTION-GUIDE.md
+├── evaluation/
+│   ├── README.md
+│   └── evaluate_detection_csv.py
 ├── results/
 │   └── README.md
 └── src/
+    ├── __init__.py
     ├── README.md
     ├── database.py
-    └── pipeline.py
+    ├── export_results.py
+    ├── metrics.py
+    ├── pipeline.py
+    └── segmenter.py
 ```
 
 ## Relationship to Project 06
@@ -174,6 +185,26 @@ Document:
 - IoU / Dice
 - dashboard screenshots
 - documented failure cases
+
+## Current implementation status
+
+Implemented now:
+
+- dedicated Project 13 repository structure;
+- preserved laboratory proposal (Run `45ef3e05`);
+- verified recorded-video input with documented provenance;
+- YOLO + Supervision + ByteTrack video pipeline;
+- SQLite session and observation persistence;
+- optional SAM 3 text-prompt segmentation adapter;
+- tracked-box ↔ SAM-box IoU association;
+- mask-area persistence when a valid SAM 3 match exists;
+- Precision, Recall, F1, bounding-box IoU, mask IoU, and Dice utilities;
+- ground-truth detection evaluation script;
+- session CSV export;
+- Streamlit historical-results dashboard;
+- reproducible execution guide.
+
+Still requires a GPU/SAM 3 runtime for **fresh Project 13 generated evidence**. The repository intentionally does not claim model results that were not executed specifically for Project 13.
 
 ## Author
 
