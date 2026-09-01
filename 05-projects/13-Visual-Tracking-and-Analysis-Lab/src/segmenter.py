@@ -21,6 +21,8 @@ def _to_numpy(value) -> np.ndarray:
         value = value.detach()
     if hasattr(value, "cpu"):
         value = value.cpu()
+    if hasattr(value, "dtype") and str(value.dtype) in {"torch.bfloat16", "torch.float16"}:
+        value = value.float()
     if hasattr(value, "numpy"):
         return value.numpy()
     return np.asarray(value)
