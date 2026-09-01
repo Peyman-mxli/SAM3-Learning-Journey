@@ -320,3 +320,35 @@ Project:
 GitHub: [Peyman-mxli](https://github.com/Peyman-mxli)
 
 LinkedIn: [Peyman Miyandashti](https://www.linkedin.com/in/peyman-mxli/)
+
+
+---
+
+## Environmental Condition Evaluation
+
+Project 06 now includes a dedicated evaluator for the official guiding question:
+
+> How do variations in lighting and occlusion affect object-tracking accuracy in recorded videos?
+
+Files:
+
+- [`environmental_condition_analysis.py`](./environmental_condition_analysis.py)
+- [`environmental_conditions_template.csv`](./environmental_conditions_template.csv)
+- [MVP Completion Matrix](../docs/MVP-COMPLETION-MATRIX.md)
+
+The evaluator calculates condition-level **precision, recall, F1, ID-switch rate, and average confidence** from real labeled observations and exports reproducible CSV summaries and a comparison chart.
+
+It deliberately refuses to invent condition results. To use it, copy the template to `environmental_conditions.csv`, record measured lighting/occlusion trials, and run:
+
+```bash
+python evaluation/environmental_condition_analysis.py
+```
+
+Generated outputs:
+
+```text
+reports/environmental_condition_results.csv
+reports/lighting_condition_summary.csv
+reports/occlusion_condition_summary.csv
+reports/environmental_condition_chart.png
+```
