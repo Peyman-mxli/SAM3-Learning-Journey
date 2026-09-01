@@ -141,3 +141,27 @@ Machine-readable evidence:
 The results are intentionally described as robustness indicators rather than
 ground-truth tracking accuracy because human-reviewed temporal identities are
 still required for true ID-switch and fragmentation accuracy.
+
+
+## Ground-truth review system
+
+A complete temporal-identity review packet has now been generated from the
+Project 13 source video.
+
+- Sampled frames: **15**
+- Sampling interval: **every 5 frames**
+- Candidate annotations: generated with the same YOLO + ByteTrack pipeline
+- Review interface: implemented in Streamlit
+- Ground-truth finalization validator: implemented
+- ID-switch / fragmentation evaluator: implemented
+
+The review packet is preserved at:
+
+[`../evaluation/review_packet/`](../evaluation/review_packet/)
+
+The repository deliberately does **not** auto-mark model suggestions as
+human-reviewed ground truth. That would make the evaluation circular.
+
+At this point the Project 13 core MVP and controlled environmental experiment
+are complete. The remaining independent annotation step is an optional
+stronger validation layer rather than a missing software component.
