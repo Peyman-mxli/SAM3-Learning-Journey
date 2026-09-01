@@ -10,8 +10,12 @@ import numpy as np
 import supervision as sv
 from ultralytics import YOLO
 
-from database import connect, create_session, insert_observations
-from metrics import box_iou
+try:
+    from .database import connect, create_session, insert_observations
+    from .metrics import box_iou
+except ImportError:  # direct script execution
+    from database import connect, create_session, insert_observations
+    from metrics import box_iou
 
 
 def _sam_mask_areas_for_tracks(
@@ -84,7 +88,10 @@ def process_video(
 
     segmenter = None
     if sam_checkpoint:
-        from segmenter import SAM3TextSegmenter
+        try:
+            from .segmenter import SAM3TextSegmenter
+        except ImportError:
+            from segmenter import SAM3TextSegmenter
         segmenter = SAM3TextSegmenter(
             checkpoint_path=sam_checkpoint,
             device=sam_device,
