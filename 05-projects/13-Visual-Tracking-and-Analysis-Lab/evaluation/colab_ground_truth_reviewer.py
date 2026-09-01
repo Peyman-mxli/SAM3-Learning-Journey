@@ -90,6 +90,9 @@ class MouseGroundTruthReviewer:
         self.relabel_btn = widgets.Button(
             description="Apply relabel", button_style="warning"
         )
+        self.delete_object_btn = widgets.Button(
+            description="Delete selected object", button_style="danger"
+        )
         self.finish_btn = widgets.Button(
             description="Finish evaluation review", button_style="success"
         )
@@ -98,6 +101,7 @@ class MouseGroundTruthReviewer:
         self.approve_btn.on_click(self._approve_next)
         self.save_btn.on_click(self._save_progress)
         self.relabel_btn.on_click(self._relabel_selected)
+        self.delete_object_btn.on_click(self._delete_selected_object)
         self.finish_btn.on_click(self._finish)
 
         self.widget = None
@@ -263,6 +267,7 @@ class MouseGroundTruthReviewer:
                 self.object_to_relabel,
                 self.new_class,
                 self.relabel_btn,
+                self.delete_object_btn,
             ]),
             widgets.HBox([
                 self.prev_btn,
@@ -313,6 +318,24 @@ class MouseGroundTruthReviewer:
 
         self.status.value = (
             f"<b>✓ Object {idx + 1} relabeled to {label}.</b>"
+        )
+
+    def _delete_selected_object(self, _):
+        if self.widget is None or not self.widget.bboxes:
+            self.status.value = "<b>No boxes available to delete.</b>"
+            return
+
+        idx = self.object_to_relabel.value
+        if idx is None or idx < 0 or idx >= len(self.widget.bboxes):
+            self.status.value = "<b>Choose an object from the Object dropdown.</b>"
+            return
+
+        edited = [{**bbox} for bbox in self.widget.bboxes]
+        removed = edited.pop(idx)
+        self.widget.bboxes = edited
+        self._refresh_object_dropdown()
+        self.status.value = (
+            f"<b>✓ Deleted object {idx + 1}: {removed.get('label','object')}.</b>"
         )
 
     def _save_progress(self, _):
