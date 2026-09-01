@@ -1,0 +1,1 @@
+case_id,session_id,lighting_condition,occlusion_condition,true_positives,false_positives,false_negatives,id_switches,tracked_id_opportunities,average_confidence,notes
