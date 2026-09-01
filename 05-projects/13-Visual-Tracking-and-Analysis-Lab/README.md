@@ -338,3 +338,34 @@ for the complete interpretation and reproducibility details.
 These measurements are robustness indicators. A strict numerical claim about
 true ID-switch or fragmentation accuracy still requires human-reviewed
 temporal identity ground truth.
+
+
+## Ground-truth review packet
+
+The final annotation workflow is now implemented and a real review packet has
+been generated from `tracking_test_01.mp4`.
+
+Generated evidence:
+
+- 15 sampled frames (`frame_0000.jpg` through `frame_0070.jpg`, every 5 frames);
+- YOLO + ByteTrack candidate detections;
+- editable temporal identity field (`review_track_id`);
+- false-positive rejection field;
+- per-row reviewed flag;
+- finalization validator;
+- tracking evaluator for ID switches and fragmentation.
+
+Files:
+
+- [`evaluation/review_packet/`](./evaluation/review_packet/)
+- [`evaluation/generate_ground_truth_review_packet.py`](./evaluation/generate_ground_truth_review_packet.py)
+- [`evaluation/ground_truth_review_app.py`](./evaluation/ground_truth_review_app.py)
+- [`evaluation/finalize_tracking_ground_truth.py`](./evaluation/finalize_tracking_ground_truth.py)
+- [`docs/HUMAN-GROUND-TRUTH-PROTOCOL.md`](./docs/HUMAN-GROUND-TRUTH-PROTOCOL.md)
+
+The packet currently contains **candidate annotations, not falsely labeled
+ground truth**. True ID-switch/fragmentation accuracy becomes reportable only
+after the review flags and corrected temporal IDs are completed against the
+exported frames.
+
+This distinction is intentional and keeps the portfolio scientifically valid.
