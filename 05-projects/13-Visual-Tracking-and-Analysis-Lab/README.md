@@ -11,6 +11,13 @@ The laboratory proposed a Python system capable of detecting, segmenting, tracki
 
 This project turns that proposal into a reproducible engineering structure.
 
+
+## Run in Google Colab
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Peyman-mxli/SAM3-Learning-Journey/blob/main/05-projects/13-Visual-Tracking-and-Analysis-Lab/notebooks/Project13_Colab_Run.ipynb)
+
+The notebook performs the first real Project 13 technical test using the repository's verified `tracking_test_01.mp4` input. It installs the runtime dependencies, runs YOLO + ByteTrack, creates the Project 13 SQLite database, exports CSV evidence, writes a machine-readable run summary, and includes an optional SAM 3 section for the existing course/Drive setup.
+
 ## Objective
 
 Build an application that can:
