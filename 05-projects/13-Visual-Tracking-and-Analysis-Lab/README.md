@@ -214,6 +214,14 @@ Implemented now:
 Still requires a GPU/SAM 3 runtime for **fresh Project 13 generated evidence**. The repository intentionally does not claim model results that were not executed specifically for Project 13.
 
 
+## Definitive Persistent Run
+
+The definitive persistent SAM 3 execution is session `lab13_0d46777217`. Its SQLite database and exported CSV/JSON evidence were saved to Google Drive so they survive Colab runtime disconnections.
+
+Verified aggregate results: **299 observations**, **10 unique tracker IDs**, **0.7059505884 average confidence**, **21 SAM 3 mask observations**, and **10047.0952 px average mask area**.
+
+See [`docs/VERIFIED-PERSISTENT-RUN.md`](./docs/VERIFIED-PERSISTENT-RUN.md) and [`results/lab13_0d46777217_run_summary.json`](./results/lab13_0d46777217_run_summary.json).
+
 ## Verified Run 01
 
 Project 13 has now completed a real end-to-end **YOLO + ByteTrack + SAM 3** execution using `tracking_test_01.mp4`.
