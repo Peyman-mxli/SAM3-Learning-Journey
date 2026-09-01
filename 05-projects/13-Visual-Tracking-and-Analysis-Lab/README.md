@@ -304,3 +304,37 @@ python evaluation/analyze_validation_conditions.py
 ```
 
 This creates a reproducible controlled comparison for baseline, low light, occlusion, blur, and reduced scale.
+
+
+## Executed Environmental Validation
+
+The five-condition robustness experiment has now been **executed successfully**
+and the generated evidence is preserved in
+[`results/validation/`](./results/validation/).
+
+Measured condition summary:
+
+| Condition | Observations | Unique Trackers | Avg Confidence | Avg Track Length |
+|---|---:|---:|---:|---:|
+| Baseline | 299 | 10 | 0.7060 | 29.9 |
+| Low light | 216 | 5 | 0.7222 | 43.2 |
+| Partial occlusion | 230 | 10 | 0.6930 | 23.0 |
+| Motion blur | 267 | 5 | 0.7390 | 53.4 |
+| Reduced scale | 291 | 9 | 0.6846 | 32.33 |
+
+The strongest sign of temporal instability in this controlled experiment is
+**partial occlusion**, which produced the shortest average track length
+(**23.0 observations per tracker**) while retaining the same number of unique
+tracker IDs as the baseline.
+
+Low light reduced total observations from **299 to 216** and reduced unique
+tracker IDs from **10 to 5**. Reduced scale produced the lowest average
+confidence among perturbed conditions (**0.6846**).
+
+See
+[`docs/ENVIRONMENTAL-VALIDATION-RESULTS.md`](./docs/ENVIRONMENTAL-VALIDATION-RESULTS.md)
+for the complete interpretation and reproducibility details.
+
+These measurements are robustness indicators. A strict numerical claim about
+true ID-switch or fragmentation accuracy still requires human-reviewed
+temporal identity ground truth.
