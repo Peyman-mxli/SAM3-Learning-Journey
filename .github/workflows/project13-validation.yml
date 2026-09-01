@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/project13-validation.yml"
+      - "05-projects/13-Visual-Tracking-and-Analysis-Lab/evaluation/**"
   workflow_dispatch:
 
 permissions:
