@@ -1,0 +1,6 @@
+condition,session_id,source_video
+baseline,lab13_507337190f,validation_01_baseline.mp4
+low_light,lab13_350b0666c5,validation_02_low_light.mp4
+partial_occlusion,lab13_fecdd04881,validation_03_partial_occlusion.mp4
+motion_blur,lab13_64980bfdc2,validation_04_motion_blur.mp4
+reduced_scale,lab13_2357d5cb6b,validation_05_reduced_scale.mp4

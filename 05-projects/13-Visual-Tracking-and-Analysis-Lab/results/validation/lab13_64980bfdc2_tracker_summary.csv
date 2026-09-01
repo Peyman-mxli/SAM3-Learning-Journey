@@ -1,0 +1,6 @@
+tracker_id,class_name,observations,average_confidence,first_frame,last_frame,average_mask_area
+1,bus,75,0.8039347116152445,1,75,
+2,person,75,0.6855071989695231,1,75,
+3,person,75,0.7947728061676025,1,75,
+4,person,37,0.6440668347719554,3,39,
+5,person,5,0.4350896060466766,41,75,

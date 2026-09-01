@@ -1,0 +1,6 @@
+condition,session_id,total_observations,unique_trackers,average_confidence,average_track_length,sam_mask_tracks,total_observations_delta_vs_baseline,unique_trackers_delta_vs_baseline,average_confidence_delta_vs_baseline,average_track_length_delta_vs_baseline,sam_mask_tracks_delta_vs_baseline
+baseline,lab13_507337190f,299,10,0.588793918879278,24.916666666666668,0,0,0,0.0,0.0,0
+low_light,lab13_350b0666c5,216,5,0.5680897222286989,36.0,0,-83,-5,-0.0207041966505791,11.083333333333332,0
+partial_occlusion,lab13_fecdd04881,230,10,0.5558885730327903,17.692307692307693,0,-69,0,-0.032905345846487744,-7.2243589743589745,0
+motion_blur,lab13_64980bfdc2,267,5,0.6726742315142002,53.4,0,-32,-5,0.08388031263492224,28.48333333333333,0
+reduced_scale,lab13_2357d5cb6b,291,9,0.5476188380577738,24.25,0,-8,-1,-0.04117508082150423,-0.6666666666666679,0
