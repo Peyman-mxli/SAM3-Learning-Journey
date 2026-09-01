@@ -1,0 +1,59 @@
+{
+  "iou_threshold": 0.5,
+  "true_positives": 79,
+  "false_positives": 15,
+  "false_negatives": 13,
+  "precision": 0.8404255319148937,
+  "recall": 0.8586956521739131,
+  "f1_score": 0.849462365591398,
+  "mean_matched_iou": 0.9945093908311252,
+  "per_class": {
+    "bus": {
+      "tp": 14,
+      "fp": 0,
+      "fn": 9,
+      "precision": 1,
+      "recall": 0.6086956521739131,
+      "f1": 0.7567567567567568
+    },
+    "person": {
+      "tp": 65,
+      "fp": 1,
+      "fn": 4,
+      "precision": 0.9848484848484849,
+      "recall": 0.9420289855072463,
+      "f1": 0.962962962962963
+    },
+    "car": {
+      "tp": 0,
+      "fp": 14,
+      "fn": 0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    }
+  },
+  "confusion_matrix_detection": {
+    "rows": [
+      "ground_truth_object",
+      "background"
+    ],
+    "columns": [
+      "predicted_object",
+      "background"
+    ],
+    "values": [
+      [
+        79,
+        13
+      ],
+      [
+        15,
+        0
+      ]
+    ]
+  },
+  "reviewed_frames": 25,
+  "predictions_on_reviewed_frames": 94,
+  "ground_truth_objects": 92
+}
