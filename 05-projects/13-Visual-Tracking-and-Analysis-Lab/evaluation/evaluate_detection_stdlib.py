@@ -110,7 +110,21 @@ def main():
     if any(str(r.get("reviewed","")).strip().lower() not in {"1","true","yes"} for r in gt):
         raise ValueError("Ground-truth CSV contains unreviewed rows. Refusing to score.")
 
-    result = score(load(args.predictions_csv), gt, args.iou)
+    predictions = load(args.predictions_csv)
+
+    # Evaluate only frames represented in the human-reviewed ground truth.
+    # Project 13 reviews a deterministic subset of video frames (25 of 75),
+    # so predictions from unreviewed frames must not be counted as false positives.
+    reviewed_frames = {int(float(r["frame_index"])) for r in gt}
+    predictions = [
+        r for r in predictions
+        if int(float(r["frame_index"])) in reviewed_frames
+    ]
+
+    result = score(predictions, gt, args.iou)
+    result["reviewed_frames"] = len(reviewed_frames)
+    result["predictions_on_reviewed_frames"] = len(predictions)
+    result["ground_truth_objects"] = len(gt)
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2), encoding="utf-8")
