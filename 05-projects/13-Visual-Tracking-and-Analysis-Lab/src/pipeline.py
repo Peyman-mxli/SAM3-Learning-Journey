@@ -6,10 +6,60 @@ from pathlib import Path
 import uuid
 
 import cv2
+import numpy as np
 import supervision as sv
 from ultralytics import YOLO
 
 from database import connect, create_session, insert_observations
+from metrics import box_iou
+
+
+def _sam_mask_areas_for_tracks(
+    frame_bgr,
+    tracked,
+    segmenter,
+    prompt: str,
+    min_score: float,
+    match_iou: float,
+):
+    """
+    Run text-prompt SAM 3 segmentation for a frame and associate returned
+    masks to tracked detections by bounding-box IoU.
+
+    Returns one mask-area value per tracked detection. Unmatched detections
+    receive None rather than fabricated segmentation values.
+    """
+    if segmenter is None or len(tracked) == 0:
+        return [None] * len(tracked)
+
+    frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
+    sam = segmenter.segment_text(frame_rgb, prompt)
+
+    if sam.boxes.size == 0 or sam.masks.size == 0:
+        return [None] * len(tracked)
+
+    boxes = np.asarray(sam.boxes).reshape(-1, 4)
+    masks = np.asarray(sam.masks)
+    scores = np.asarray(sam.scores).reshape(-1) if sam.scores.size else np.ones(len(boxes))
+
+    areas = [None] * len(tracked)
+
+    for track_index, track_box in enumerate(tracked.xyxy):
+        best_index = None
+        best_iou = 0.0
+
+        for sam_index, sam_box in enumerate(boxes):
+            if sam_index >= len(scores) or float(scores[sam_index]) < min_score:
+                continue
+            iou = box_iou(track_box, sam_box)
+            if iou > best_iou:
+                best_iou = iou
+                best_index = sam_index
+
+        if best_index is not None and best_iou >= match_iou and best_index < len(masks):
+            areas[track_index] = float(np.count_nonzero(masks[best_index]))
+
+    return areas
 
 
 def process_video(
@@ -18,6 +68,12 @@ def process_video(
     model_name: str = "yolov8n.pt",
     confidence_threshold: float = 0.35,
     notes: str = "",
+    sam_checkpoint: str | None = None,
+    sam_prompt: str = "person",
+    sam_every: int = 10,
+    sam_min_score: float = 0.25,
+    sam_match_iou: float = 0.25,
+    sam_device: str = "cuda",
 ) -> str:
     source_path = Path(source)
     if not source_path.exists():
@@ -25,6 +81,14 @@ def process_video(
 
     model = YOLO(model_name)
     tracker = sv.ByteTrack()
+
+    segmenter = None
+    if sam_checkpoint:
+        from segmenter import SAM3TextSegmenter
+        segmenter = SAM3TextSegmenter(
+            checkpoint_path=sam_checkpoint,
+            device=sam_device,
+        )
 
     cap = cv2.VideoCapture(str(source_path))
     if not cap.isOpened():
@@ -62,7 +126,28 @@ def process_video(
             continue
 
         detections = detections[detections.confidence >= confidence_threshold]
+        if len(detections) == 0:
+            continue
+
         tracked = tracker.update_with_detections(detections)
+
+        should_segment = (
+            segmenter is not None
+            and sam_every > 0
+            and frame_index % sam_every == 0
+        )
+        mask_areas = (
+            _sam_mask_areas_for_tracks(
+                frame_bgr=frame,
+                tracked=tracked,
+                segmenter=segmenter,
+                prompt=sam_prompt,
+                min_score=sam_min_score,
+                match_iou=sam_match_iou,
+            )
+            if should_segment
+            else [None] * len(tracked)
+        )
 
         for i in range(len(tracked)):
             x1, y1, x2, y2 = tracked.xyxy[i]
@@ -73,11 +158,7 @@ def process_video(
 
             center_x = float((x1 + x2) / 2)
             center_y = float((y1 + y2) / 2)
-
-            # SAM 3 segmentation is intentionally an explicit adapter boundary.
-            # Set mask_area after the project-specific SAM 3 integration returns
-            # a validated mask for this tracked detection.
-            mask_area = None
+            mask_area = mask_areas[i]
 
             pending_rows.append(
                 (
@@ -95,7 +176,11 @@ def process_video(
                     center_x,
                     center_y,
                     mask_area,
-                    "",
+                    (
+                        f"SAM3 prompt={sam_prompt}"
+                        if mask_area is not None
+                        else ""
+                    ),
                 )
             )
 
@@ -118,6 +203,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default="yolov8n.pt")
     parser.add_argument("--confidence", type=float, default=0.35)
     parser.add_argument("--notes", default="")
+    parser.add_argument("--sam-checkpoint", default=None)
+    parser.add_argument("--sam-prompt", default="person")
+    parser.add_argument("--sam-every", type=int, default=10)
+    parser.add_argument("--sam-min-score", type=float, default=0.25)
+    parser.add_argument("--sam-match-iou", type=float, default=0.25)
+    parser.add_argument("--sam-device", default="cuda")
     return parser.parse_args()
 
 
@@ -129,5 +220,11 @@ if __name__ == "__main__":
         model_name=args.model,
         confidence_threshold=args.confidence,
         notes=args.notes,
+        sam_checkpoint=args.sam_checkpoint,
+        sam_prompt=args.sam_prompt,
+        sam_every=args.sam_every,
+        sam_min_score=args.sam_min_score,
+        sam_match_iou=args.sam_match_iou,
+        sam_device=args.sam_device,
     )
     print(f"Completed session: {sid}")
