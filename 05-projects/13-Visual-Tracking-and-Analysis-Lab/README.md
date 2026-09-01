@@ -214,6 +214,28 @@ Implemented now:
 Still requires a GPU/SAM 3 runtime for **fresh Project 13 generated evidence**. The repository intentionally does not claim model results that were not executed specifically for Project 13.
 
 
+## Final Detection Evaluation
+
+A human-reviewed 25-frame evaluation subset is complete for the persistent run `lab13_0d46777217`.
+
+```text
+TP:                    79
+FP:                    15
+FN:                    13
+Precision:             0.8404
+Recall:                0.8587
+F1:                    0.8495
+Mean matched box IoU:  0.9945
+```
+
+Per-class highlights:
+
+- `person`: Precision **0.9848**, Recall **0.9420**, F1 **0.9630**
+- `bus`: Precision **1.0000**, Recall **0.6087**, F1 **0.7568**
+- `car`: 14 false positives and no true positives in the reviewed subset
+
+See [`docs/FINAL-DETECTION-EVALUATION.md`](./docs/FINAL-DETECTION-EVALUATION.md) and [`results/detection_evaluation.json`](./results/detection_evaluation.json).
+
 ## Definitive Persistent Run
 
 The definitive persistent SAM 3 execution is session `lab13_0d46777217`. Its SQLite database and exported CSV/JSON evidence were saved to Google Drive so they survive Colab runtime disconnections.
