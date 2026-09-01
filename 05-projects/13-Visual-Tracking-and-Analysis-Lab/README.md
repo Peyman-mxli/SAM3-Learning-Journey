@@ -211,7 +211,6 @@ Implemented now:
 - Streamlit historical-results dashboard;
 - reproducible execution guide.
 
-Still requires a GPU/SAM 3 runtime for **fresh Project 13 generated evidence**. The repository intentionally does not claim model results that were not executed specifically for Project 13.
 
 
 ## Final Detection Evaluation
@@ -272,3 +271,36 @@ Full verified-run documentation is available in [`docs/VERIFIED-RUN-01.md`](./do
 Part of the repository:
 
 `SAM3-Learning-Journey`
+
+
+## Final implementation status
+
+**Engineering implementation: COMPLETE**
+
+Project 13 now includes the remaining validation infrastructure required by the original laboratory proposal:
+
+- deterministic 5-video robustness suite (baseline, low light, partial occlusion, motion blur, reduced scale);
+- multi-session batch runner;
+- condition-level robustness comparison;
+- human-ground-truth tracking evaluator for ID switches and fragmentation;
+- human-ground-truth segmentation evaluator for mask IoU and Dice;
+- tracking and segmentation annotation templates;
+- final requirement-to-evidence completion audit.
+
+See [`docs/FINAL-COMPLETION-AUDIT.md`](./docs/FINAL-COMPLETION-AUDIT.md).
+
+### Important evidence boundary
+
+The code path is complete, but **mask IoU/Dice and tracking ID-switch accuracy must not be assigned numerical values until human-reviewed mask and temporal-identity annotations exist**. The project now contains the evaluators required to calculate those values without fabricating ground truth.
+
+### Controlled robustness validation
+
+Generate the full five-video laboratory suite:
+
+```bash
+python evaluation/create_condition_variants.py data/input/tracking_test_01.mp4
+python evaluation/run_validation_suite.py
+python evaluation/analyze_validation_conditions.py
+```
+
+This creates a reproducible controlled comparison for baseline, low light, occlusion, blur, and reduced scale.
