@@ -64,7 +64,8 @@ class MouseGroundTruthReviewer:
               <b>How to review:</b>
               Draw a box by <b>clicking and dragging on the image</b>.
               Drag a box to move it; drag its edges/corners to resize it.
-              Select a box to change its class. Delete any false box.
+              To change a class: select the box, click the desired class below the image,
+              then click <b>Relabel selected box</b>. Delete any false box.
               Add boxes for missed objects. Then click <b>✓ Approve & Next</b>.
             </div>
             """
@@ -76,6 +77,9 @@ class MouseGroundTruthReviewer:
             description="✓ Approve & Next", button_style="success"
         )
         self.save_btn = widgets.Button(description="Save progress", button_style="info")
+        self.relabel_btn = widgets.Button(
+            description="Relabel selected box", button_style="warning"
+        )
         self.finish_btn = widgets.Button(
             description="Finish evaluation review", button_style="success"
         )
@@ -83,6 +87,7 @@ class MouseGroundTruthReviewer:
         self.prev_btn.on_click(self._previous)
         self.approve_btn.on_click(self._approve_next)
         self.save_btn.on_click(self._save_progress)
+        self.relabel_btn.on_click(self._relabel_selected)
         self.finish_btn.on_click(self._finish)
 
         self.widget = None
@@ -246,6 +251,7 @@ class MouseGroundTruthReviewer:
             widgets.HBox([
                 self.prev_btn,
                 self.save_btn,
+                self.relabel_btn,
                 self.approve_btn,
                 self.finish_btn,
             ]),
@@ -257,6 +263,27 @@ class MouseGroundTruthReviewer:
         if self.current > 0:
             self.current -= 1
         self._render()
+
+    def _relabel_selected(self, _):
+        if self.widget is None:
+            return
+        idx = getattr(self.widget, "selected_index", -1)
+        label = getattr(self.widget, "label", None)
+        if idx is None or idx < 0:
+            self.status.value = "<b>Select a box first.</b>"
+            return
+        if not label:
+            self.status.value = "<b>Select a class first.</b>"
+            return
+        edited = [{**bbox} for bbox in self.widget.bboxes]
+        if idx >= len(edited):
+            self.status.value = "<b>Selected box index is invalid.</b>"
+            return
+        edited[idx]["label"] = label
+        self.widget.bboxes = edited
+        self.status.value = (
+            f"<b>✓ Selected box relabeled to {label}.</b>"
+        )
 
     def _save_progress(self, _):
         self._save_current("0")
