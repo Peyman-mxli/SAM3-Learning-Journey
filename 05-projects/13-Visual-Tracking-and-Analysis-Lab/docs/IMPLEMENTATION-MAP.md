@@ -116,13 +116,21 @@ Every validation run should check:
 - [x] Laboratory proposal preserved
 - [x] Engineering implementation map
 - [x] SQLite persistence layer
-- [x] Executable YOLO + ByteTrack processing skeleton
+- [x] Executable YOLO + ByteTrack processing pipeline
+- [x] SAM 3 integration and verified Project 13 execution
 - [x] Streamlit dashboard entry point
-- [ ] Add 2–5 project-specific video test runs
-- [ ] Preserve Project 13 generated outputs
-- [ ] Add ground-truth evaluation dataset
-- [ ] Generate Project 13 Precision / Recall report
-- [ ] Generate Project 13 IoU / Dice report
-- [ ] Add final screenshots and demo evidence
+- [x] Project 13 generated persistent run evidence
+- [x] Human-reviewed detection ground truth
+- [x] Project 13 Precision / Recall / F1 report
+- [x] Detection confusion matrix
+- [x] Mean matched bounding-box IoU report
+- [x] 2–5 video validation-suite implementation
+- [x] Lighting / occlusion / blur / scale robustness tooling
+- [x] Tracking ID-switch / fragmentation evaluator
+- [x] Mask IoU / Dice evaluator
+- [x] Tracking and segmentation ground-truth templates
+- [x] Final completion audit
 
-The unchecked items require fresh Project 13 execution evidence and should not be marked complete until those runs are performed.
+Numerical **mask IoU / Dice** and **tracking ID-switch / fragmentation accuracy** remain evidence-gated: they require human-reviewed segmentation masks and temporal identities. The evaluators are implemented, but no values are fabricated before those annotations exist.
+
+See [`FINAL-COMPLETION-AUDIT.md`](./FINAL-COMPLETION-AUDIT.md).
