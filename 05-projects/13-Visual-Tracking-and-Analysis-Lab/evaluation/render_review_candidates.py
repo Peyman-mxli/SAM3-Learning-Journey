@@ -19,6 +19,8 @@ def main():
     )
     ap.add_argument("frames_dir")
     ap.add_argument("candidates_csv")
+    ap.add_argument("--manifest", default=None,
+                    help="Optional manifest.csv. When provided, render every review frame, including frames with zero candidates.")
     ap.add_argument("--output-dir", default="evaluation/review_pack")
     args = ap.parse_args()
 
@@ -32,8 +34,15 @@ def main():
         frame = int(float(row["frame_index"]))
         by_frame.setdefault(frame, []).append(row)
 
+    if args.manifest:
+        manifest_rows = load_rows(Path(args.manifest))
+        review_frames = sorted(int(float(r["frame_index"])) for r in manifest_rows)
+    else:
+        review_frames = sorted(by_frame)
+
     rendered = []
-    for frame, rows in sorted(by_frame.items()):
+    for frame in review_frames:
+        rows = by_frame.get(frame, [])
         src = frames_dir / f"frame_{frame:04d}.jpg"
         image = cv2.imread(str(src))
         if image is None:
@@ -60,6 +69,7 @@ def main():
             f"""
             <section>
               <h2>Frame {frame:04d} — {count} candidate(s)</h2>
+              <p>{"No model candidates — inspect carefully for missed objects." if count == 0 else "Review every candidate and check for additional missed objects."}</p>
               <img src="{html.escape(filename)}" loading="lazy">
             </section>
             """
