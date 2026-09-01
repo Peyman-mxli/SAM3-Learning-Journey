@@ -1246,6 +1246,34 @@ The mock backend validates software structure and orchestration only. It does no
 
 ---
 
+---
+
+### 13 — Visual Tracking and Analysis Laboratory
+
+[`13-Visual-Tracking-and-Analysis-Lab/`](./13-Visual-Tracking-and-Analysis-Lab/)
+
+A dedicated portfolio implementation of the **SAM 3 Computer Vision Laboratory** proposal **“Sistema de Seguimiento y Análisis Visual”** (Run `45ef3e05`).
+
+The project translates the laboratory MVP into an engineering structure with:
+
+- YOLO object detection
+- Supervision detections
+- ByteTrack temporal identity
+- SQLite session and observation persistence
+- historical session exploration
+- a Streamlit dashboard
+- an explicit SAM 3 segmentation integration boundary
+- a formal requirement-to-implementation map
+- Precision / Recall and IoU / Dice evaluation targets
+- documented validation and failure-analysis requirements
+
+Unlike Project 06, which contains earlier practical tracking experiments and verified evidence, Project 13 is organized specifically around the official laboratory proposal and its portfolio deliverables.
+
+Current implementation includes the project structure, documentation, SQLite persistence layer, executable YOLO + ByteTrack video-processing pipeline, and Streamlit dashboard. Fresh Project 13 test-video and SAM 3 evaluation evidence remains intentionally marked as pending until executed.
+
+**Status:** Implementation scaffold complete; dedicated validation evidence pending.
+
+
 # Project Progression
 
 The projects are intentionally organized so that each one introduces additional computer vision capabilities.
