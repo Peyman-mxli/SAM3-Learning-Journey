@@ -114,3 +114,33 @@ python evaluation/render_review_candidates.py \
 This creates one annotated JPEG per review frame plus `evaluation/review_pack/index.html`.
 
 The overlays are review aids only. They must not be treated as ground truth automatically.
+
+
+## Mouse-based Colab reviewer
+
+For human ground-truth review, install the lightweight annotation widget:
+
+```bash
+pip install -q -r evaluation/requirements-reviewer.txt
+```
+
+In Google Colab, enable the custom widget manager and launch the reviewer:
+
+```python
+from google.colab import output
+output.enable_custom_widget_manager()
+
+from evaluation.colab_ground_truth_reviewer import launch
+
+reviewer = launch(
+    frames_dir="evaluation/ground_truth_frames",
+    candidates_csv="evaluation/ground_truth_frames/review_candidates.csv",
+    manifest_csv="evaluation/ground_truth_frames/manifest.csv",
+    output_csv="evaluation/ground_truth.csv",
+    backup_csv="/content/drive/MyDrive/Project13-Results/ground_truth.csv",
+)
+```
+
+The reviewer supports direct mouse drawing, moving, resizing, relabeling, and deleting of boxes. It autosaves reviewed annotations and writes a persistent Drive backup.
+
+The underlying annotation widget supports mouse creation/editing of bounding boxes and programmatic model-assisted starting boxes.
