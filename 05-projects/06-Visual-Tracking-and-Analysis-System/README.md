@@ -1519,3 +1519,18 @@ Project directory:
 GitHub: [Peyman-mxli](https://github.com/Peyman-mxli)
 
 LinkedIn: [Peyman Miyandashti](https://www.linkedin.com/in/peyman-mxli/)
+
+
+---
+
+# Official Proposal Completion Audit
+
+The official **Sistema de Seguimiento y Análisis Visual** requirements are mapped to repository evidence in:
+
+[`docs/MVP-COMPLETION-MATRIX.md`](./docs/MVP-COMPLETION-MATRIX.md)
+
+A dedicated environmental-condition evaluator has also been added to address the proposal's guiding research question about **lighting and occlusion**:
+
+[`evaluation/environmental_condition_analysis.py`](./evaluation/environmental_condition_analysis.py)
+
+The evaluator reports precision, recall, F1, ID-switch rate, and confidence by condition from real labeled trials. It intentionally does not fabricate environmental-condition measurements that were not recorded during earlier verified runs.
