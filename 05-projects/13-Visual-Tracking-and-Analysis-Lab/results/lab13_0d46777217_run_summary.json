@@ -1,0 +1,16 @@
+{
+  "session_id": "lab13_0d46777217",
+  "pipeline": "YOLO + ByteTrack + SAM 3",
+  "input": "tracking_test_01.mp4",
+  "frames": 75,
+  "fps": 15,
+  "resolution": "640x360",
+  "duration_seconds": 5,
+  "total_observations": 299,
+  "unique_tracker_ids": 10,
+  "average_confidence": 0.7059505883865931,
+  "sam_mask_observations": 21,
+  "average_sam_mask_area": 10047.095238095239,
+  "persistence": "Google Drive",
+  "status": "verified"
+}
