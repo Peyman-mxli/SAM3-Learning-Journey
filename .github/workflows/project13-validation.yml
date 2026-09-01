@@ -10,31 +10,29 @@ permissions:
   contents: write
 
 jobs:
-  validate-project13:
+  validate:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
 
-      - name: Install validation dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install ultralytics supervision opencv-python-headless numpy pandas
 
-      - name: Generate five controlled validation videos
+      - name: Create validation videos
         working-directory: 05-projects/13-Visual-Tracking-and-Analysis-Lab
-        run: |
-          python evaluation/create_condition_variants.py data/input/tracking_test_01.mp4
+        run: python evaluation/create_condition_variants.py data/input/tracking_test_01.mp4
 
-      - name: Run five validation sessions
+      - name: Run validation sessions
         working-directory: 05-projects/13-Visual-Tracking-and-Analysis-Lab
         run: |
           python evaluation/run_validation_suite.py \
@@ -44,157 +42,28 @@ jobs:
             --model yolov8n.pt \
             --confidence 0.35
 
-      - name: Analyze condition robustness
+      - name: Analyze conditions
         working-directory: 05-projects/13-Visual-Tracking-and-Analysis-Lab
-        run: |
-          python evaluation/analyze_validation_conditions.py \
-            --results-dir results/validation
+        run: python evaluation/analyze_validation_conditions.py --results-dir results/validation
 
-      - name: Build environmental validation report
+      - name: Build report
         working-directory: 05-projects/13-Visual-Tracking-and-Analysis-Lab
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import pandas as pd
+        run: python evaluation/build_validation_report.py --results-dir results/validation
 
-          root = Path(".")
-          result_dir = root / "results" / "validation"
-          summary = pd.read_csv(result_dir / "condition_summary.csv")
-          deltas = pd.read_csv(result_dir / "condition_deltas.csv")
-
-          merged = summary.merge(
-              deltas[
-                  [
-                      "condition",
-                      "total_observations_delta_vs_baseline",
-                      "unique_trackers_delta_vs_baseline",
-                      "average_confidence_delta_vs_baseline",
-                      "average_track_length_delta_vs_baseline",
-                  ]
-              ],
-              on="condition",
-              how="left",
-          )
-
-          labels = {
-              "baseline": "Baseline",
-              "low_light": "Low light",
-              "partial_occlusion": "Partial occlusion",
-              "motion_blur": "Motion blur",
-              "reduced_scale": "Reduced scale",
-          }
-
-          rows = []
-          for _, r in merged.iterrows():
-              rows.append(
-                  "| {condition} | {obs} | {tracks} | {conf:.4f} | {length:.4f} | "
-                  "{dobs:+.0f} | {dtracks:+.0f} | {dconf:+.4f} |".format(
-                      condition=labels.get(r["condition"], r["condition"]),
-                      obs=int(r["total_observations"]),
-                      tracks=int(r["unique_trackers"]),
-                      conf=float(r["average_confidence"]),
-                      length=float(r["average_track_length"]),
-                      dobs=float(r["total_observations_delta_vs_baseline"]),
-                      dtracks=float(r["unique_trackers_delta_vs_baseline"]),
-                      dconf=float(r["average_confidence_delta_vs_baseline"]),
-                  )
-              )
-
-          non_baseline = merged[merged["condition"] != "baseline"].copy()
-          worst_conf = non_baseline.loc[
-              non_baseline["average_confidence"].idxmin()
-          ]
-          shortest_tracks = non_baseline.loc[
-              non_baseline["average_track_length"].idxmin()
-          ]
-
-          report = f"""# Environmental Validation Results — Project 13
-
-This report is generated automatically from the controlled five-video
-validation suite for **Run 45ef3e05**.
-
-## Research question
-
-> How do variations in lighting and occlusion affect the precision and
-> stability of object tracking in recorded videos?
-
-## Experimental design
-
-The same recorded source video is used for all conditions so scene content is
-held constant while a single visual perturbation is introduced.
-
-Conditions:
-
-1. Baseline
-2. Low light
-3. Partial occlusion
-4. Motion blur
-5. Reduced scale
-
-The pipeline uses the same YOLO model, confidence threshold, Supervision
-representation, and ByteTrack configuration across all five sessions.
-
-## Results
-
-| Condition | Observations | Unique trackers | Avg confidence | Avg track length | Δ observations | Δ trackers | Δ confidence |
-|---|---:|---:|---:|---:|---:|---:|---:|
-{chr(10).join(rows)}
-
-## Interpretation
-
-The lowest average detection confidence among the perturbed conditions was
-observed for **{labels.get(worst_conf['condition'], worst_conf['condition'])}**
-at **{float(worst_conf['average_confidence']):.4f}**.
-
-The shortest average track length among the perturbed conditions was observed
-for **{labels.get(shortest_tracks['condition'], shortest_tracks['condition'])}**
-at **{float(shortest_tracks['average_track_length']):.4f} observations per tracker**.
-
-These controlled results show how visual degradation changes tracking-system
-behavior relative to the baseline. Changes in tracker count and average track
-length are especially useful indicators of temporal fragmentation.
-
-## Evidence boundary
-
-These results are **controlled robustness indicators**, not full
-ground-truth tracking accuracy. They measure how the same pipeline behaves
-under deterministic perturbations.
-
-A numerical claim about true ID-switch accuracy or fragmentation accuracy
-still requires human-reviewed temporal identities. Mask IoU and Dice require
-human-reviewed segmentation masks.
-
-## Reproducibility
-
-Generated by:
-
-- `evaluation/create_condition_variants.py`
-- `evaluation/run_validation_suite.py`
-- `evaluation/analyze_validation_conditions.py`
-
-Machine-readable outputs are preserved in `results/validation/`.
-"""
-
-          (root / "docs" / "ENVIRONMENTAL-VALIDATION-RESULTS.md").write_text(
-              report, encoding="utf-8"
-          )
-          PY
-
-      - name: Remove generated videos and temporary database
+      - name: Remove temporary generated data
         working-directory: 05-projects/13-Visual-Tracking-and-Analysis-Lab
         run: |
           rm -rf data/validation_videos
           rm -f data/project13_validation.sqlite3
 
-      - name: Commit validation evidence
+      - name: Commit results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            05-projects/13-Visual-Tracking-and-Analysis-Lab/results/validation \
-            05-projects/13-Visual-Tracking-and-Analysis-Lab/docs/ENVIRONMENTAL-VALIDATION-RESULTS.md
+          git add 05-projects/13-Visual-Tracking-and-Analysis-Lab/results/validation
+          git add 05-projects/13-Visual-Tracking-and-Analysis-Lab/docs/ENVIRONMENTAL-VALIDATION-RESULTS.md
           if git diff --cached --quiet; then
-            echo "No validation changes to commit."
+            echo "No changes."
           else
             git commit -m "Add Project 13 environmental validation results"
             git push
