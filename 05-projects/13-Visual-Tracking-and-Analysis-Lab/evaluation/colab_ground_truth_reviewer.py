@@ -64,8 +64,9 @@ class MouseGroundTruthReviewer:
               <b>How to review:</b>
               Draw a box by <b>clicking and dragging on the image</b>.
               Drag a box to move it; drag its edges/corners to resize it.
-              To change a class: select the box, click the desired class below the image,
-              then click <b>Relabel selected box</b>. Delete any false box.
+              To change a class, use the <b>Object</b> and <b>New class</b>
+              dropdowns below the image, then click <b>Apply relabel</b>.
+              Delete any false box.
               Add boxes for missed objects. Then click <b>✓ Approve & Next</b>.
             </div>
             """
@@ -77,8 +78,17 @@ class MouseGroundTruthReviewer:
             description="✓ Approve & Next", button_style="success"
         )
         self.save_btn = widgets.Button(description="Save progress", button_style="info")
+        self.object_to_relabel = widgets.Dropdown(
+            description="Object:",
+            options=[],
+        )
+        self.new_class = widgets.Dropdown(
+            description="New class:",
+            options=self.classes,
+            value=self.classes[0],
+        )
         self.relabel_btn = widgets.Button(
-            description="Relabel selected box", button_style="warning"
+            description="Apply relabel", button_style="warning"
         )
         self.finish_btn = widgets.Button(
             description="Finish evaluation review", button_style="success"
@@ -225,6 +235,7 @@ class MouseGroundTruthReviewer:
     def _render(self):
         frame = self.frames[self.current]
         self.widget, track_id_widget = self._build_widget(frame)
+        self._refresh_object_dropdown()
 
         approved = frame in self.approved_frames
         approved_count = len(self.approved_frames)
@@ -249,9 +260,13 @@ class MouseGroundTruthReviewer:
             self.widget,
             track_id_widget,
             widgets.HBox([
+                self.object_to_relabel,
+                self.new_class,
+                self.relabel_btn,
+            ]),
+            widgets.HBox([
                 self.prev_btn,
                 self.save_btn,
-                self.relabel_btn,
                 self.approve_btn,
                 self.finish_btn,
             ]),
@@ -264,25 +279,40 @@ class MouseGroundTruthReviewer:
             self.current -= 1
         self._render()
 
-    def _relabel_selected(self, _):
+    def _refresh_object_dropdown(self):
         if self.widget is None:
+            self.object_to_relabel.options = []
             return
-        idx = getattr(self.widget, "selected_index", -1)
-        label = getattr(self.widget, "label", None)
-        if idx is None or idx < 0:
-            self.status.value = "<b>Select a box first.</b>"
+        options = []
+        for i, box in enumerate(self.widget.bboxes):
+            label = str(box.get("label", "object"))
+            track_id = str(box.get("track_id", ""))
+            text = f"{i + 1}. {label}"
+            if track_id:
+                text += f" — track {track_id}"
+            options.append((text, i))
+        self.object_to_relabel.options = options
+        if options:
+            self.object_to_relabel.value = options[0][1]
+
+    def _relabel_selected(self, _):
+        if self.widget is None or not self.widget.bboxes:
+            self.status.value = "<b>No boxes available to relabel.</b>"
             return
-        if not label:
-            self.status.value = "<b>Select a class first.</b>"
+
+        idx = self.object_to_relabel.value
+        if idx is None or idx < 0 or idx >= len(self.widget.bboxes):
+            self.status.value = "<b>Choose an object from the Object dropdown.</b>"
             return
+
+        label = self.new_class.value
         edited = [{**bbox} for bbox in self.widget.bboxes]
-        if idx >= len(edited):
-            self.status.value = "<b>Selected box index is invalid.</b>"
-            return
         edited[idx]["label"] = label
         self.widget.bboxes = edited
+        self._refresh_object_dropdown()
+
         self.status.value = (
-            f"<b>✓ Selected box relabeled to {label}.</b>"
+            f"<b>✓ Object {idx + 1} relabeled to {label}.</b>"
         )
 
     def _save_progress(self, _):
