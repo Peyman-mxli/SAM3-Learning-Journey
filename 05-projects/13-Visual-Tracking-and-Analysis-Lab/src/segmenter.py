@@ -14,6 +14,18 @@ class SegmentationResult:
     scores: np.ndarray
 
 
+def _to_numpy(value) -> np.ndarray:
+    if value is None:
+        return np.asarray([])
+    if hasattr(value, "detach"):
+        value = value.detach()
+    if hasattr(value, "cpu"):
+        value = value.cpu()
+    if hasattr(value, "numpy"):
+        return value.numpy()
+    return np.asarray(value)
+
+
 class SAM3TextSegmenter:
     """
     Thin adapter around the SAM 3 image processor used in the course environment.
@@ -46,8 +58,7 @@ class SAM3TextSegmenter:
     def segment_text(self, image_rgb: np.ndarray, prompt: str) -> SegmentationResult:
         image = Image.fromarray(image_rgb)
 
-        autocast_enabled = self.device.startswith("cuda")
-        if autocast_enabled:
+        if self.device.startswith("cuda"):
             context = self.torch.autocast(
                 device_type="cuda",
                 dtype=self.torch.bfloat16,
@@ -63,9 +74,9 @@ class SAM3TextSegmenter:
                 prompt=prompt,
             )
 
-        masks = np.asarray(output.get("masks", []))
-        boxes = np.asarray(output.get("boxes", []))
-        scores = np.asarray(output.get("scores", []))
+        masks = _to_numpy(output.get("masks"))
+        boxes = _to_numpy(output.get("boxes"))
+        scores = _to_numpy(output.get("scores"))
 
         return SegmentationResult(
             prompt=prompt,
