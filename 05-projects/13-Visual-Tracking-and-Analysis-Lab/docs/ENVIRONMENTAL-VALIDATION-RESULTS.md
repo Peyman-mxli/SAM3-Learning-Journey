@@ -28,19 +28,19 @@ ByteTrack configuration are used across all sessions.
 
 | Condition | Observations | Unique trackers | Avg confidence | Avg track length | Δ observations | Δ trackers | Δ confidence |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Baseline | 299 | 10 | 0.5888 | 24.9167 | +0 | +0 | +0.0000 |
-| Low light | 216 | 5 | 0.5681 | 36.0000 | -83 | -5 | -0.0207 |
-| Partial occlusion | 230 | 10 | 0.5559 | 17.6923 | -69 | +0 | -0.0329 |
-| Motion blur | 267 | 5 | 0.6727 | 53.4000 | -32 | -5 | +0.0839 |
-| Reduced scale | 291 | 9 | 0.5476 | 24.2500 | -8 | -1 | -0.0412 |
+| Baseline | 299 | 10 | 0.7060 | 29.9000 | +0 | +0 | +0.0000 |
+| Low light | 216 | 5 | 0.7222 | 43.2000 | -83 | -5 | +0.0162 |
+| Partial occlusion | 230 | 10 | 0.6930 | 23.0000 | -69 | +0 | -0.0130 |
+| Motion blur | 267 | 5 | 0.7390 | 53.4000 | -32 | -5 | +0.0331 |
+| Reduced scale | 291 | 9 | 0.6846 | 32.3333 | -8 | -1 | -0.0213 |
 
 ## Interpretation
 
 The lowest average detection confidence among perturbed conditions was
-**Reduced scale**, with an average confidence of **0.5476**.
+**Reduced scale**, with an average confidence of **0.6846**.
 
 The shortest average track length among perturbed conditions was
-**Partial occlusion**, with **17.6923 observations per tracker**.
+**Partial occlusion**, with **23.0000 observations per tracker**.
 
 Changes in tracker count and average track length are useful indicators of
 temporal instability and possible fragmentation under degraded visual
