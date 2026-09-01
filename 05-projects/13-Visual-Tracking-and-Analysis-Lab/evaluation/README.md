@@ -149,3 +149,67 @@ The underlying annotation widget supports mouse creation/editing of bounding box
 ### Reviewed-frame scope
 
 Only predictions from human-reviewed frame indices are scored. Predictions from the other video frames are excluded from FP counts because those frames do not have reviewed ground truth.
+
+
+## Controlled 5-video validation suite
+
+Project 13 now includes a deterministic robustness suite that expands the single
+recorded source into five controlled test videos:
+
+- baseline
+- low light
+- partial occlusion
+- motion blur
+- reduced scale
+
+Generate and run the suite:
+
+```bash
+python evaluation/create_condition_variants.py data/input/tracking_test_01.mp4
+python evaluation/run_validation_suite.py
+python evaluation/analyze_validation_conditions.py
+```
+
+The analysis compares observation count, tracker count, average confidence,
+average track length, and SAM-mask coverage against the baseline.
+
+These are **robustness/sensitivity indicators**, not ground-truth tracking
+accuracy.
+
+## Tracking identity evaluation
+
+Human-reviewed temporal identities can be evaluated with:
+
+```bash
+python evaluation/evaluate_tracking_csv.py \
+  results/predictions_tracking.csv \
+  evaluation/tracking_ground_truth.csv \
+  --output results/tracking_evaluation.json
+```
+
+Template:
+
+`evaluation/tracking_ground_truth_template.csv`
+
+The evaluator reports matched detections, missed ground-truth objects,
+unmatched predictions, ID switches, ID-switch rate, and fragmented tracks.
+
+## Segmentation evaluation
+
+Human-reviewed binary masks can be evaluated with:
+
+```bash
+python evaluation/evaluate_segmentation_masks.py \
+  evaluation/segmentation_manifest.csv \
+  --output results/segmentation_evaluation.csv
+```
+
+Template:
+
+`evaluation/segmentation_manifest_template.csv`
+
+The evaluator calculates per-sample and mean **mask IoU** and **Dice**.
+
+See the complete proposal audit in:
+
+`docs/FINAL-COMPLETION-AUDIT.md`
