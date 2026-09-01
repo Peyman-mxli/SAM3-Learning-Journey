@@ -144,3 +144,8 @@ reviewer = launch(
 The reviewer supports direct mouse drawing, moving, resizing, relabeling, and deleting of boxes. It autosaves reviewed annotations and writes a persistent Drive backup.
 
 The underlying annotation widget supports mouse creation/editing of bounding boxes and programmatic model-assisted starting boxes.
+
+
+### Reviewed-frame scope
+
+Only predictions from human-reviewed frame indices are scored. Predictions from the other video frames are excluded from FP counts because those frames do not have reviewed ground truth.
