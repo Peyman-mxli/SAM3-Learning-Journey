@@ -213,6 +213,28 @@ Implemented now:
 
 Still requires a GPU/SAM 3 runtime for **fresh Project 13 generated evidence**. The repository intentionally does not claim model results that were not executed specifically for Project 13.
 
+
+## Verified Run 01
+
+Project 13 has now completed a real end-to-end **YOLO + ByteTrack + SAM 3** execution using `tracking_test_01.mp4`.
+
+Verified results:
+
+```text
+Session ID:                  lab13_1a429b993d
+Frames:                      75
+FPS:                         15.0
+Resolution:                  640 × 360
+Duration:                    5.0 s
+Observations:                299
+Unique tracker IDs:          10
+Average confidence:          0.7059505884
+SAM 3 mask observations:     21
+Average SAM 3 mask area:     10047.0952 px
+```
+
+Full verified-run documentation is available in [`docs/VERIFIED-RUN-01.md`](./docs/VERIFIED-RUN-01.md).
+
 ## Author
 
 **Peyman Miyandashti**
