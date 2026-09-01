@@ -97,3 +97,19 @@ Tracking accuracy requires human-reviewed temporal identities. Candidate metrics
 ## Evidence rule
 
 No Precision, Recall, F1, IoU, Dice, confusion-matrix interpretation, ID-switch count, or fragmentation result belongs in the portfolio until its corresponding human-reviewed ground truth exists.
+
+
+## Visual review pack
+
+Render the 94 model candidates over the 25 extracted review frames:
+
+```bash
+python evaluation/render_review_candidates.py \
+  evaluation/ground_truth_frames \
+  evaluation/ground_truth_frames/review_candidates.csv \
+  --output-dir evaluation/review_pack
+```
+
+This creates one annotated JPEG per review frame plus `evaluation/review_pack/index.html`.
+
+The overlays are review aids only. They must not be treated as ground truth automatically.
