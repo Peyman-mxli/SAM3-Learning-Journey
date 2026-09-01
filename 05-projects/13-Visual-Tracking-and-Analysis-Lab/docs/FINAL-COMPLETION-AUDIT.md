@@ -107,7 +107,37 @@ inventing ground truth.
 
 **Detection evaluation: COMPLETE.**
 
-**Environmental robustness experiment infrastructure: COMPLETE.**
+**Environmental robustness experiment: COMPLETE — executed across baseline, low light, partial occlusion, motion blur, and reduced scale.**
 
 **Mask/tracking accuracy code paths: COMPLETE and awaiting human-reviewed
 annotations before numerical claims can be made.**
+
+
+## Executed environmental results
+
+The controlled five-video suite has been run successfully and committed to the
+repository.
+
+| Condition | Observations | Unique trackers | Avg confidence | Avg track length |
+|---|---:|---:|---:|---:|
+| Baseline | 299 | 10 | 0.7060 | 29.9 |
+| Low light | 216 | 5 | 0.7222 | 43.2 |
+| Partial occlusion | 230 | 10 | 0.6930 | 23.0 |
+| Motion blur | 267 | 5 | 0.7390 | 53.4 |
+| Reduced scale | 291 | 9 | 0.6846 | 32.33 |
+
+The experiment confirms that controlled visual degradation changes the
+tracking pipeline's observable behavior. Partial occlusion produced the
+shortest average track length; low light reduced both observation count and
+the number of unique retained tracker IDs; reduced scale produced the lowest
+average confidence among the perturbed conditions.
+
+Full report:
+[`ENVIRONMENTAL-VALIDATION-RESULTS.md`](./ENVIRONMENTAL-VALIDATION-RESULTS.md)
+
+Machine-readable evidence:
+[`../results/validation/`](../results/validation/)
+
+The results are intentionally described as robustness indicators rather than
+ground-truth tracking accuracy because human-reviewed temporal identities are
+still required for true ID-switch and fragmentation accuracy.
