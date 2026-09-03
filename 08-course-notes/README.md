@@ -23,6 +23,7 @@ The purpose of this section is to document each course session in a structured w
 | 10 | [SAM 3 Point Prompts](./10-SAM3-Point-Prompts/) | Completed |
 | 11 | [SAM 3 Video Segmentation](./11-SAM3-Video-Segmentation/) | Completed |
 | 12 | [Muse Glimmer and SAM 3 Agents](./12-Muse-Glimmer-and-SAM3-Agents/) | Documentation completed |
+| 13 | [Hugging Face + SAM 3](./13-Hugging-Face-SAM/) | Course notebook documented |
 
 ---
 
@@ -2976,6 +2977,31 @@ The module contains architecture, installation, hardware, workflow, and official
 
 ---
 
+# Session 13 — Hugging Face + SAM 3
+
+[`13-Hugging-Face-SAM/`](./13-Hugging-Face-SAM/)
+
+This advanced optional session uses **SAM 3 directly through the Hugging Face `transformers` API** instead of relying only on the Ultralytics wrapper.
+
+The supplied course notebook demonstrates:
+
+- `Sam3Processor` and `Sam3Model`
+- Hugging Face authentication and gated model access
+- Native text-prompt segmentation
+- Native output post-processing
+- Manual conversion of `masks`, `boxes`, and `scores` into `sv.Detections`
+- Supervision `MaskAnnotator` and `LabelAnnotator`
+- Multiple semantic concepts in one prompt
+- YOLOv8 bounding boxes as SAM 3 prompts
+- Text-prompt vs. bounding-box comparison
+- Confidence-threshold experiments at `0.2`, `0.5`, and `0.8`
+
+The repository includes a **sanitized copy of the supplied notebook**. The hard-coded Hugging Face token found in the uploaded source was removed before publication.
+
+**Status:** Course notebook and technical documentation completed; repository execution results not yet independently validated
+
+---
+
 # Course Notes Organization
 
 Each course session is documented independently.
@@ -3079,7 +3105,7 @@ The course also introduces concepts related to:
 ```text
 SAM3 Computer Vision Learning Journey
 
-Course Sessions Documented: 13
+Course Sessions Documented: 14
 
 00 Agentic AI Programming                 ✅
 01 Introduction to Supervision            ✅
@@ -3094,9 +3120,10 @@ Course Sessions Documented: 13
 10 SAM 3 Point Prompts                    ✅
 11 SAM 3 Video Segmentation               ✅
 12 Muse Glimmer and SAM 3 Agents          📘
+13 Hugging Face + SAM 3                   📘
 ```
 
-The repository currently documents the learning progression through **Session 12 — Muse Glimmer and SAM 3 Agents**.
+The repository currently documents the learning progression through **Session 13 — Hugging Face + SAM 3**.
 
 ---
 
@@ -3146,10 +3173,10 @@ The objective is not only to preserve course material, but to demonstrate the pr
 ```text
 08-course-notes/
 
-Sessions documented:  13
+Sessions documented:  14
 Course sessions completed: 12
 Extension modules documented: 1
-Latest module:        12 — Muse Glimmer and SAM 3 Agents
+Latest module:        13 — Hugging Face + SAM 3
 
 Status: UP TO DATE ✅
 ```
