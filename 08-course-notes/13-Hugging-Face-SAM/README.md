@@ -346,7 +346,7 @@ Only more confident results
 
 ## Class Recording
 
-[Watch Class 13 — Hugging Face + SAM](https://youtu.be/ZCTztxXQQS0)
+[Watch Class 13 — Hugging Face + SAM](https://youtu.be/w9DE806d4oU)
 
 The recording is documented separately in [CLASS-RECORDING.md](./CLASS-RECORDING.md).
 
