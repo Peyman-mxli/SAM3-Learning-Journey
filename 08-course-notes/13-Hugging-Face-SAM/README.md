@@ -4,22 +4,6 @@ This course-note module is reserved for **Class 13**, focused on the use of **Hu
 
 The class recording is currently being uploaded, so this module is being created first as the structured home for the lesson. The technical documentation will be completed from the actual class content, notebook, code, and recording rather than guessing or documenting unverified material.
 
----
-
-## Session Status
-
-```text
-Session:          13 — Hugging Face and SAM
-Folder:           Created
-Class Recording:  ✅ Added
-Course Notebook:  Pending
-Detailed Notes:   Pending class review
-Practical Work:   Pending validation
-Status:           In progress
-```
-
----
-
 # Session Objective
 
 The objective of this module is to document how **Hugging Face** is used in the SAM learning workflow and how the platform connects with model access, authentication, model repositories, inference, and practical Computer Vision development.
