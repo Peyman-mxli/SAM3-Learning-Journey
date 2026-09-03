@@ -11,7 +11,7 @@ The class recording is currently being uploaded, so this module is being created
 ```text
 Session:          13 — Hugging Face and SAM
 Folder:           Created
-Class Recording:  Upload in progress
+Class Recording:  ✅ Added
 Course Notebook:  Pending
 Detailed Notes:   Pending class review
 Practical Work:   Pending validation
@@ -105,15 +105,15 @@ The final workflow will be updated to match the real class implementation.
 
 # Class Recording
 
-The Class 13 recording is currently being uploaded to YouTube.
+The Class 13 recording is now available on YouTube:
 
-When the final video URL is available, it will be documented in:
+[Watch Class 13 — Hugging Face + SAM](https://youtu.be/5gBU0k45R84)
+
+The recording is also documented in:
 
 ```text
 CLASS-RECORDING.md
 ```
-
-and linked directly from this README.
 
 ---
 
@@ -184,16 +184,14 @@ This module will connect model-platform usage with the practical segmentation wo
 
 To complete this module:
 
-1. Finish uploading the Class 13 recording.
-2. Add the final YouTube link.
-3. Review the full recording.
-4. Preserve the original notebook or class code.
-5. Document the lesson section by section.
-6. Build the practical implementation.
-7. Run and validate the practical.
-8. Save screenshots and outputs.
-9. Update the parent `08-course-notes/README.md`.
-10. Mark the session completed only after validation.
+1. Review the full Class 13 recording.
+2. Preserve the original notebook or class code.
+3. Document the lesson section by section.
+4. Build the practical implementation.
+5. Run and validate the practical.
+6. Save screenshots and outputs.
+7. Update the parent `08-course-notes/README.md`.
+8. Mark the session completed only after validation.
 
 ---
 
@@ -212,7 +210,7 @@ To complete this module:
 13 — Hugging Face and SAM
 
 README:           ✅ Created
-Recording:        ⏳ Uploading
+Recording:        ✅ Added
 Class review:     ⏳ Pending
 Detailed notes:  ⏳ Pending
 Practical:        ⏳ Pending
