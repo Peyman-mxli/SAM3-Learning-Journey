@@ -4,7 +4,7 @@ This file preserves the official class recording used for **Session 13 — Huggi
 
 ## Recording
 
-**YouTube:** https://youtu.be/5gBU0k45R84
+**YouTube:** https://youtu.be/ZCTztxXQQS0
 
 ## Session
 
