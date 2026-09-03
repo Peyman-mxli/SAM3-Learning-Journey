@@ -46,6 +46,7 @@ From environment setup and small reusable examples to complete Computer Vision p
 | 🚀 [Practical Development](#-practical-development) | Larger Computer Vision projects and pipelines |
 | 🧠 [SAM 3 Segmentation](#-sam-3-segmentation) | Current SAM 3 segmentation work |
 | 🖼️ [Visual Assets](#️-visual-assets) | Repository banners and screenshots |
+| 🏆 [Achievements & Milestones](#-achievements--milestones) | Verified course achievements and technical milestones |
 | 📚 [Resources](#-resources) | External references and documentation |
 | ⚠️ [Professional Impact](#️-professional-impact) | Portfolio and professional value |
 | 👤 [Author](#-author) | Repository author information |
@@ -315,8 +316,11 @@ SAM3-Learning-Journey/
 │   ├── screenshots/
 │   └── README.md
 │
-└── 08-course-notes/
-    └── Course notes, recordings, notebooks, and practical exercises
+├── 08-course-notes/
+│   └── Course notes, recordings, notebooks, and practical exercises
+│
+└── 09-achievements/
+    └── Verified achievements, milestones, and assessment evidence
 ```
 
 ## Folder Overview
@@ -333,6 +337,7 @@ SAM3-Learning-Journey/
 | **07-assets/Banners** | Main repository and technology banners |
 | **07-assets/screenshots** | Screenshots and visual development evidence |
 | **08-course-notes** | Detailed lesson notes, recordings, notebooks, and practical work |
+| **09-achievements** | Verified achievements, milestones, and assessment evidence |
 
 The structure intentionally separates **learning material**, **small examples**, and **larger projects**.
 
@@ -1878,6 +1883,7 @@ The main repository sections can be explored directly below.
 | Resources | [`06-resources/`](./06-resources/) |
 | Visual Assets | [`07-assets/`](./07-assets/) |
 | Course Notes | [`08-course-notes/`](./08-course-notes/) |
+| Achievements & Milestones | [`09-achievements/`](./09-achievements/) |
 
 ---
 
@@ -2228,6 +2234,36 @@ Documented Project
 This prevents the learning process from becoming a collection of disconnected notebooks.
 
 Instead, each lesson contributes to an increasingly complete technical system.
+
+---
+
+# 🏆 Achievements & Milestones
+
+My learning journey also includes verified assessment milestones.
+
+## SAM3 Technical Exam — 100%
+
+On **September 2, 2026**, I completed the **SAM3 Technical Exam: Computer Vision with Segment Anything Model 3 by Meta — Cohort 1** with a perfect result:
+
+```text
+Score:       20 / 20
+Percentage:  100%
+Questions:   20
+Time used:   8 minutes 44 seconds
+Status:      Completed successfully
+```
+
+<p align="center">
+  <img src="07-assets/screenshots/sam3-technical-exam-100-percent.png"
+       alt="SAM3 Technical Exam 100 Percent Result"
+       width="720">
+</p>
+
+This milestone provides direct evidence of the knowledge developed throughout the course and complements the practical projects, notebooks, evaluations, and technical documentation maintained in this repository.
+
+Detailed milestone documentation is available here:
+
+**[View Achievements & Milestones →](./09-achievements/)**
 
 ---
 
