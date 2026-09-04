@@ -4,7 +4,11 @@ This session documents a **local real-time computer vision workflow** built with
 
 The supplied notebook is designed to run locally from **Google Antigravity IDE on Windows**, using the computer's webcam through a local WebRTC connection.
 
-The core pipeline is:
+The final practical execution was completed successfully and verified with a real webcam stream.
+
+---
+
+## Pipeline
 
 ```text
 Webcam
@@ -17,14 +21,14 @@ sv.Detections
    ↓
 Supervision annotations
    ↓
-Processed video in the browser
+Processed live video in the browser
 ```
 
-Unlike the remote/cloud workflows used in other sessions, this setup runs on `127.0.0.1` and does not require Colab, a public share link, TURN/Twilio, or a Hugging Face token.
+The application runs locally on `127.0.0.1` and does not require Colab, a public share link, TURN/Twilio, or a Hugging Face token.
 
 ---
 
-## What I Learn
+## What I Learned
 
 - Build a local webcam computer vision pipeline
 - Use FastRTC for real-time WebRTC video streaming
@@ -33,17 +37,17 @@ Unlike the remote/cloud workflows used in other sessions, this setup runs on `12
 - Annotate live detections with Supervision
 - Display class names and confidence scores
 - Select CPU or CUDA automatically
-- Use `skip_frames=True` to reduce real-time latency
+- Use `skip_frames=True` to reduce accumulated latency
 - Launch a local browser interface through Gradio/FastRTC
-- Troubleshoot camera, CUDA, port, and latency issues
+- Work with browser webcam permissions
+- Debug a live processing pipeline using terminal output
+- Validate real-time detections with saved evidence
 
 ---
 
 ## Why It Matters
 
-Earlier course work focused heavily on images, prerecorded video, segmentation, and cloud notebooks. Class 14 moves the workflow into **live local inference**.
-
-The important transition is:
+Earlier course work focused on images, prerecorded video, segmentation, and cloud notebooks. Class 14 moves the workflow into **live local inference**.
 
 ```text
 Static image / saved video
@@ -57,7 +61,7 @@ Real-time annotations
 Interactive local application
 ```
 
-This is useful for understanding how a computer vision model can become part of an actual live application rather than only an offline notebook experiment.
+This demonstrates how a computer vision model can become part of an actual live application instead of remaining only an offline notebook experiment.
 
 ---
 
@@ -65,36 +69,49 @@ This is useful for understanding how a computer vision model can become part of 
 
 **YouTube:** https://youtu.be/H_DDf3NCV5M
 
-See [`CLASS-RECORDING.md`](./CLASS-RECORDING.md) for the recording reference.
+See [`CLASS-RECORDING.md`](./CLASS-RECORDING.md).
 
 ---
 
-## Environment
+## Real Execution Environment
 
-The notebook is written for:
+The practical was executed locally with the following verified environment:
 
 ```text
 Operating system: Windows
 IDE: Google Antigravity
-Recommended Python: 3.11 or 3.12
-Execution: Local machine
-Web endpoint: 127.0.0.1
+Python: 3.11.9
+FastRTC: 0.0.34
+Gradio: 5.50.0
+Ultralytics: 8.4.138
+Supervision: 0.30.1
+aiortc: 1.15.0
+CUDA available: False
+Device: CPU
+Local endpoint: http://127.0.0.1:7860
 ```
 
-The notebook creates a dedicated Python virtual environment and Jupyter kernel:
+CPU execution was sufficient for the practical demonstration.
+
+---
+
+## Virtual Environment
+
+The local workflow uses a dedicated virtual environment:
 
 ```powershell
-python -m venv .venv
+py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip ipykernel
-python -m ipykernel install --user --name fastrtc-local --display-name "Python (FastRTC Local)"
+pip install -r 08-course-notes\14-Supervision-FastRTC\practical\requirements.txt
 ```
+
+The repository-level `.venv/` folder should remain excluded from Git tracking.
 
 ---
 
 ## Dependencies
 
-The practical notebook installs:
+The practical requirements are:
 
 ```text
 fastrtc==0.0.34
@@ -102,66 +119,51 @@ ultralytics
 supervision
 ```
 
-FastRTC also brings the WebRTC/UI stack needed by the notebook, including Gradio and aiortc.
-
-The notebook verifies versions for:
-
-```text
-fastrtc
-gradio
-ultralytics
-supervision
-aiortc
-```
-
-and checks whether CUDA is available.
+FastRTC brings the supporting WebRTC/UI stack used by the application, including Gradio and aiortc.
 
 ---
 
 ## Model Configuration
 
-The notebook intentionally uses:
+The practical uses:
 
 ```python
 MODEL_NAME = "yolov8n.pt"
+CONFIDENCE = 0.30
+IMAGE_SIZE = 640
 DEVICE = 0 if torch.cuda.is_available() else "cpu"
 ```
 
-`yolov8n.pt` is the Nano version of YOLOv8, which makes it suitable for webcam inference and more practical on CPU-constrained systems.
+`yolov8n.pt` is the Nano variant of YOLOv8, making it suitable for a lightweight local webcam demonstration.
 
-The first execution downloads the model weights automatically if they are not already present.
+On first execution, Ultralytics automatically downloaded the model weights.
 
 ---
 
 ## Supervision Annotators
 
-Two annotators are created:
+The live visualization uses:
 
 ```python
 box_annotator = sv.BoxAnnotator(thickness=2)
+
 label_annotator = sv.LabelAnnotator(
-    text_scale=0.5,
-    text_thickness=1
+    text_scale=0.6,
+    text_thickness=1,
 )
 ```
 
-The live visualization therefore includes:
+The annotated browser output therefore includes:
 
 - bounding boxes
 - detected class names
-- model confidence values
+- confidence values
 
 ---
 
 ## Frame Processing
 
-The main function is:
-
-```python
-process_frame(frame: np.ndarray) -> np.ndarray
-```
-
-For every incoming webcam frame, the notebook performs:
+Every incoming webcam frame is processed through:
 
 ```text
 NumPy frame
@@ -179,42 +181,25 @@ LabelAnnotator
 Annotated NumPy frame
 ```
 
-The configured inference parameters are:
-
-```python
-CONFIDENCE = 0.30
-IMAGE_SIZE = 640
-```
-
----
-
-## Detection Labels
-
-When class IDs and confidence values are available, labels are created using:
-
-```python
-f"{model.names[int(class_id)]} {confidence:.2f}"
-```
-
-A rendered detection can therefore look conceptually like:
+The practical runner also prints the number of detections for processed frames:
 
 ```text
-person 0.91
-car 0.84
-bottle 0.73
+Frame processed | detections: N
 ```
+
+This was useful for verifying that the FastRTC handler was actually receiving frames and sending them through YOLOv8.
 
 ---
 
 ## FastRTC Stream
 
-The notebook creates the local video stream with:
+The live stream uses:
 
 ```python
 stream = Stream(
     handler=VideoStreamHandler(
         process_frame,
-        skip_frames=True
+        skip_frames=True,
     ),
     modality="video",
     mode="send-receive",
@@ -224,29 +209,29 @@ stream = Stream(
 )
 ```
 
-### `skip_frames=True`
+### Why `skip_frames=True` Matters
 
-This is especially important in real-time computer vision.
+A webcam can produce frames faster than inference can process them.
 
-Without frame skipping, a slow model can build up a queue of old frames and create increasing latency.
-
-Conceptually:
+Without frame skipping:
 
 ```text
-Camera produces frames faster than inference
-                  ↓
-          Unprocessed queue grows
-                  ↓
-              Video delay
+Camera frames
+     ↓
+Inference slower than camera
+     ↓
+Old frames accumulate
+     ↓
+Increasing delay
 ```
 
 With frame skipping:
 
 ```text
-Keep processing recent frames
-          ↓
-Drop obsolete frames when necessary
-          ↓
+Recent frames prioritized
+     ↓
+Obsolete frames skipped when necessary
+     ↓
 Lower accumulated latency
 ```
 
@@ -254,120 +239,129 @@ Lower accumulated latency
 
 ## Local Browser Launch
 
-The interface is launched using:
+The verified runner launches with:
 
 ```python
 stream.ui.launch(
     server_name="127.0.0.1",
+    server_port=7860,
     share=False,
     inbrowser=True,
     debug=True,
 )
 ```
 
-Important properties:
+The application successfully opened at:
 
 ```text
-server_name = 127.0.0.1
-share       = False
-inbrowser   = True
+http://127.0.0.1:7860
 ```
 
-This means the application stays local to the machine rather than exposing a public URL.
+The browser webcam permission was granted successfully.
+
+An important practical detail discovered during execution is that the **Record** control in the FastRTC/Gradio interface must be activated to begin the live processing session. After activation, frames were processed continuously and annotated detections appeared in the browser.
 
 ---
 
-## Local vs. Remote Architecture
+## Verified Live Result
 
-### Local Class 14 workflow
+The final live test successfully displayed real-time YOLOv8 detections with Supervision annotations.
 
-```text
-Webcam
-  ↓
-Browser
-  ↓
-127.0.0.1
-  ↓
-FastRTC
-  ↓
-YOLOv8 + Supervision
-  ↓
-Browser
-```
-
-### Remote workflow
-
-A remote/public deployment generally introduces additional concerns such as:
+The saved evidence frame shows:
 
 ```text
-HTTPS
-TURN / STUN
-Remote networking
-Public hosting
-Authentication / access control
+person      0.86
+cell phone  0.74
 ```
 
-The supplied notebook deliberately avoids those complications by remaining local.
+Both objects were surrounded by bounding boxes with class names and confidence scores.
+
+### Evidence Screenshot
+
+![Class 14 live FastRTC detection](./practical/outputs/live_detection_screenshot.jpg)
+
+The screenshot is a real capture from the local execution.
 
 ---
 
-## Troubleshooting from the Notebook
+## Execution Summary
 
-### Local page does not open
+The structured execution result is stored in:
 
-Use the URL printed by Gradio. If port `7860` is already occupied, another available port may be selected.
+[`practical/outputs/execution_summary.json`](./practical/outputs/execution_summary.json)
 
-### Camera does not appear
+It records:
 
-Allow camera access for `127.0.0.1` in the browser and close other applications that may already be using the webcam.
+- real package versions
+- CPU execution
+- model configuration
+- webcam/WebRTC verification
+- YOLOv8 inference verification
+- Supervision annotation verification
+- evidence-frame detections
 
-### CUDA is `False`
+---
 
-The notebook can run on CPU. NVIDIA GPU execution requires a compatible PyTorch/CUDA installation for the local driver.
+## Practical Runner
 
-### Video is delayed
+The verified local script is:
 
-Keep:
+[`practical/run_live_detection.py`](./practical/run_live_detection.py)
 
-```python
-skip_frames=True
+Run it from the repository root with the virtual environment active:
+
+```powershell
+.\.venv\Scripts\python.exe 08-course-notes\14-Supervision-FastRTC\practical\run_live_detection.py
 ```
 
-and, if necessary, reduce:
+---
 
-```python
-IMAGE_SIZE = 480
+## Troubleshooting Observed During the Real Run
+
+### Windows `python` command did not behave correctly
+
+The Windows environment had an application-association issue with the plain `python` command.
+
+The working approach was:
+
+```powershell
+py -3.11 -m venv .venv
 ```
 
-or use a GPU.
+and later using the virtual-environment executable directly:
 
-### Access from another computer
+```powershell
+.\.venv\Scripts\python.exe
+```
 
-`localhost` / `127.0.0.1` only serves the local machine. Remote access would require a different network/deployment configuration.
+### Webcam visible but no annotations
+
+Initially the raw webcam preview was visible but YOLO annotations were not.
+
+The processing pipeline started correctly after activating the FastRTC interface's **Record** control.
+
+### CUDA unavailable
+
+The terminal reported:
+
+```text
+CUDA available: False
+Model: yolov8n.pt | device: cpu
+```
+
+This did not prevent successful live inference.
 
 ---
 
 ## Notebook
 
-The supplied Class 14 notebook is preserved in:
+The supplied Class 14 notebook is preserved at:
 
 [`notebook/class_14_supervision_fastrtc_antigravity.ipynb`](./notebook/class_14_supervision_fastrtc_antigravity.ipynb)
 
-Notebook-specific documentation is available in:
+Notebook-specific documentation:
 
 [`notebook/README.md`](./notebook/README.md)
-
----
-
-## Practical Validation
-
-The source notebook and workflow are documented in the repository. A live webcam execution result has **not yet been claimed as verified** in this repository.
-
-The next practical step is to run the notebook locally in Antigravity, verify the webcam stream, record the environment versions, and save screenshots or other evidence of the working live detection interface.
-
-See:
-
-[`practical/README.md`](./practical/README.md)
 
 ---
 
@@ -381,7 +375,13 @@ See:
 │   ├── README.md
 │   └── class_14_supervision_fastrtc_antigravity.ipynb
 ├── practical/
-│   └── README.md
+│   ├── README.md
+│   ├── requirements.txt
+│   ├── run_live_detection.py
+│   └── outputs/
+│       ├── README.md
+│       ├── execution_summary.json
+│       └── live_detection_screenshot.jpg
 └── references/
     └── README.md
 ```
@@ -390,13 +390,14 @@ See:
 
 ## Key Takeaways
 
-- FastRTC can connect a local webcam to a Python computer vision processing function through WebRTC.
-- YOLOv8 performs the object detection stage.
-- `sv.Detections` keeps the Supervision workflow consistent with previous course sessions.
-- `BoxAnnotator` and `LabelAnnotator` provide real-time visual feedback.
-- Local execution on `127.0.0.1` avoids the additional infrastructure required by public WebRTC deployments.
-- `skip_frames=True` is an important real-time strategy when inference cannot match camera FPS.
-- GPU acceleration is optional because the notebook can fall back to CPU.
+- FastRTC successfully connected the local webcam to a Python computer vision processing function through WebRTC.
+- YOLOv8 performed real-time object detection on incoming webcam frames.
+- `sv.Detections` provided the bridge between Ultralytics results and Supervision.
+- `BoxAnnotator` and `LabelAnnotator` rendered the live visual output.
+- The practical worked on CPU without CUDA.
+- `skip_frames=True` helps keep a real-time workflow responsive when inference is slower than camera frame production.
+- The FastRTC UI session must be activated before frame processing begins.
+- The complete local webcam → FastRTC → YOLOv8 → Supervision → browser workflow was verified successfully.
 
 ---
 
@@ -405,7 +406,11 @@ See:
 **Documentation:** Completed  
 **Class recording:** Added  
 **Notebook:** Added  
-**Live local execution:** Pending verification
+**Practical runner:** Completed  
+**Live local execution:** Completed and verified  
+**Evidence screenshot:** Added  
+**Execution summary:** Added  
+**Class 14:** **Completed**
 
 ---
 
