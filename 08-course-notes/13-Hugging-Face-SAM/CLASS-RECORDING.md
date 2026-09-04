@@ -25,7 +25,7 @@ This recording is used as the primary source for documenting the real Class 13 w
 - Segmentation workflow
 - Troubleshooting and runtime details
 
-The detailed technical notes in the main README will be expanded from the actual class content instead of relying on generic or unverified assumptions.
+The detailed technical notes in the main README are based on the actual class content instead of generic or unverified assumptions.
 
 ## Repository Location
 
@@ -33,7 +33,14 @@ The detailed technical notes in the main README will be expanded from the actual
 08-course-notes/
 └── 13-Hugging-Face-SAM/
     ├── README.md
-    └── CLASS-RECORDING.md
+    ├── CLASS-RECORDING.md
+    ├── notebook/
+    │   ├── README.md
+    │   └── class_13_huggingface_sam.ipynb
+    ├── practical/
+    │   └── README.md
+    └── references/
+        └── README.md
 ```
 
 ## Author
