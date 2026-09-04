@@ -278,7 +278,7 @@ Both objects were surrounded by bounding boxes with class names and confidence s
 
 ### Evidence Screenshot
 
-![Class 14 live FastRTC detection](./practical/outputs/live_detection_screenshot.jpg)
+![Class 14 live FastRTC detection](./practical/outputs/live_detection_screenshot.png)
 
 The screenshot is a real capture from the local execution.
 
@@ -381,7 +381,7 @@ Notebook-specific documentation:
 │   └── outputs/
 │       ├── README.md
 │       ├── execution_summary.json
-│       └── live_detection_screenshot.jpg
+│       └── live_detection_screenshot.png
 └── references/
     └── README.md
 ```
