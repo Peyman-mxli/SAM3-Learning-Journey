@@ -1,10 +1,8 @@
 # Outputs — Class 14 Supervision + FastRTC
 
-This folder is reserved for **real evidence from the local Class 14 webcam run**.
+This folder contains **real evidence from the verified local Class 14 webcam run**.
 
-Do not add fabricated screenshots or manually invented execution results.
-
-## Expected Evidence
+## Verified Evidence
 
 ```text
 outputs/
@@ -13,20 +11,46 @@ outputs/
 └── execution_summary.json
 ```
 
-## Validation Requirements
+## Real Execution Result
 
-A Class 14 run is considered verified when the local application actually demonstrates:
+The Class 14 application was executed locally on Windows through Google Antigravity IDE and FastRTC/Gradio at:
 
-- FastRTC/Gradio opening on a local `127.0.0.1` URL
-- browser webcam permission granted
-- live camera frames received through WebRTC
-- YOLOv8 inference on the incoming frames
+```text
+http://127.0.0.1:7860
+```
+
+The live webcam stream was successfully processed through YOLOv8 and Supervision.
+
+Verified visible detections in the saved evidence frame:
+
+```text
+person      0.86
+cell phone  0.74
+```
+
+The screenshot demonstrates:
+
+- live webcam frames received through WebRTC
+- YOLOv8 inference on incoming frames
 - conversion to `sv.Detections`
-- Supervision bounding boxes rendered
-- labels and confidence scores rendered
-- the real Python/package versions and CPU/GPU device recorded
+- Supervision bounding boxes
+- class labels
+- confidence scores
 
-## Source Notebook Parameters
+## Real Environment
+
+```text
+Python: 3.11.9
+FastRTC: 0.0.34
+Gradio: 5.50.0
+Ultralytics: 8.4.138
+Supervision: 0.30.1
+aiortc: 1.15.0
+CUDA available: False
+Device: CPU
+```
+
+## Model Configuration
 
 ```text
 Model: yolov8n.pt
@@ -37,4 +61,9 @@ Host: 127.0.0.1
 Public sharing: False
 ```
 
-The uploaded course notebook explicitly uses a local Windows/Antigravity workflow and states that local execution does not require Colab, TURN, Twilio, a Hugging Face token, or a public link.
+## Status
+
+**Live execution:** Verified  
+**Detection annotations:** Verified  
+**Evidence captured:** Verified  
+**Class 14 practical:** Completed
