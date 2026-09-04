@@ -79,7 +79,7 @@ practical/
 ├── requirements.txt
 └── outputs/
     ├── README.md
-    ├── live_detection_screenshot.jpg
+    ├── live_detection_screenshot.png
     └── execution_summary.json
 ```
 
