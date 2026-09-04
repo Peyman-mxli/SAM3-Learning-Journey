@@ -1,6 +1,6 @@
 # Practical — Native SAM 3 with Hugging Face
 
-This folder documents the hands-on experiments included in Class 13.
+This folder contains the hands-on execution workflow for Class 13.
 
 ## Practical Flow
 
@@ -21,8 +21,26 @@ masks + boxes + scores
         ↓
 Convert to sv.Detections
         ↓
-MaskAnnotator + LabelAnnotator
+Supervision Annotation
+        ↓
+Save Real Output Artifacts
 ```
+
+## Execution-Ready Runner
+
+The reproducible runner is:
+
+```text
+practical/run_class13.py
+```
+
+Run it from the Class 13 folder after installing the dependencies and authenticating with Hugging Face:
+
+```bash
+python practical/run_class13.py
+```
+
+The script does **not** contain or save a Hugging Face token.
 
 ## Experiments
 
@@ -32,10 +50,37 @@ MaskAnnotator + LabelAnnotator
 4. Side-by-side comparison of text prompts and box prompts
 5. Confidence-threshold comparison at `0.2`, `0.5`, and `0.8`
 
-## Validation Note
+## Real Outputs
 
-The supplied notebook contains the code for these experiments, but the uploaded copy does not include trusted execution outputs that prove every experiment was successfully run in the current repository environment. For that reason, this documentation records the course workflow without inventing numeric results.
+After a successful authenticated execution, the runner saves:
+
+```text
+outputs/
+├── person_text_prompt.jpg
+├── multi_concept_prompt.jpg
+├── yolo_bbox_prompt.jpg
+├── text_vs_bbox_comparison.jpg
+├── threshold_comparison.jpg
+└── execution_summary.json
+```
+
+The JSON summary records the real detection counts and execution environment rather than relying on manually entered values.
+
+## Current Validation Status
+
+The repository now contains an execution-ready workflow, but the actual `facebook/sam3` inference cannot be claimed as completed until the model is loaded under an approved, authenticated Hugging Face account and the generated artifacts are produced.
+
+This distinction is intentional: the repository documents real execution evidence only and does not invent numeric results.
 
 ## Security
 
-The original supplied notebook contained a hard-coded Hugging Face token. The repository version removes it and uses interactive authentication instead.
+`facebook/sam3` is a gated Hugging Face model. Authentication must happen in the execution environment using your own approved account.
+
+Never commit:
+
+- Hugging Face access tokens
+- Colab secret values
+- API keys
+- credential files
+
+The original supplied notebook contained a hard-coded Hugging Face token. The repository version removes it and uses secure authentication instead.
