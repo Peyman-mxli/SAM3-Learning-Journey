@@ -60,7 +60,7 @@ Recommended execution flow:
 ```text
 1. Open the notebook in Google Colab
 2. Enable a GPU runtime
-3. Install and import the required dependencies
+3. Install compatible dependencies
 4. Authenticate with Hugging Face
 5. Load facebook/sam3
 6. Download the test images
@@ -73,6 +73,39 @@ Recommended execution flow:
 ```
 
 The notebook-specific guide is available in [`notebook/README.md`](./notebook/README.md).
+
+---
+
+## Verified Execution
+
+This class has now been successfully executed in Google Colab with the gated native Hugging Face SAM 3 model.
+
+```text
+Model:       facebook/sam3
+GPU:         Tesla T4
+CUDA:        12.8
+Torch:       2.11.0+cu128
+TorchVision: 0.26.0+cu128
+TorchAudio:  2.11.0+cu128
+```
+
+The practical run completed text prompting, multi-concept prompting, YOLOv8 bounding-box prompting, Supervision visualization, and confidence-threshold comparison.
+
+### Verified Results
+
+| Experiment | Result |
+|---|---:|
+| Text prompt `person` | 4 objects |
+| Multi-concept `person + vehicle` | 5 objects |
+| YOLOv8 detection | 6 objects |
+| SAM 3 with YOLO boxes | 6 masks |
+| Threshold `0.2` | 5 objects |
+| Threshold `0.5` | 4 objects |
+| Threshold `0.8` | 4 objects |
+
+YOLOv8 detected one bus, four persons, and one stop sign.
+
+The verified machine-readable summary is stored in [`outputs/execution_summary.json`](./outputs/execution_summary.json).
 
 ---
 
@@ -96,17 +129,19 @@ post_process_instance_segmentation()
 More explicit and flexible
 ```
 
-The notebook specifically presents the native API as useful for broader prompt support, threshold control, batch inference, and direct model weights.
+The native API provides broader prompt support, threshold control, batch inference, and direct access to the model weights.
 
 ---
 
 ## Environment and Dependencies
 
-The notebook installs and uses:
+The notebook uses:
 
 ```text
 transformers
 torch
+torchvision
+torchaudio
 supervision
 ultralytics
 opencv-python
@@ -160,8 +195,6 @@ Never commit a real token to GitHub.
 
 ## Loading Native SAM 3
 
-The processor prepares the inputs expected by the model, while the model generates segmentation predictions.
-
 ```python
 processor = Sam3Processor.from_pretrained("facebook/sam3")
 model = Sam3Model.from_pretrained("facebook/sam3").to(device)
@@ -178,8 +211,6 @@ The first practical example uses:
 Prompt: "person"
 Image:  bus.jpg
 ```
-
-The native inference flow is:
 
 ```python
 inputs = processor(
@@ -202,6 +233,8 @@ results = processor.post_process_instance_segmentation(
     target_sizes=[image_pil.size[::-1]]
 )[0]
 ```
+
+The real run returned **4 objects**, all with masks.
 
 ---
 
@@ -230,8 +263,6 @@ def sam3_a_detections(results: dict) -> sv.Detections:
     )
 ```
 
-Conceptually:
-
 ```text
 GPU Tensor
     ↓
@@ -246,8 +277,6 @@ sv.Detections
 
 ## Supervision Visualization
 
-Once the result becomes `sv.Detections`, Supervision can visualize it exactly like detections from other APIs.
-
 The notebook uses:
 
 ```text
@@ -256,7 +285,7 @@ sv.LabelAnnotator
 sv.ColorLookup.INDEX
 ```
 
-The important architectural idea is:
+The architectural idea remains:
 
 ```text
 Different Model APIs
@@ -270,7 +299,7 @@ Same Visualization Layer
 
 ## Experiment 1 — Multiple Concepts
 
-The notebook tests multiple semantic concepts in one call:
+The notebook tests:
 
 ```python
 text=[["person", "vehicle"]]
@@ -283,21 +312,11 @@ threshold = 0.3
 mask_threshold = 0.3
 ```
 
-The resulting detections are converted to `sv.Detections` and visualized with the same mask pipeline.
+The verified run returned **5 objects**.
 
 ---
 
 ## Experiment 2 — Text vs. Bounding Boxes
-
-The lesson compares two prompting methods.
-
-### Text Prompt
-
-```text
-"person"
-```
-
-### Bounding-Box Prompt
 
 YOLOv8 first detects objects:
 
@@ -318,39 +337,37 @@ inputs_bbox = processor(
 ).to(device)
 ```
 
-This experiment is designed to visually compare masks generated from semantic text prompting against masks generated from detector-provided boxes.
+YOLOv8 detected **6 objects**, and SAM 3 produced **6 masks** from those bounding-box prompts.
 
 ---
 
 ## Experiment 3 — Confidence Threshold
 
-The notebook compares:
+The real comparison produced:
 
 ```text
-threshold = 0.2
-threshold = 0.5
-threshold = 0.8
+threshold = 0.2 → 5 objects
+threshold = 0.5 → 4 objects
+threshold = 0.8 → 4 objects
 ```
 
-The lesson explains the intended trade-off:
-
-```text
-Lower threshold
-      ↓
-More detections
-      ↓
-Potentially more false positives
-
-Higher threshold
-      ↓
-Fewer detections
-      ↓
-Only more confident results
-```
+This demonstrates the expected trade-off: a lower threshold allows more predictions to survive post-processing.
 
 ---
 
 ## Troubleshooting
+
+### PyTorch / TorchAudio CUDA mismatch
+
+During the real Colab run, SAM 3 initially failed to import because PyTorch was built for CUDA 13.0 while TorchAudio was built for CUDA 12.8.
+
+The working solution was to install matching CUDA 12.8 builds:
+
+```text
+Torch:       2.11.0+cu128
+TorchVision: 0.26.0+cu128
+TorchAudio:  2.11.0+cu128
+```
 
 ### Gated model or access denied
 
@@ -370,11 +387,9 @@ Restart the runtime, clear unused variables when needed, and avoid loading unnec
 
 ### Empty detections
 
-A high confidence threshold can remove valid predictions. Test lower thresholds carefully and compare the resulting masks.
+A high confidence threshold can remove valid predictions. Test lower thresholds and compare the masks.
 
 ### Tensor conversion problems
-
-Model outputs running on GPU must be moved to CPU before NumPy conversion:
 
 ```python
 tensor.cpu().numpy()
@@ -382,41 +397,38 @@ tensor.cpu().numpy()
 
 ### Mask or box shape mismatch
 
-Verify that post-processing uses the correct original image size and that masks, boxes, and scores correspond to the same prediction batch.
-
-### Library/API mismatch
-
-If a processor or model method is unavailable, verify the installed `transformers` version and compare it with the version expected by the course notebook.
+Verify that post-processing uses the original image size and that masks, boxes, and scores correspond to the same prediction batch.
 
 ---
 
-## Expected Outputs
+## Real Output Artifacts
 
-The repository does not claim generated results unless they are backed by trusted notebook execution outputs.
-
-When the practical notebook is executed and outputs are intentionally saved, useful artifacts could include:
+The completed Colab execution generated:
 
 ```text
 outputs/
+├── README.md
 ├── person_text_prompt.jpg
 ├── multi_concept_prompt.jpg
 ├── yolo_bbox_prompt.jpg
 ├── text_vs_bbox_comparison.jpg
-└── threshold_comparison.jpg
+├── threshold_comparison.jpg
+└── execution_summary.json
 ```
 
-These filenames describe a recommended organization only; they are not presented as existing results unless they are actually generated and committed later.
+The output guide and verified measurements are documented in [`outputs/README.md`](./outputs/README.md).
 
 ---
 
 ## Key Takeaways
 
 - Hugging Face exposes SAM 3 at a lower and more explicit abstraction level than a high-level wrapper.
-- `Sam3Processor` prepares the image and prompt inputs required by the model.
+- `Sam3Processor` prepares image and prompt inputs for the model.
 - Native outputs require post-processing before they become useful segmentation results.
-- `sv.Detections` provides a common representation that keeps the rest of the Supervision workflow consistent.
-- Text prompts and detector-generated bounding boxes provide different ways to guide segmentation.
-- Confidence thresholds directly affect how many predictions survive post-processing.
+- `sv.Detections` provides a common representation for different model APIs.
+- Text prompts and detector-generated bounding boxes offer different ways to guide segmentation.
+- Lower confidence thresholds can preserve additional predictions.
+- Matching PyTorch ecosystem CUDA builds is important for a stable runtime.
 - Authentication secrets must stay outside committed source code.
 
 ---
@@ -432,7 +444,11 @@ These filenames describe a recommended organization only; they are not presented
 │   ├── README.md
 │   └── class_13_huggingface_sam.ipynb
 ├── practical/
-│   └── README.md
+│   ├── README.md
+│   └── run_class13.py
+├── outputs/
+│   ├── README.md
+│   └── execution_summary.json
 └── references/
     └── README.md
 ```
@@ -453,15 +469,13 @@ The sanitized course notebook is preserved here:
 
 [Open `class_13_huggingface_sam.ipynb`](./notebook/class_13_huggingface_sam.ipynb)
 
-The notebook content is based on the supplied Class 13 course file. Only the exposed Hugging Face token was removed before publication.
+The notebook content is based on the supplied Class 13 course file. The exposed Hugging Face token was removed before publication.
 
 ---
 
 ## Learning Outcome
 
-After studying this session, I understand how to move from a high-level SAM wrapper to the native Hugging Face API, inspect the native segmentation result, transform that result into the common `sv.Detections` representation, and continue using the same Supervision visualization workflow.
-
-I also understand how text prompts, detector-generated bounding boxes, and confidence thresholds can change the segmentation workflow.
+After completing this session, I can load native SAM 3 through Hugging Face, authenticate securely, run semantic text prompting, convert native results into `sv.Detections`, use YOLOv8 bounding boxes as SAM 3 prompts, visualize segmentation masks with Supervision, and analyze the effect of confidence thresholds using verified practical results.
 
 ---
 
