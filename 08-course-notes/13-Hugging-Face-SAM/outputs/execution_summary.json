@@ -1,0 +1,61 @@
+{
+  "model": "facebook/sam3",
+  "device": "cuda",
+  "text_prompt_person": {
+    "prompt": "person",
+    "objects_found": 4,
+    "confidence": [
+      0.9657163,
+      0.9512506,
+      0.97732687,
+      0.9753788
+    ]
+  },
+  "multi_concept_prompt": {
+    "prompt": [
+      "person",
+      "vehicle"
+    ],
+    "objects_found": 5,
+    "confidence": [
+      0.72931856,
+      0.7100393,
+      0.7358877,
+      0.39503664,
+      0.7390171
+    ]
+  },
+  "yolo_detection": {
+    "objects_found": 6,
+    "classes": [
+      "bus",
+      "person",
+      "person",
+      "person",
+      "person",
+      "stop sign"
+    ]
+  },
+  "sam3_bbox_prompt": {
+    "objects_found": 6,
+    "confidence": [
+      0.97003,
+      0.97052,
+      0.95566,
+      0.9465,
+      0.9799,
+      0.94823
+    ]
+  },
+  "threshold_results": {
+    "0.2": {
+      "objects_found": 5
+    },
+    "0.5": {
+      "objects_found": 4
+    },
+    "0.8": {
+      "objects_found": 4
+    }
+  }
+}
