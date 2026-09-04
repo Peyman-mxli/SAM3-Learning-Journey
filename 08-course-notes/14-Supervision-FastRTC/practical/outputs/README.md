@@ -7,7 +7,7 @@ This folder contains **real evidence from the verified local Class 14 webcam run
 ```text
 outputs/
 ├── README.md
-├── live_detection_screenshot.jpg
+├── live_detection_screenshot.png
 └── execution_summary.json
 ```
 
