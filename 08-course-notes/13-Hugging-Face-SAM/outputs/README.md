@@ -1,51 +1,10 @@
 # Outputs — Class 13 Hugging Face + SAM 3
 
-This folder contains **real artifacts produced from an authenticated Google Colab execution of Class 13** using the gated Hugging Face model `facebook/sam3` on a Tesla T4 GPU.
+This folder contains the **real artifacts produced by executing the Class 13 practical workflow** with native SAM 3 through Hugging Face.
 
-The results documented here come from the actual practical run and are not estimated or invented.
+The experiment was run successfully in Google Colab with a Tesla T4 GPU after installing a CUDA-compatible PyTorch stack and authenticating with an approved Hugging Face account.
 
-## Verified Execution
-
-```text
-Model:       facebook/sam3
-Device:      CUDA
-GPU:         Tesla T4
-Image:       bus.jpg
-Runtime:     Google Colab
-```
-
-The working PyTorch stack used during the successful run was:
-
-```text
-Torch:       2.11.0+cu128
-TorchVision: 0.26.0+cu128
-TorchAudio:  2.11.0+cu128
-CUDA:        12.8
-```
-
-## Verified Results
-
-| Experiment | Result |
-|---|---:|
-| Text prompt `person` | 4 objects |
-| Multi-concept prompt `person + vehicle` | 5 objects |
-| YOLOv8 detections | 6 objects |
-| SAM 3 from YOLO bounding boxes | 6 masks |
-| Threshold `0.2` | 5 objects |
-| Threshold `0.5` | 4 objects |
-| Threshold `0.8` | 4 objects |
-
-YOLOv8 detected:
-
-```text
-1 bus
-4 persons
-1 stop sign
-```
-
-## Output Files
-
-The complete Colab run produced:
+## Verified Generated Files
 
 ```text
 outputs/
@@ -58,31 +17,64 @@ outputs/
 └── execution_summary.json
 ```
 
-`execution_summary.json` is committed in this folder and contains the verified numeric results from the run.
+## Verified Results
+
+### Text prompt — `person`
+
+- Objects found: **4**
+- Masks generated: **Yes**
+- Boxes shape: `(4, 4)`
+- Mask shape: `(4, 1080, 810)`
+
+### Multi-concept prompt — `person`, `vehicle`
+
+- Objects found: **5**
+- Masks generated: **Yes**
+- Boxes shape: `(5, 4)`
+- Mask shape: `(5, 1080, 810)`
+
+### YOLOv8 detections
+
+YOLOv8 detected **6 objects**:
+
+- 1 bus
+- 4 persons
+- 1 stop sign
+
+### SAM 3 with YOLO bounding-box prompts
+
+- Objects segmented: **6**
+- Masks generated: **Yes**
+- Boxes shape: `(6, 4)`
+- Mask shape: `(6, 1080, 810)`
+
+### Confidence-threshold comparison
+
+| Threshold | Objects found |
+| ---: | ---: |
+| 0.2 | 5 |
+| 0.5 | 4 |
+| 0.8 | 4 |
 
 ## Artifact Meaning
 
 - `person_text_prompt.jpg` — native SAM 3 segmentation using the text prompt `person`.
-- `multi_concept_prompt.jpg` — SAM 3 segmentation using `person` and `vehicle` in the same request.
-- `yolo_bbox_prompt.jpg` — SAM 3 masks generated from YOLOv8 bounding-box prompts.
-- `text_vs_bbox_comparison.jpg` — side-by-side comparison of native text prompting and YOLO-provided bounding boxes.
-- `threshold_comparison.jpg` — visual comparison at thresholds `0.2`, `0.5`, and `0.8`.
-- `execution_summary.json` — machine-readable verified counts and confidence values.
+- `multi_concept_prompt.jpg` — segmentation using the concepts `person` and `vehicle`.
+- `yolo_bbox_prompt.jpg` — SAM 3 segmentation driven by bounding boxes detected with YOLOv8.
+- `text_vs_bbox_comparison.jpg` — side-by-side visual comparison between text prompting and YOLO bounding-box prompting.
+- `threshold_comparison.jpg` — visual comparison of confidence thresholds `0.2`, `0.5`, and `0.8`.
+- `execution_summary.json` — machine-readable record of the verified execution results.
 
 ## Reproducibility
 
-The practical workflow can be repeated with:
+Use:
 
 ```bash
 python practical/run_class13.py
 ```
 
-The environment must be authenticated with Hugging Face and the account must have approved access to `facebook/sam3`.
-
-## Important Compatibility Note
-
-During the Colab setup, a CUDA mismatch between PyTorch and TorchAudio initially prevented `Sam3Processor` from importing. The working stack was restored by installing matching CUDA 12.8 builds of `torch`, `torchvision`, and `torchaudio`.
+The environment must already be authenticated with Hugging Face and have approved access to `facebook/sam3`.
 
 ## Security
 
-No Hugging Face token, Colab secret value, API key, or credential file is stored in this repository.
+No Hugging Face access token, Colab secret, API key, or credential file is committed to this repository.
