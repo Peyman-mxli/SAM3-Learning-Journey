@@ -1,0 +1,3 @@
+fastrtc==0.0.34
+ultralytics
+supervision
