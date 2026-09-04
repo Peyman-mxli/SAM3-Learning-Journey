@@ -53,6 +53,29 @@ This gives finer control over the model while preserving compatibility with the 
 
 ---
 
+## Quick Start
+
+Recommended execution flow:
+
+```text
+1. Open the notebook in Google Colab
+2. Enable a GPU runtime
+3. Install and import the required dependencies
+4. Authenticate with Hugging Face
+5. Load facebook/sam3
+6. Download the test images
+7. Run text-prompt inference
+8. Post-process the native outputs
+9. Convert the results to sv.Detections
+10. Visualize the masks and labels
+11. Run the YOLOv8 + SAM 3 bounding-box experiment
+12. Compare prompt types and confidence thresholds
+```
+
+The notebook-specific guide is available in [`notebook/README.md`](./notebook/README.md).
+
+---
+
 ## Native API vs. Ultralytics Wrapper
 
 The course notebook contrasts the two approaches:
@@ -327,6 +350,77 @@ Only more confident results
 
 ---
 
+## Troubleshooting
+
+### Gated model or access denied
+
+Make sure the Hugging Face account used for authentication has permission to access `facebook/sam3`.
+
+### Invalid or missing Hugging Face token
+
+Run interactive authentication again and avoid storing the token directly in notebook source code.
+
+### CUDA is unavailable
+
+Check the Colab runtime configuration and confirm that a GPU hardware accelerator is enabled.
+
+### GPU memory error
+
+Restart the runtime, clear unused variables when needed, and avoid loading unnecessary models at the same time.
+
+### Empty detections
+
+A high confidence threshold can remove valid predictions. Test lower thresholds carefully and compare the resulting masks.
+
+### Tensor conversion problems
+
+Model outputs running on GPU must be moved to CPU before NumPy conversion:
+
+```python
+tensor.cpu().numpy()
+```
+
+### Mask or box shape mismatch
+
+Verify that post-processing uses the correct original image size and that masks, boxes, and scores correspond to the same prediction batch.
+
+### Library/API mismatch
+
+If a processor or model method is unavailable, verify the installed `transformers` version and compare it with the version expected by the course notebook.
+
+---
+
+## Expected Outputs
+
+The repository does not claim generated results unless they are backed by trusted notebook execution outputs.
+
+When the practical notebook is executed and outputs are intentionally saved, useful artifacts could include:
+
+```text
+outputs/
+├── person_text_prompt.jpg
+├── multi_concept_prompt.jpg
+├── yolo_bbox_prompt.jpg
+├── text_vs_bbox_comparison.jpg
+└── threshold_comparison.jpg
+```
+
+These filenames describe a recommended organization only; they are not presented as existing results unless they are actually generated and committed later.
+
+---
+
+## Key Takeaways
+
+- Hugging Face exposes SAM 3 at a lower and more explicit abstraction level than a high-level wrapper.
+- `Sam3Processor` prepares the image and prompt inputs required by the model.
+- Native outputs require post-processing before they become useful segmentation results.
+- `sv.Detections` provides a common representation that keeps the rest of the Supervision workflow consistent.
+- Text prompts and detector-generated bounding boxes provide different ways to guide segmentation.
+- Confidence thresholds directly affect how many predictions survive post-processing.
+- Authentication secrets must stay outside committed source code.
+
+---
+
 ## Repository Structure
 
 ```text
@@ -335,6 +429,7 @@ Only more confident results
 ├── README.md
 ├── CLASS-RECORDING.md
 ├── notebook/
+│   ├── README.md
 │   └── class_13_huggingface_sam.ipynb
 ├── practical/
 │   └── README.md
