@@ -67,6 +67,12 @@ This achievement does not mark the end of the journey. It is another validated m
 
 # 🎖️ SAM3 Microcredential — Centro
 
+<p align="center">
+  <a href="https://www.credential.net/510bc07a-36e3-4733-924f-ff61f164c75f#acc.AdLPTpnF">
+    <img src="sam3-microcredential.jpg" alt="SAM3 Computer Vision microcredential badge issued by Centro" width="240">
+  </a>
+</p>
+
 I earned the **SAM 3: Visión Computacional con Segment Anything Model 3 de Meta** microcredential, issued by **Centro**. This credential recognizes my practical work with Segment Anything Model 3 in Computer Vision.
 
 | Item | Details |
