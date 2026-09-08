@@ -69,7 +69,7 @@ This achievement does not mark the end of the journey. It is another validated m
 
 <p align="center">
   <a href="https://www.credential.net/510bc07a-36e3-4733-924f-ff61f164c75f#acc.AdLPTpnF">
-    <img src="sam3-microcredential.jpg" alt="SAM3 Computer Vision microcredential badge issued by Centro" width="240">
+    <img src="../07-assets/screenshots/sam3-microcredential.png" alt="SAM3 Computer Vision microcredential badge issued by Centro" width="240">
   </a>
 </p>
 
