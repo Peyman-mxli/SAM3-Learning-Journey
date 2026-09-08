@@ -65,6 +65,31 @@ This achievement does not mark the end of the journey. It is another validated m
 
 ---
 
+# 🎖️ SAM3 Microcredential — Centro
+
+I earned the **SAM 3: Visión Computacional con Segment Anything Model 3 de Meta** microcredential, issued by **Centro**. This credential recognizes my practical work with Segment Anything Model 3 in Computer Vision.
+
+| Item | Details |
+|---|---|
+| Credential | SAM 3: Visión Computacional con Segment Anything Model 3 de Meta |
+| Issuer | Centro |
+| Issued | September 3, 2026 |
+| Expiration | Does not expire |
+| Credential holder | Peyman Miyandashti |
+| Verification | [View my verified credential](https://www.credential.net/510bc07a-36e3-4733-924f-ff61f164c75f#acc.AdLPTpnF) |
+
+## Skills & Knowledge
+
+Computer Vision · Model Implementation · Data Annotation · Machine Learning · Hugging Face · Segment Anything Model 3 · Image Segmentation · Object Detection · Supervision · YOLO · Python
+
+## Why It Matters
+
+This microcredential is another milestone in my ongoing learning journey. I am continuing to develop my skills through practical projects, experiments, and technical documentation, with the goal of building reliable, real-world AI and Computer Vision solutions.
+
+**[View the official SAM3 microcredential →](https://www.credential.net/510bc07a-36e3-4733-924f-ff61f164c75f#acc.AdLPTpnF)**
+
+---
+
 ## 🔗 Connect
 
 - [GitHub — Peyman-mxli](https://github.com/Peyman-mxli)
